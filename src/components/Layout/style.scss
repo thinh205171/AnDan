@@ -1,0 +1,31 @@
+.search-panel {
+    height: 144px;
+    border: 1px solid #DD1C1C;
+    background-color: #FBF7F7;
+    padding: 12px 32px 0 32px;
+
+    span {
+        font-size: 20px;
+    }
+
+    .search-panel-input {
+        padding-top: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        column-gap: 16px;
+
+        .search-panel-input-textField {
+            width: 100%;
+        }
+
+        .search-panel-icon {
+            width: 100px;
+            height: 56px;
+            background: #4251D5;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+    }
+}

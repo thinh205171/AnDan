@@ -1,0 +1,23 @@
+#pdf-controls {
+    display: none;
+}
+
+.sub-menu-container {
+    margin-top: 32px;
+    background-color: #F8EDED;
+    border: 1px solid #E88F8F;
+    border-radius: 20px;
+
+    #react-doc-viewer {
+        border-radius: 20px;
+
+        #pdf-page-wrapper {
+            border: 1px solid #000000;
+            border-radius: 28px;
+
+            .react-pdf__Page__canvas {
+                border-radius: 28px;
+            }
+        }
+    }
+}
