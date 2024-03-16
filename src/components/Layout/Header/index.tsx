@@ -17,16 +17,16 @@ const Header = () => {
                     <NavLink to="/sub-menu-1">Phụ lục 1</NavLink>
                 </div>
                 <div className="header-nav-bar-item">
-                    <NavLink to="/">Phụ lục 2</NavLink>
+                    <NavLink to="/sub-menu-2">Phụ lục 2</NavLink>
                 </div>
                 <div className="header-nav-bar-item">
-                    <NavLink to="/">Phụ lục 3</NavLink>
+                    <NavLink to="/sub-menu-3">Phụ lục 3</NavLink>
                 </div>
                 <div className="header-nav-bar-item">
-                    <NavLink to="/">Phụ lục 4</NavLink>
+                    <NavLink to="/sub-menu-4">Phụ lục 4</NavLink>
                 </div>
                 <div className="header-nav-bar-item">
-                    <NavLink to="/">Phụ lục 5</NavLink>
+                    <NavLink to="/sub-menu-5">Phụ lục 5</NavLink>
                 </div>
                 <div className="header-nav-bar-item">
                     <NavLink to="/">Bài giảng SCORM</NavLink>

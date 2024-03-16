@@ -1,0 +1,82 @@
+@font-face {
+    font-family: 'Times New Roman';
+    src: url('../../font/font-times-new-roman.ttf') format('truetype');
+}
+
+.sub-menu-container {
+    margin-top: 32px;
+    background-color: #F8EDED;
+    border: 1px solid #E88F8F;
+    border-radius: 20px;
+    font-family: 'Times New Roman', serif;
+    font-size: 14px;
+    padding: 48px 64px;
+
+    .sub-menu-content {
+        background-color: #fff;
+        border: 1px solid #000;
+        border-radius: 28px;
+        max-height: 1000px;
+        overflow-y: auto;
+        scrollbar-width: none;
+        padding: 32px;
+
+        &-header-title {
+            margin-top: 8px;
+            text-align: center;
+            line-height: 20px;
+        }
+
+        &-header-infomation {
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            line-height: 16px;
+        }
+
+        &-title {
+            margin-top: 32px;
+            text-align: center;
+            line-height: 20px;
+        }
+
+        &-main {
+            margin-top: 36px;
+
+            &-feature-item {
+                line-height: 20px;
+                display: flex;
+                justify-content: space-between;
+
+                &:last-child {
+                    justify-content: flex-end;
+                }
+            }
+
+            &-feature-table {
+                margin-top: 12px;
+
+                .table-list-sub-menu {
+                    margin-top: 8px;
+                    border-radius: 0;
+                    box-shadow: none;
+                }
+
+                .add-row-button {
+                    margin-top: 4px;
+                    text-align: center;
+
+                    .add-row-icon {
+                        cursor: pointer;
+                        border: 2px solid #000;
+                    }
+                }
+            }
+        }
+    }
+}
+
+input {
+    border: 0;
+}

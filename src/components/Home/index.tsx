@@ -2,8 +2,10 @@ import './style.scss'
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules"
 import 'swiper/css';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+    const navigate = useNavigate()
     return (
         <div className='home-panel'>
             <div className='home-panel-content'>
@@ -25,23 +27,23 @@ const Home = () => {
                                 loop={true}
                             >
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail')}>
                                     </div>
                                 </SwiperSlide>
                             </Swiper>
@@ -66,23 +68,23 @@ const Home = () => {
                                 loop={true}
                             >
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail')}>
                                     </div>
                                 </SwiperSlide>
                             </Swiper>
@@ -107,23 +109,23 @@ const Home = () => {
                                 loop={true}
                             >
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail')}>
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <div className='sub-menu-content-detail'>
+                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail')}>
                                     </div>
                                 </SwiperSlide>
                             </Swiper>
