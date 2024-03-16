@@ -73,6 +73,23 @@
                     }
                 }
             }
+
+            &-note {
+                margin-top: 24px;
+            }
+
+            &-signature {
+                margin-top: 24px;
+                display: flex;
+                justify-content: space-around;
+
+                .to-truong,
+                .hieu-truong {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+            }
         }
     }
 }

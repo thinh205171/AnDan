@@ -1,89 +1,67 @@
 import React, { useState } from 'react'
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import './style.scss'
-import { Add } from '@mui/icons-material';
+import { Add, Remove } from '@mui/icons-material';
 
-interface Row1 {
-    stt: number | null;
-    thietBiDayHoc: string;
-    soLuong: number | null;
-    baiThiNghiem: string;
-    ghiChu: string;
-}
-interface Row2 {
-    stt: number | null;
-    tenPhong: string;
-    soLuong: number | null;
-    phamViNoiDung: string;
-    ghiChu: string;
-}
-
-interface Row3 {
+interface Row {
     stt: number | null;
     baiHoc: string;
     soTiet: number | null;
-    yeuCau: string;
+    thietBiDayHoc: string;
+    thoiDiem: string;
+    diaDiem: string;
 }
-
-interface Row4 {
-    stt: number | null;
-    chuyenDe: string;
-    soTiet: number | null;
-    yeuCau: string;
-}
-
 
 const SubMenu3Detail = () => {
-    const [rows1, setRows1] = useState<Row1[]>([{ stt: null, thietBiDayHoc: '', soLuong: null, baiThiNghiem: '', ghiChu: '' }]);
-    const [rows2, setRows2] = useState<Row2[]>([{ stt: null, tenPhong: '', soLuong: null, phamViNoiDung: '', ghiChu: '' }]);
-    const [rows3, setRows3] = useState<Row3[]>([{ stt: null, baiHoc: '', soTiet: null, yeuCau: '' }]);
-    const [rows4, setRows4] = useState<Row4[]>([{ stt: null, chuyenDe: '', soTiet: null, yeuCau: '' }]);
+    const [rows1, setRows1] = useState<Row[]>([{ stt: null, baiHoc: '', thietBiDayHoc: '', soTiet: null, thoiDiem: '', diaDiem: '' }]);
+    const [rows2, setRows2] = useState<Row[]>([{ stt: null, baiHoc: '', thietBiDayHoc: '', soTiet: null, thoiDiem: '', diaDiem: '' }]);
     const handleAddRow1 = () => {
         const newRow = {
             stt: null,
+            baiHoc: '',
             thietBiDayHoc: '',
-            soLuong: null,
-            baiThiNghiem: '',
-            ghiChu: ''
+            soTiet: null,
+            thoiDiem: '',
+            diaDiem: ''
         };
         setRows1([...rows1, newRow]);
     };
+
     const handleAddRow2 = () => {
         const newRow = {
             stt: null,
-            tenPhong: '',
-            soLuong: null,
-            phamViNoiDung: '',
-            ghiChu: ''
+            baiHoc: '',
+            thietBiDayHoc: '',
+            soTiet: null,
+            thoiDiem: '',
+            diaDiem: ''
         };
         setRows2([...rows2, newRow]);
     };
-    const handleAddRow3 = () => {
-        const newRow = {
-            stt: null,
-            baiHoc: '',
-            soTiet: null,
-            yeuCau: '',
-        };
-        setRows3([...rows3, newRow]);
+
+    const handleRemoveRow1 = () => {
+        if (rows1.length > 1) {
+            const updatedRows = [...rows1];
+            updatedRows.pop();
+            setRows1(updatedRows);
+        }
     };
-    const handleAddRow4 = () => {
-        const newRow = {
-            stt: null,
-            chuyenDe: '',
-            soTiet: null,
-            yeuCau: '',
-        };
-        setRows4([...rows4, newRow]);
+
+    const handleRemoveRow2 = () => {
+        if (rows2.length > 1) {
+            const updatedRows = [...rows2];
+            updatedRows.pop();
+            setRows2(updatedRows);
+        }
     };
     return (
         <div className='sub-menu-container'>
             <div className='sub-menu-content'>
                 <div className="sub-menu-content-header">
-                    <strong className='phu-luc'>Phụ lục I</strong>
+                    <strong className='phu-luc'>Phụ lục III</strong>
                     <div className="sub-menu-content-header-title">
                         <strong className="sub-menu-content-header-title-main">
-                            KHUNG KẾ HOẠCH DẠY HỌC MÔN HỌC CỦA TỔ CHUYÊN MÔN
+                            KHUNG KẾ HOẠCH DẠY HỌC MÔN HỌC CỦA GIÁO VIÊN
                         </strong>
                         <div className="sub-menu-content-header-title-sub">
                             <i>(Kèm theo Công văn số 5512/BGDĐT-GDTrH ngày 18 tháng 12 năm 2020 của Bộ GDĐT)</i>
@@ -93,6 +71,7 @@ const SubMenu3Detail = () => {
                         <div className='sub-menu-content-header-infomation-detail' >
                             <div style={{ display: "flex" }}> <div><strong>TRƯỜNG: </strong><input type="text" placeholder='...........' /></div></div>
                             <div style={{ display: "flex" }}> <div><strong>TỔ: </strong><input type="text" placeholder='...........' /></div></div>
+                            <div style={{ display: "flex" }}> <div>Họ và tên giáo viên:<input type="text" placeholder='...........' /></div></div>
                         </div>
                         <div className='sub-menu-content-header-infomation-slogan'>
                             <div> <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></div>
@@ -102,53 +81,34 @@ const SubMenu3Detail = () => {
                 </div>
 
                 <div className="sub-menu-content-title">
-                    <div><strong>KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN</strong></div>
+                    <div><strong>KẾ HOẠCH DẠY HỌC CỦA GIÁO VIÊN</strong></div>
                     <div style={{ display: "flex", justifyContent: "center" }}>
-                        <div><strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong><input type="text" placeholder='..............' style={{ width: "50px" }} /></div>
-                        <div><strong>, KHỐI LỚP</strong><input type="number" placeholder='...........' style={{ width: "50px" }} /></div>
+                        <div>
+                            <strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong>
+                            <input type="text" placeholder='..............' style={{ width: "50px" }} />
+                            <strong>, LỚP</strong>
+                            <input type="text" placeholder='..............' style={{ width: "50px" }} />
+                        </div>
                     </div>
-                    <div>(Năm học 20<input type="text" placeholder='...........' style={{ width: "15x" }} /> - 20<input type="text" placeholder='...........' style={{ width: "15px" }} />)</div>
+                    <div>(Năm học 20<input type="text" placeholder='...........' style={{ width: "15px" }} /> - 20<input type="text" placeholder='...........' style={{ width: "15px" }} />)</div>
                 </div>
 
                 <div className='sub-menu-content-main'>
                     <div className="sub-menu-content-main-feature">
-                        <div className="sub-menu-content-main-feature-item-last">
-                            <div><strong>I. Đặc điểm tình hình</strong></div>
-                        </div>
                         <div className="sub-menu-content-main-feature-item">
-                            <div><strong>1. Số lớp: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                            <div><strong>Số học sinh: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                            <div><strong>Số học sinh học chuyên để lựa chọn</strong>(nếu có)<input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                        </div>
-                        <div className="sub-menu-content-main-feature-item">
-                            <div><strong>2. Tình hình đội ngũ: </strong></div>
-                            <div><strong>Số giáo viên: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                            <div style={{ display: "flex" }}>
-                                <strong>Trình độ đào tạo:</strong>
-                                <div style={{ marginLeft: "6px" }}><strong>Cao đẳng: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                                <div><strong>; Đại học: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                                <div><strong>; Trên đại học: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                            </div>
-                        </div>
-                        <div className="sub-menu-content-main-feature-item" style={{ justifyContent: "flex-end" }}>
-                            <div><strong>Mức độ đạt chuẩn nghề nghiệp giáo viên:  </strong></div>
-                            <div style={{ display: "flex" }}>
-                                <div>Tốt: <input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                                <div>; Khá: <input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                                <div>; Chưa đạt: <input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                            </div>
+                            <div><strong>I. Phân phối chương trình</strong></div>
                         </div>
                         <div className="sub-menu-content-main-feature-table">
-                            <div><strong>3. Thiết bị dạy học </strong> (Trình bày cụ thể các thiết bị dạy học có thể sử dụng để tổ chức dạy học môn học/hoạt động giáo dục)</div>
                             <TableContainer component={Paper} className="table-list-sub-menu">
                                 <Table sx={{ minWidth: 450, fontSize: '12px', border: 1 }} aria-label="simple table" >
                                     <TableHead>
                                         <TableRow sx={{ 'th': { border: 1 } }}>
                                             <TableCell align="center">STT</TableCell>
-                                            <TableCell align="center">Thiết bị dạy học</TableCell>
-                                            <TableCell align="center">Số lượng</TableCell>
-                                            <TableCell align="center">Các bài thí nghiệm thực hành</TableCell>
-                                            <TableCell align="center">Ghi chú</TableCell>
+                                            <TableCell align="center">Bài học <br />(1)</TableCell>
+                                            <TableCell align="center">Số tiết <br />(2)</TableCell>
+                                            <TableCell align="center">Thời điểm <br />(3)</TableCell>
+                                            <TableCell align="center">Thiết bị dạy học <br />(4)</TableCell>
+                                            <TableCell align="center">Địa điểm dạy học<br />(5)</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -156,8 +116,40 @@ const SubMenu3Detail = () => {
                                             <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                 <TableCell align="center">{index + 1}</TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
+                                                    <textarea
+                                                        value={row.baiHoc}
+                                                        onChange={(e) => {
+                                                            const newValue = e.target.value;
+                                                            const updatedRows = [...rows1];
+                                                            updatedRows[index].baiHoc = newValue;
+                                                            setRows1(updatedRows);
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <textarea
+                                                        value={row.soTiet ?? ''}
+                                                        onChange={(e) => {
+                                                            const newValue = parseInt(e.target.value);
+                                                            const updatedRows = [...rows1];
+                                                            updatedRows[index].soTiet = newValue;
+                                                            setRows1(updatedRows);
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <textarea
+                                                        value={row.thoiDiem}
+                                                        onChange={(e) => {
+                                                            const newValue = e.target.value;
+                                                            const updatedRows = [...rows1];
+                                                            updatedRows[index].thoiDiem = newValue;
+                                                            setRows1(updatedRows);
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <textarea
                                                         value={row.thietBiDayHoc}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
@@ -168,37 +160,12 @@ const SubMenu3Detail = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="number"
-                                                        value={row.soLuong ?? ''}
-                                                        onChange={(e) => {
-                                                            const newValue = parseInt(e.target.value);
-                                                            const updatedRows = [...rows1];
-                                                            updatedRows[index].soLuong = newValue;
-                                                            setRows1(updatedRows);
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <input
-                                                        type="text"
-                                                        value={row.baiThiNghiem}
+                                                    <textarea
+                                                        value={row.diaDiem}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
                                                             const updatedRows = [...rows1];
-                                                            updatedRows[index].baiThiNghiem = newValue;
-                                                            setRows1(updatedRows);
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <input
-                                                        type="text"
-                                                        value={row.ghiChu}
-                                                        onChange={(e) => {
-                                                            const newValue = e.target.value;
-                                                            const updatedRows = [...rows1];
-                                                            updatedRows[index].ghiChu = newValue;
+                                                            updatedRows[index].diaDiem = newValue;
                                                             setRows1(updatedRows);
                                                         }}
                                                     />
@@ -210,19 +177,26 @@ const SubMenu3Detail = () => {
                             </TableContainer>
                             <div className='add-row-button'>
                                 <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddRow1} />
+                                <Remove style={{ color: "black" }} className='add-row-icon' onClick={handleRemoveRow1} />
                             </div>
                         </div>
+                    </div>
+
+                    <div className="sub-menu-content-main-feature">
+                        <div className="sub-menu-content-main-feature-item">
+                            <div><strong>2. Chuyên đề lựa chọn</strong>(đối với cấp trung học phổ thông)</div>
+                        </div>
                         <div className="sub-menu-content-main-feature-table">
-                            <div><strong>4. Phòng học bộ môn/phòng thí nghiệm/phòng đa năng/sân chơi, bài tập</strong> (Trình bày cụ thể các phòng thí nghiệm/phòng bộ môn/phòng đa năng/sân chơi/bãi tập có thể sử dụng để tổ chức dạy học môn học/hoạt động giáo dục)</div>
                             <TableContainer component={Paper} className="table-list-sub-menu">
                                 <Table sx={{ minWidth: 450, fontSize: '12px', border: 1 }} aria-label="simple table" >
                                     <TableHead>
                                         <TableRow sx={{ 'th': { border: 1 } }}>
                                             <TableCell align="center">STT</TableCell>
-                                            <TableCell align="center">Thiết bị dạy học</TableCell>
-                                            <TableCell align="center">Số lượng</TableCell>
-                                            <TableCell align="center">Các bài thí nghiệm thực hành</TableCell>
-                                            <TableCell align="center">Ghi chú</TableCell>
+                                            <TableCell align="center">Bài học <br />(1)</TableCell>
+                                            <TableCell align="center">Số tiết <br />(2)</TableCell>
+                                            <TableCell align="center">Thời điểm <br />(3)</TableCell>
+                                            <TableCell align="center">Thiết bị dạy học <br />(4)</TableCell>
+                                            <TableCell align="center">Địa điểm dạy học<br />(5)</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -230,49 +204,56 @@ const SubMenu3Detail = () => {
                                             <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                 <TableCell align="center">{index + 1}</TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
-                                                        value={row.tenPhong}
+                                                    <textarea
+                                                        value={row.baiHoc}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
                                                             const updatedRows = [...rows2];
-                                                            updatedRows[index].tenPhong = newValue;
+                                                            updatedRows[index].baiHoc = newValue;
                                                             setRows2(updatedRows);
                                                         }}
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="number"
-                                                        value={row.soLuong ?? ''}
+                                                    <textarea
+                                                        value={row.soTiet ?? ''}
                                                         onChange={(e) => {
                                                             const newValue = parseInt(e.target.value);
                                                             const updatedRows = [...rows2];
-                                                            updatedRows[index].soLuong = newValue;
+                                                            updatedRows[index].soTiet = newValue;
                                                             setRows2(updatedRows);
                                                         }}
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
-                                                        value={row.phamViNoiDung}
+                                                    <textarea
+                                                        value={row.thoiDiem}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
                                                             const updatedRows = [...rows2];
-                                                            updatedRows[index].phamViNoiDung = newValue;
+                                                            updatedRows[index].thoiDiem = newValue;
                                                             setRows2(updatedRows);
                                                         }}
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
-                                                        value={row.ghiChu}
+                                                    <textarea
+                                                        value={row.thietBiDayHoc}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
                                                             const updatedRows = [...rows2];
-                                                            updatedRows[index].ghiChu = newValue;
+                                                            updatedRows[index].thietBiDayHoc = newValue;
+                                                            setRows2(updatedRows);
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <textarea
+                                                        value={row.diaDiem}
+                                                        onChange={(e) => {
+                                                            const newValue = e.target.value;
+                                                            const updatedRows = [...rows2];
+                                                            updatedRows[index].diaDiem = newValue;
                                                             setRows2(updatedRows);
                                                         }}
                                                     />
@@ -284,135 +265,47 @@ const SubMenu3Detail = () => {
                             </TableContainer>
                             <div className='add-row-button'>
                                 <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddRow2} />
+                                <Remove style={{ color: "black" }} className='add-row-icon' onClick={handleRemoveRow2} />
                             </div>
                         </div>
                     </div>
 
+                    <div className="sub-menu-content-main-note">
+                        <div><i>(1) Tên bài học/chuyên đề được xây dựng từ nội dung/chủ đề (được lấy nguyên hoặc thiết kê lại phù hợp với điều kiện thực
+                            tê của nhà trường) theo chương trùnh, sách giáo khoa môn họchoạt động giáo dục. </i></div>
+                        <div><i>(2) Số tiết được sử dụng đề thực hiện bài dạy/chuyên đề.</i></div>
+                        <div><i>(3) Tuần thực hiện bài học/chuyên đề.</i></div>
+                        <div><i>(4) Thiết bị dạy học được sử dụng để tổ chức dạy học.</i></div>
+                        <div><i>(5) Địa điểm tổ chức hoạt động dạy học (lớp học, phòng học bộ môn, phòng đa năng, bãi tập, tại di sản, thực địa...).</i></div>
+                    </div>
+
                     <div className="sub-menu-content-main-feature">
-                        <div className="sub-menu-content-main-feature-item-last">
-                            <div><strong>II. Kế hoạch dạy học</strong></div>
+                        <div className="sub-menu-content-main-feature-item"><strong>II. Nhiệm vụ khác (nếu có)</strong>(Bồi dưỡng học sinh giỏi; Tổ chức hoạt động giáo dục)</div>
+                        <div style={{ marginTop: "12px" }}>
+                            <textarea
+                                style={{ width: "100%", border: 0, lineHeight: "24px" }} rows={5}
+                                placeholder="................................................................................................................................................................................................................................................................................................................................................
+                                "
+                            />
                         </div>
-                        <div className="sub-menu-content-main-feature-table">
-                            <div><strong>1. Phân phối chương trình </strong></div>
-                            <TableContainer component={Paper} className="table-list-sub-menu">
-                                <Table sx={{ minWidth: 450, fontSize: '12px', border: 1 }} aria-label="simple table" >
-                                    <TableHead>
-                                        <TableRow sx={{ 'th': { border: 1 } }}>
-                                            <TableCell align="center">STT</TableCell>
-                                            <TableCell align="center">Bài học</TableCell>
-                                            <TableCell align="center">Số tiết</TableCell>
-                                            <TableCell align="center">Yêu cầu cần đạt</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {rows3.map((row, index) => (
-                                            <TableRow key={index} sx={{ 'td': { border: 1 } }}>
-                                                <TableCell align="center">{index + 1}</TableCell>
-                                                <TableCell align="center">
-                                                    <input
-                                                        type="text"
-                                                        value={row.baiHoc}
-                                                        onChange={(e) => {
-                                                            const newValue = e.target.value;
-                                                            const updatedRows = [...rows3];
-                                                            updatedRows[index].baiHoc = newValue;
-                                                            setRows3(updatedRows);
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <input
-                                                        type="number"
-                                                        value={row.soTiet ?? ''}
-                                                        onChange={(e) => {
-                                                            const newValue = parseInt(e.target.value);
-                                                            const updatedRows = [...rows3];
-                                                            updatedRows[index].soTiet = newValue;
-                                                            setRows3(updatedRows);
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <input
-                                                        type="text"
-                                                        value={row.yeuCau}
-                                                        onChange={(e) => {
-                                                            const newValue = e.target.value;
-                                                            const updatedRows = [...rows3];
-                                                            updatedRows[index].yeuCau = newValue;
-                                                            setRows3(updatedRows);
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                            <div className='add-row-button'>
-                                <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddRow3} />
-                            </div>
+                    </div>
+                    <div className="sub-menu-content-main-signature">
+                        <div className='to-truong'>
+                            <div><strong>TỔ TRƯỞNG</strong></div>
+                            <div><i>(Ký và ghi rõ họ tên)</i></div>
                         </div>
-                        <div className="sub-menu-content-main-feature-table">
-                            <div><strong>2. Chuyên đề lựa chọn (đối với cấp trung học phổ thông)</strong></div>
-                            <TableContainer component={Paper} className="table-list-sub-menu">
-                                <Table sx={{ minWidth: 450, fontSize: '12px', border: 1 }} aria-label="simple table" >
-                                    <TableHead>
-                                        <TableRow sx={{ 'th': { border: 1 } }}>
-                                            <TableCell align="center">STT</TableCell>
-                                            <TableCell align="center">Chuyên đề</TableCell>
-                                            <TableCell align="center">Số tiết</TableCell>
-                                            <TableCell align="center">Yêu cầu cần đạt</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {rows4.map((row, index) => (
-                                            <TableRow key={index} sx={{ 'td': { border: 1 } }}>
-                                                <TableCell align="center">{index + 1}</TableCell>
-                                                <TableCell align="center">
-                                                    <input
-                                                        type="text"
-                                                        value={row.chuyenDe}
-                                                        onChange={(e) => {
-                                                            const newValue = e.target.value;
-                                                            const updatedRows = [...rows4];
-                                                            updatedRows[index].chuyenDe = newValue;
-                                                            setRows4(updatedRows);
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <input
-                                                        type="number"
-                                                        value={row.soTiet ?? ''}
-                                                        onChange={(e) => {
-                                                            const newValue = parseInt(e.target.value);
-                                                            const updatedRows = [...rows4];
-                                                            updatedRows[index].soTiet = newValue;
-                                                            setRows4(updatedRows);
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <input
-                                                        type="text"
-                                                        value={row.yeuCau}
-                                                        onChange={(e) => {
-                                                            const newValue = e.target.value;
-                                                            const updatedRows = [...rows4];
-                                                            updatedRows[index].yeuCau = newValue;
-                                                            setRows4(updatedRows);
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                            <div className='add-row-button'>
-                                <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddRow4} />
+                        <div className="hieu-truong">
+                            <div>
+                                <input type="number" placeholder='...' style={{ width: "15px" }} />
+                                , ngày   <input type="number" placeholder='...' style={{ width: "15px" }} />
+                                , tháng   <input type="number" placeholder='...' style={{ width: "15px" }} />
+                                , năm   <input type="number" placeholder='...' style={{ width: "15px" }} />
+                                20   <input type="number" placeholder='...' style={{ width: "15px" }} />
                             </div>
+                            <div>
+                                <strong>HIỆU TRƯỞNG</strong>
+                            </div>
+                            <div><i>(Ký và ghi rõ họ tên)</i></div>
                         </div>
                     </div>
                 </div>

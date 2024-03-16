@@ -46,8 +46,8 @@
 
             &-feature-item {
                 line-height: 20px;
-                display: flex;
-                justify-content: space-between;
+                display: block !important;
+                margin-top: 12px;
 
                 &:last-child {
                     justify-content: flex-end;

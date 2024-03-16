@@ -44,7 +44,7 @@ const LeftSubNavBar = () => {
                                     <>
                                         <div key={index} className='sub-nav-bar-item-content-folder-name'>
                                             <Square style={{ color: "#5E97DA", width: "17px", height: "17px" }} />
-                                            <img src="icon/OpenFolder.svg" alt='folder' style={{ width: "25px", height: "21" }} />
+                                            <img src="/icon/OpenFolder.svg" alt='folder' style={{ width: "25px", height: "21" }} />
                                             <div>{folder.name}</div>
                                         </div>
                                         {
@@ -52,14 +52,14 @@ const LeftSubNavBar = () => {
                                                 <>
                                                     <div className='sub-nav-bar-item-content-folder-grade' key={index}>
                                                         <Square style={{ color: "#5E97DA", width: "17px", height: "17px" }} />
-                                                        <img src="icon/OpenFolder.svg" alt='folder' style={{ width: "25px", height: "21" }} />
+                                                        <img src="/icon/OpenFolder.svg" alt='folder' style={{ width: "25px", height: "21" }} />
                                                         <div>{grade.grade}</div>
                                                     </div>
                                                     {
                                                         grade.courses.map((course, index) => (
                                                             <div className='sub-nav-bar-item-content-folder-course'>
                                                                 <Square style={{ color: "#5E97DA", width: "17px", height: "17px" }} />
-                                                                <img src="icon/OpenFolder.svg" alt='folder' style={{ width: "25px", height: "21" }} />
+                                                                <img src="/icon/OpenFolder.svg" alt='folder' style={{ width: "25px", height: "21" }} />
                                                                 {course}
                                                             </div>
                                                         ))

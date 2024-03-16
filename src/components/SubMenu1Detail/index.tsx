@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import './style.scss'
-import { Add } from '@mui/icons-material';
+import { Add, Remove } from '@mui/icons-material';
 
 interface Row1 {
     stt: number | null;
@@ -76,6 +76,38 @@ const SubMenu1Detail = () => {
         };
         setRows4([...rows4, newRow]);
     };
+
+    const handleRemoveRow1 = () => {
+        if (rows1.length > 1) {
+            const updatedRows = [...rows1];
+            updatedRows.pop();
+            setRows1(updatedRows);
+        }
+    };
+
+    const handleRemoveRow2 = () => {
+        if (rows2.length > 1) {
+            const updatedRows = [...rows2];
+            updatedRows.pop();
+            setRows2(updatedRows);
+        }
+    };
+
+    const handleRemoveRow3 = () => {
+        if (rows1.length > 1) {
+            const updatedRows = [...rows3];
+            updatedRows.pop();
+            setRows3(updatedRows);
+        }
+    };
+
+    const handleRemoveRow4 = () => {
+        if (rows1.length > 1) {
+            const updatedRows = [...rows4];
+            updatedRows.pop();
+            setRows4(updatedRows);
+        }
+    };
     return (
         <div className='sub-menu-container'>
             <div className='sub-menu-content'>
@@ -107,7 +139,7 @@ const SubMenu1Detail = () => {
                         <div><strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong><input type="text" placeholder='..............' style={{ width: "50px" }} /></div>
                         <div><strong>, KHỐI LỚP</strong><input type="number" placeholder='...........' style={{ width: "50px" }} /></div>
                     </div>
-                    <div>(Năm học 20<input type="text" placeholder='...........' style={{ width: "15x" }} /> - 20<input type="text" placeholder='...........' style={{ width: "15px" }} />)</div>
+                    <div>(Năm học 20<input type="text" placeholder='...........' style={{ width: "15px" }} /> - 20<input type="text" placeholder='...........' style={{ width: "15px" }} />)</div>
                 </div>
 
                 <div className='sub-menu-content-main'>
@@ -156,8 +188,7 @@ const SubMenu1Detail = () => {
                                             <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                 <TableCell align="center">{index + 1}</TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
+                                                    <textarea
                                                         value={row.thietBiDayHoc}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
@@ -168,8 +199,7 @@ const SubMenu1Detail = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="number"
+                                                    <textarea
                                                         value={row.soLuong ?? ''}
                                                         onChange={(e) => {
                                                             const newValue = parseInt(e.target.value);
@@ -180,8 +210,7 @@ const SubMenu1Detail = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
+                                                    <textarea
                                                         value={row.baiThiNghiem}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
@@ -192,8 +221,7 @@ const SubMenu1Detail = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
+                                                    <textarea
                                                         value={row.ghiChu}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
@@ -210,6 +238,7 @@ const SubMenu1Detail = () => {
                             </TableContainer>
                             <div className='add-row-button'>
                                 <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddRow1} />
+                                <Remove style={{ color: "black" }} className='add-row-icon' onClick={handleRemoveRow1} />
                             </div>
                         </div>
                         <div className="sub-menu-content-main-feature-table">
@@ -230,8 +259,7 @@ const SubMenu1Detail = () => {
                                             <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                 <TableCell align="center">{index + 1}</TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
+                                                    <textarea
                                                         value={row.tenPhong}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
@@ -242,8 +270,7 @@ const SubMenu1Detail = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="number"
+                                                    <textarea
                                                         value={row.soLuong ?? ''}
                                                         onChange={(e) => {
                                                             const newValue = parseInt(e.target.value);
@@ -254,8 +281,7 @@ const SubMenu1Detail = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
+                                                    <textarea
                                                         value={row.phamViNoiDung}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
@@ -266,8 +292,7 @@ const SubMenu1Detail = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
+                                                    <textarea
                                                         value={row.ghiChu}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
@@ -284,6 +309,7 @@ const SubMenu1Detail = () => {
                             </TableContainer>
                             <div className='add-row-button'>
                                 <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddRow2} />
+                                <Remove style={{ color: "black" }} className='add-row-icon' onClick={handleRemoveRow2} />
                             </div>
                         </div>
                     </div>
@@ -309,20 +335,10 @@ const SubMenu1Detail = () => {
                                             <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                 <TableCell align="center">{index + 1}</TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
-                                                        value={row.baiHoc}
-                                                        onChange={(e) => {
-                                                            const newValue = e.target.value;
-                                                            const updatedRows = [...rows3];
-                                                            updatedRows[index].baiHoc = newValue;
-                                                            setRows3(updatedRows);
-                                                        }}
-                                                    />
+                                                    <textarea name="" id="" style={{ width: "100%", border: 0 }}></textarea>
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="number"
+                                                    <textarea
                                                         value={row.soTiet ?? ''}
                                                         onChange={(e) => {
                                                             const newValue = parseInt(e.target.value);
@@ -333,8 +349,7 @@ const SubMenu1Detail = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
+                                                    <textarea
                                                         value={row.yeuCau}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
@@ -351,6 +366,7 @@ const SubMenu1Detail = () => {
                             </TableContainer>
                             <div className='add-row-button'>
                                 <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddRow3} />
+                                <Remove style={{ color: "black" }} className='add-row-icon' onClick={handleRemoveRow3} />
                             </div>
                         </div>
                         <div className="sub-menu-content-main-feature-table">
@@ -370,8 +386,7 @@ const SubMenu1Detail = () => {
                                             <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                 <TableCell align="center">{index + 1}</TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
+                                                    <textarea
                                                         value={row.chuyenDe}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
@@ -382,8 +397,7 @@ const SubMenu1Detail = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="number"
+                                                    <textarea
                                                         value={row.soTiet ?? ''}
                                                         onChange={(e) => {
                                                             const newValue = parseInt(e.target.value);
@@ -394,8 +408,7 @@ const SubMenu1Detail = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <input
-                                                        type="text"
+                                                    <textarea
                                                         value={row.yeuCau}
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
@@ -412,6 +425,7 @@ const SubMenu1Detail = () => {
                             </TableContainer>
                             <div className='add-row-button'>
                                 <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddRow4} />
+                                <Remove style={{ color: "black" }} className='add-row-icon' onClick={handleRemoveRow4} />
                             </div>
                         </div>
                     </div>
