@@ -22,15 +22,19 @@ const App = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/sub-menu-1" element={<SubMenu1Page />} />
-          <Route path="/sub-menu-1/detail" element={<SubMenu1DetailPage />} />
+          <Route path="/sub-menu-1/detail-edit" element={<SubMenu1DetailPage />} />
+          <Route path="/sub-menu-1/detail-view" element={<SubMenu1DetailPage />} />
           <Route path="/sub-menu-2" element={<SubMenu2Page />} />
-          <Route path="/sub-menu-2/detail" element={<SubMenu2DetailPage />} />
+          <Route path="/sub-menu-2/detail-edit" element={<SubMenu2DetailPage />} />
+          <Route path="/sub-menu-2/detail-view" element={<SubMenu2DetailPage />} />
           <Route path="/sub-menu-3" element={<SubMenu3Page />} />
-          <Route path="/sub-menu-3/detail" element={<SubMenu3DetailPage />} />
+          <Route path="/sub-menu-3/detail-edit" element={<SubMenu3DetailPage />} />
+          <Route path="/sub-menu-3/detail-view" element={<SubMenu3DetailPage />} />
           <Route path="/sub-menu-4" element={<SubMenu4Page />} />
-          <Route path="/sub-menu-4/detail" element={<SubMenu4DetailPage />} />
+          <Route path="/sub-menu-4/detail-edit" element={<SubMenu4DetailPage />} />
+          <Route path="/sub-menu-4/detail-view" element={<SubMenu4DetailPage />} />
           <Route path="/sub-menu-5" element={<SubMenu5Page />} />
-          <Route path="/sub-menu-5/detail" element={<SubMenu5DetailPage />} />
+          <Route path="/sub-menu-5/detail-edit" element={<SubMenu5DetailPage />} />
         </Routes>
       </div>
     </Router>
