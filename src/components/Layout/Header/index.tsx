@@ -29,7 +29,7 @@ const Header = () => {
                     <NavLink to="/sub-menu-5">Phụ lục 5</NavLink>
                 </div>
                 <div className="header-nav-bar-item">
-                    <NavLink to="/">Bài giảng SCORM</NavLink>
+                    <NavLink to="/bai-giang-scrom">Bài giảng SCORM</NavLink>
                 </div>
                 <div className="header-nav-bar-item">
                     <NavLink to="/">Thoát</NavLink>

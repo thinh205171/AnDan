@@ -1,0 +1,41 @@
+import React from 'react'
+import { Link, useNavigate } from 'react-router-dom';
+import { Remove } from '@mui/icons-material';
+import './style.scss'
+
+const ScromType = () => {
+    const subMenu = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const navigate = useNavigate()
+    const handleRemoveSubMenu = () => {
+
+    }
+    return (
+        <div className='scrom-panel'>
+            <div className='scrom-panel-content'>
+                <div className="scrom-panel-content-sub-menu">
+                    <div className="scrom-panel-content-sub-menu-list">
+                        <div className="scrom-panel-content-sub-menu-item-name">
+                            <div className='add-row-button'>
+                                <Link to="/upload-bai-giang">Đưa eleaning lên</Link>
+                            </div>
+                        </div>
+                        <div className='grade-name'>Violet</div>
+                        <div className="scrom-panel-content-sub-menu-item-content-grid">
+                            {
+                                subMenu?.map((item, index) => (
+                                    <div key={index} className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
+                                        <div className="remove-row-button">
+                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default ScromType
