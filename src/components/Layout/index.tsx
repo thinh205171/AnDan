@@ -11,11 +11,10 @@ const Layout = ({ children }: { children: ReactNode }) => {
     return (
         <div>
             <Header />
-            <Grid container spacing={2}>
+            <Grid container spacing={2} style={{ marginTop: "100px" }}>
                 <LeftSubNavBar />
-
                 <Grid item xs={8} style={{ padding: "24px 64px" }}>
-                    <div className="search-panel">
+                    {/* <div className="search-panel">
                         <span>Search</span>
                         <div className='search-panel-input'>
                             <TextField id="outlined-basic" label="Tìm kiếm" variant="outlined" className='search-panel-input-textField' />
@@ -23,7 +22,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
                                 <SearchOutlined style={{ color: "#fff" }} />
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                     {children}
                 </Grid>
 

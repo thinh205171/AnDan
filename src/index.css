@@ -15,3 +15,35 @@ code {
 .MuiTableCell-root {
   padding: 12px !important;
 }
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "SVN-Poppins", Arial, sans-serif !important;
+}
+
+body {
+  background: #f2f6fc;
+
+  .container {
+    margin: 0 auto;
+    padding: 0 15px;
+
+    @media (min-width: 769px) {
+      width: 750px;
+    }
+    
+    @media (min-width: 992px) {
+      width: 970px;
+    }
+    
+    @media (min-width: 1200px) {
+      width: 1270px;
+    }
+  }
+
+  a {
+    text-decoration: none;
+  }
+}

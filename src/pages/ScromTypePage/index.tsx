@@ -2,7 +2,7 @@ import React from 'react'
 import Layout from '../../components/Layout'
 import ScromType from '../../components/ScromType'
 
-const ScromPage = () => {
+const ScromTypePage = () => {
     return (
         <Layout>
             <ScromType />
@@ -10,4 +10,4 @@ const ScromPage = () => {
     )
 }
 
-export default ScromPage
+export default ScromTypePage

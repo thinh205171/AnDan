@@ -1,7 +1,7 @@
 import { Grid } from '@mui/material'
 import React from 'react'
 import '../style.scss'
-import { Square } from '@mui/icons-material'
+import { Article, Folder, Note, Square } from '@mui/icons-material'
 
 const LeftSubNavBar = () => {
     const folders = [
@@ -43,23 +43,20 @@ const LeftSubNavBar = () => {
                                 folders.map((folder, index) => (
                                     <>
                                         <div key={index} className='sub-nav-bar-item-content-folder-name'>
-                                            <Square style={{ color: "#5E97DA", width: "17px", height: "17px" }} />
-                                            <img src="/icon/OpenFolder.svg" alt='folder' style={{ width: "25px", height: "21" }} />
+                                            <Folder style={{ width: "30", height: "30", color: "orange" }} />
                                             <div>{folder.name}</div>
                                         </div>
                                         {
                                             folder.grades.map((grade, index) => (
                                                 <>
                                                     <div className='sub-nav-bar-item-content-folder-grade' key={index}>
-                                                        <Square style={{ color: "#5E97DA", width: "17px", height: "17px" }} />
-                                                        <img src="/icon/OpenFolder.svg" alt='folder' style={{ width: "25px", height: "21" }} />
+                                                        <Note style={{ width: "30", height: "30", color: "#008DDA" }} />
                                                         <div>{grade.grade}</div>
                                                     </div>
                                                     {
                                                         grade.courses.map((course, index) => (
                                                             <div className='sub-nav-bar-item-content-folder-course'>
-                                                                <Square style={{ color: "#5E97DA", width: "17px", height: "17px" }} />
-                                                                <img src="/icon/OpenFolder.svg" alt='folder' style={{ width: "25px", height: "21" }} />
+                                                                <Article style={{ width: "30", height: "30", color: "#EFB38E" }} />
                                                                 {course}
                                                             </div>
                                                         ))

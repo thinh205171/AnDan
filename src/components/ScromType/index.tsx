@@ -10,17 +10,17 @@ const ScromType = () => {
 
     }
     return (
-        <div className='scrom-panel'>
-            <div className='scrom-panel-content'>
-                <div className="scrom-panel-content-sub-menu">
-                    <div className="scrom-panel-content-sub-menu-list">
-                        <div className="scrom-panel-content-sub-menu-item-name">
+        <div className='scrom-type-panel'>
+            <div className='scrom-type-panel-content'>
+                <div className="scrom-type-panel-content-sub-menu">
+                    <div className="scrom-type-panel-content-sub-menu-list">
+                        <div className="scrom-type-panel-content-sub-menu-item-name">
                             <div className='add-row-button'>
                                 <Link to="/upload-bai-giang">Đưa eleaning lên</Link>
                             </div>
                         </div>
                         <div className='grade-name'>Violet</div>
-                        <div className="scrom-panel-content-sub-menu-item-content-grid">
+                        <div className="scrom-type-panel-content-sub-menu-item-content-grid">
                             {
                                 subMenu?.map((item, index) => (
                                     <div key={index} className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
