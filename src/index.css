@@ -47,3 +47,13 @@ body {
     text-decoration: none;
   }
 }
+
+.button-mui {
+  background-color: #E2BFB3 !important;
+  color: #000 !important;
+  font-weight: 600 !important;
+
+  &:hover {
+      background-color: #FFB38E !important;
+  }
+}

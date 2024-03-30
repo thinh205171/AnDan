@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
-import { Add, Remove } from '@mui/icons-material';
+import { Add } from '@mui/icons-material';
 import './style.scss'
 
 const SubMenu1 = () => {
@@ -10,9 +10,7 @@ const SubMenu1 = () => {
     const handleAddSubMenu = () => {
         navigate("/sub-menu-1/detail-edit")
     }
-    const handleRemoveSubMenu = () => {
 
-    }
     return (
         <div className='home-panel1'>
             <div className='home-panel1-content'>
@@ -33,9 +31,6 @@ const SubMenu1 = () => {
                                         {
                                             subMenu?.map((item, index) => (
                                                 <div key={index} className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-                                                    <div className="remove-row-button">
-                                                        <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                                    </div>
                                                 </div>
                                             ))
                                         }

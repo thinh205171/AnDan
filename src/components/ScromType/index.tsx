@@ -6,9 +6,7 @@ import './style.scss'
 const ScromType = () => {
     const subMenu = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     const navigate = useNavigate()
-    const handleRemoveSubMenu = () => {
 
-    }
     return (
         <div className='scrom-type-panel'>
             <div className='scrom-type-panel-content'>
@@ -24,9 +22,7 @@ const ScromType = () => {
                             {
                                 subMenu?.map((item, index) => (
                                     <div key={index} className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 ))
                             }

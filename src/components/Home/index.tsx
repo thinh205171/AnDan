@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules"
 import 'swiper/css';
 import { useNavigate } from 'react-router-dom';
-import { Add, Remove } from '@mui/icons-material';
+import { Add } from '@mui/icons-material';
 
 const Home = () => {
     const navigate = useNavigate()
@@ -19,9 +19,7 @@ const Home = () => {
         navigate("/sub-menu-3/detail-edit")
     }
 
-    const handleRemoveSubMenu = () => {
 
-    }
     return (
         <div className='home-panel'>
             <div className='home-panel-content'>
@@ -49,37 +47,27 @@ const Home = () => {
                             >
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                             </Swiper>
@@ -110,37 +98,27 @@ const Home = () => {
                             >
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                             </Swiper>
@@ -171,37 +149,27 @@ const Home = () => {
                             >
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail-view')}>j
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                                 <SwiperSlide>
                                     <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail-view')}>
-                                        <div className="remove-row-button">
-                                            <Remove style={{ color: "black" }} className='remove-row-icon' onClick={handleRemoveSubMenu} />
-                                        </div>
+
                                     </div>
                                 </SwiperSlide>
                             </Swiper>

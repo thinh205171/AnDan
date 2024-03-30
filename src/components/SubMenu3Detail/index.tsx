@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import './style.scss'
 import { Add, Remove } from '@mui/icons-material';
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
@@ -18,13 +18,41 @@ const SubMenu3Detail = () => {
     const location = useLocation()
     const [rows1, setRows1] = useState<Row[]>([{ stt: null, baiHoc: '', thietBiDayHoc: '', soTiet: null, thoiDiem: '', diaDiem: '' }]);
     const [rows2, setRows2] = useState<Row[]>([{ stt: null, baiHoc: '', thietBiDayHoc: '', soTiet: null, thoiDiem: '', diaDiem: '' }]);
+    const [login, setLogin] = useState(false);
     const [open, setOpen] = useState(false);
+    const [openDownload, setOpenDownload] = useState(false);
+    const [openReport, setOpenReport] = useState(false);
+    const [openFeedback, setOpenFeedback] = useState(false);
     const handleClickOpen = () => {
         setOpen(true);
     };
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const handleClickOpenDownload = () => {
+        setOpenDownload(true);
+    };
+
+    const handleCloseDownload = () => {
+        setOpenDownload(false);
+    };
+
+    const handleClickOpenReport = () => {
+        setOpenReport(true);
+    };
+
+    const handleCloseReport = () => {
+        setOpenReport(false);
+    };
+
+    const handleClickOpenFeedback = () => {
+        setOpenFeedback(true);
+    };
+
+    const handleCloseFeedback = () => {
+        setOpenFeedback(false);
     };
     const docs = [{ uri: require("./phuluc3.pdf") }]
 
@@ -343,11 +371,11 @@ const SubMenu3Detail = () => {
                         <div className="sub-menu-infomation">
                             <div className="sub-menu-row">
                                 <div><i>(Tài liệu chưa được thẩm định)</i></div>
-                                <div className='right-action'><strong><u className='underline-blue'>Nhấn vào đây để tải về</u></strong></div>
+                                <div className='right-action' onClick={handleClickOpenDownload}><strong><u className='underline-blue'>Nhấn vào đây để tải về</u></strong></div>
                             </div>
                             <div className="sub-menu-row">
                                 <div><strong>Nguồn: </strong> https://baigiang.violet.vn</div>
-                                <div className='right-action'><strong><u className='underline-blue'>Báo tài liệu có sai sót</u></strong></div>
+                                <div className='right-action' onClick={handleClickOpenReport}><strong><u className='underline-blue'>Báo tài liệu có sai sót</u></strong></div>
                             </div>
                             <div className="sub-menu-row">
                                 <div><strong>Người gửi: </strong> <u className='underline-blue'>Sam Dung</u></div>
@@ -365,7 +393,7 @@ const SubMenu3Detail = () => {
                             </div>
                             <div className="sub-menu-row">
                                 <div><strong>Dung lượng: </strong> 19/9 KB</div>
-                                <div className='right-action'></div>
+                                <div className='right-action' onClick={handleClickOpenFeedback}><strong><u className='underline-blue'>Đi đến phụ lục đánh giá của bài dạy</u></strong></div>
                             </div>
                             <div className="sub-menu-row">
                                 <div><strong>Số lượt tải: </strong>25</div>
@@ -412,6 +440,126 @@ const SubMenu3Detail = () => {
                     <Button onClick={handleClose} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
                     <Button onClick={handleClose} className='button-mui' autoFocus>
                         Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openDownload}
+                onClose={handleCloseDownload}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+
+            >
+                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
+                    Tải về thư mục
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", fontWeight: 600, marginBottom: "12px" }}>
+                        Chú ý khi tải tài liệu:
+                    </DialogContentText>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
+                        Tài liệu học tập này chỉ dành cho mục đích giáo dục và nghiên cứu. Việc sử dụng không đúng mục đích,
+                        bao gồm nhưng không giới hạn ở việc sao chép, phân phối lại, hoặc sử dụng thương mại mà không có sự cho phép
+                        của tác giả, là vi phạm bản quyền và có thể dẫn đến hậu quả pháp lý. Người sử dụng phải chịu trách nhiệm đầy
+                        đủ về việc tuân thủ các quy định liên quan đến bản quyền và sử dụng hợp pháp của tài liệu.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions >
+                    <Button onClick={handleCloseDownload} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
+                    <Button onClick={handleCloseDownload} className='button-mui' autoFocus>
+                        Tiếp tục tải
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openReport}
+                onClose={handleCloseReport}
+                maxWidth={"md"}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+
+            >
+                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
+                    Báo cáo tài liệu
+                </DialogTitle>
+
+                {
+                    login ? (
+                        <>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
+                                    <div className="report-row">
+                                        <div className='report-title'>Tài liệu</div>
+                                        <div className='report-detail'>
+                                            Giáo án tài liệu A
+                                        </div>
+                                    </div>
+                                    <div className="report-row">
+                                        <div className='report-title'>
+                                            Lý do báo cáo
+                                        </div>
+                                        <div className='report-detail' style={{ display: "flex", flexDirection: "column" }}>
+                                            <FormControlLabel value="" control={<Radio />} label="Có lỗi kỹ thuật ..." />
+                                            <FormControlLabel value="" control={<Radio />} label="Không dùng để dạy học" />
+                                            <FormControlLabel value="" control={<Radio />} label="Vi phạm bản quyền" />
+                                            <FormControlLabel value="" control={<Radio />} label="Lý do khác" />
+                                        </div>
+                                    </div>
+                                    <div className="report-row">
+                                        <div className='report-title'>Chi tiết lỗi</div>
+                                        <div className='report-detail'>
+                                            <span style={{ whiteSpace: "nowrap" }}>Đề nghị cung cấp lý do và chỉ ra các điểm không chính xác</span>
+                                            <br />
+                                            <textarea name="" id="" rows={10} />
+                                        </div>
+                                    </div>
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions >
+                                <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
+                                <Button onClick={handleCloseReport} className='button-mui' autoFocus>
+                                    Gửi báo cáo
+                                </Button>
+                            </DialogActions></>
+                    ) : (
+                        <>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", fontWeight: 600, marginBottom: "12px" }}>
+                                    Bạn cần đăng nhập để thực hiện chức năng
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions >
+                                <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
+                                <Button onClick={() => setLogin(true)} className='button-mui' autoFocus>
+                                    Đăng nhập
+                                </Button>
+                            </DialogActions>
+                        </>
+                    )
+                }
+            </Dialog>
+            <Dialog
+                open={openFeedback}
+                onClose={handleCloseFeedback}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+
+            >
+                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
+                    Chuyển tới đánh giá
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", fontWeight: 600, marginBottom: "12px" }}>
+                        Chú ý trước khi chuyển trang:
+                    </DialogContentText>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
+                        Đảm bảo thông tin bài dạy được lưu lại theo đúng mong muốn trước khi chuyển sang bước đánh giá bài dạy !
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions >
+                    <Button onClick={handleCloseFeedback} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
+                    <Button onClick={handleCloseFeedback} className='button-mui' autoFocus>
+                        Click vào đây để sang phụ lục 5
                     </Button>
                 </DialogActions>
             </Dialog>
