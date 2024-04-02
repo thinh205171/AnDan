@@ -8,7 +8,6 @@
     background-color: #F8EDED;
     border: 1px solid #E88F8F;
     border-radius: 20px;
-    font-family: 'Times New Roman', serif;
     font-size: 14px;
     padding: 48px 64px;
 
@@ -19,6 +18,7 @@
         max-height: 1000px;
         overflow-y: auto;
         scrollbar-width: none;
+        font-family: 'Times New Roman', serif !important;
         padding: 32px;
 
         &-header-title {
@@ -168,5 +168,13 @@ input {
 
     textarea {
         width: 100%;
+    }
+}
+
+.action-button {
+    cursor: pointer;
+
+    &:hover {
+        background-color: #eed3bc !important;
     }
 }

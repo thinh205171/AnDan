@@ -17,6 +17,9 @@ const SubMenu1 = () => {
                 <div className="home-panel1-content-sub-menu">
                     <div className="home-panel1-content-sub-menu-list">
                         <div className="home-panel1-content-sub-menu-item-name">
+                            <div>
+                                Phụ lục 1
+                            </div>
                             <div className='add-row-button'>
                                 <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu} />
                             </div>

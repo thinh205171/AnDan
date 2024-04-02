@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import './style.scss'
 
-const UploadScrom = () => {
+const UploadPhuLuc4 = () => {
     const [tieuDe, setTieuDe] = useState('')
     const [fileDoc, setFileDoc] = useState<File | null>(null)
     const [avatar, setAvatar] = useState<File | null>(null)
@@ -105,4 +105,4 @@ const UploadScrom = () => {
     )
 }
 
-export default UploadScrom
+export default UploadPhuLuc4

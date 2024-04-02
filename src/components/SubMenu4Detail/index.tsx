@@ -1,83 +1,174 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './style.scss'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Radio } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
 
 const SubMenu4Detail = () => {
+    const navigate = useNavigate();
+    const [login, setLogin] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [openReport, setOpenReport] = useState(false);
+    const [openFeedback, setOpenFeedback] = useState(false);
+
+    const handleClickOpenReport = () => {
+        setOpenReport(true);
+    };
+
+    const handleCloseReport = () => {
+        setOpenReport(false);
+    };
+
+    const handleClickOpenFeedback = () => {
+        setOpenFeedback(true);
+    };
+
+    const handleCloseFeedback = () => {
+        setOpenFeedback(false);
+    };
+
+    const docs = [{ uri: require("./phuluc4.pdf") }]
 
     return (
         <div className='sub-menu-container'>
-            <div className='sub-menu-content'>
-                <div className="sub-menu-content-header">
-                    <strong className='phu-luc'>Phụ lục IV</strong>
-                    <div className="sub-menu-content-header-title">
-                        <strong className="sub-menu-content-header-title-main">
-                            KHUNG KẾ HOẠCH DẠY BÀI DẠY
-                        </strong>
-                        <div className="sub-menu-content-header-title-sub">
-                            <i>(Kèm theo Công văn số 5512/BGDĐT-GDTrH ngày 18 tháng 12 năm 2020 của Bộ GDĐT)</i>
-                        </div>
-                    </div>
-                    <div className="sub-menu-content-header-infomation">
-                        <div className='sub-menu-content-header-infomation-detail' >
-                            <div style={{ display: "flex" }}> <div><strong>TRƯỜNG: </strong><input type="text" placeholder='...........' /></div></div>
-                            <div style={{ display: "flex" }}> <div><strong>TỔ: </strong><input type="text" placeholder='...........' /></div></div>
-                        </div>
-                        <div className='sub-menu-content-header-infomation-slogan'>
-                            <div> Họ và tên giáo viên:<div>
-                                <div><input type="text" placeholder='............................' style={{ width: "100px" }} /></div>
-                            </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="sub-menu-content-title">
-                        <div><strong>TÊN BÀI DẠY <input type="text" placeholder='..................................' /></strong></div>
-                        <div style={{ display: "flex", justifyContent: "center" }}>
-                            <div><strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong><input type="text" placeholder='..............' style={{ width: "50px" }} /></div>
-                            <div><strong>, LỚP</strong><input type="number" placeholder='...........' style={{ width: "50px" }} /></div>
-                        </div>
-                        <div>Thời gian thức hiện <input type="number" placeholder="...." style={{ width: "25px" }} />(số tiết)</div>
-                    </div>
+            <DocViewer documents={docs} pluginRenderers={DocViewerRenderers}
+                config={{
+                    header: {
+                        disableHeader: true,
+                        disableFileName: true,
+                        retainURLParams: true,
+                    },
+                    pdfVerticalScrollByDefault: true,
+                }}
+            />
 
-                    <div className='sub-menu-content-main'>
-                        <div className="sub-menu-content-main-feature">
-                            <div className="sub-menu-content-main-feature-item">
-                                <div><strong>I. Mục tiêu</strong></div>
-                                <div><strong>1. Về kiến thức: </strong>Nêu cụ thể nội dung kiến thức học sinh cần học trong bài
-                                    theo yêu cầu cần đạt của nội dung giáo dục/chủ đề tương ứng trong chương trình môn học/hoạt động giáo dục
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="sub-menu-content-main-feature">
-                            <div className="sub-menu-content-main-feature-item">
-                                <div><strong>II. Thiết bị dạy học và học liệu</strong></div>
-                                <div>
-                                    Nêu cụ thể các thiết bị dạy học và học liệu được sử dụng trong bài dạy để tổ
-                                    chức cho học simh hoạt động nhăm đạt được mục tiêu, yêu cầu của bài dạy (muốn
-                                    hình thành phâm chất, năng lực nào thì hoạt động học phải tương ứng và phù hợp).
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="sub-menu-content-main-feature">
-                            <div className="sub-menu-content-main-feature-item">
-                                <div><strong>III. Tiến trình dạy học </strong></div>
-                                <div>
-                                    <strong>1. Hoạt động 1: Xác định vấn đề/ nhiệm vụ học tập/ Mở đầu </strong>
-                                    (ghi rõ tên thể hiện kết quả hoạt động)
-                                </div>
-                                <div>
-                                    (a) Mục tiêu:
-                                    <i>
-                                        Vếu mục tiêu giúp học sinh xác định được vấn đề/nhiệm vụ cụ thể
-                                        cân giải quyết trong bài học hoặc xác định rõ cách thức giải quyết vân đê thực
-                                        hiện nhiệm vụ trong các hoạt động tiếp theo của bài học.
-                                    </i>
-                                </div>
-                            </div>
+            <div className="sub-menu-infomation">
+                <div className="sub-menu-row">
+                    <div><i>(Tài liệu chưa được thẩm định)</i></div>
+                </div>
+                <div className="sub-menu-row">
+                    <div><strong>Nguồn: </strong> https://baigiang.violet.vn</div>
+                    <div className='right-action' onClick={handleClickOpenReport}><strong><u className='underline-blue'>Báo tài liệu có sai sót</u></strong></div>
+                </div>
+                <div className="sub-menu-row">
+                    <div><strong>Người gửi: </strong> <u className='underline-blue'>Sam Dung</u></div>
+                    <div className='right-action'><strong><u className='underline-blue'>Nhắn tin cho tác giả</u></strong></div>
+                </div>
+                <div className="sub-menu-row">
+                    <div><strong>Ngày gửi: </strong> 10h:34' 14-01-2024</div>
+                    <div className='right-action'>
+                        <div className='share-facebook'>
+                            <img src="/facebook-circle-svgrepo-com.svg" alt="SVG" />
+                            <span>Chia sẻ</span>
+                            <span>0</span>
                         </div>
                     </div>
                 </div>
-            </div >
+                <div className="sub-menu-row">
+                    <div><strong>Dung lượng: </strong> 19/9 KB</div>
+                    <div className='right-action' onClick={handleClickOpenFeedback}><strong><u className='underline-blue'>Đi đến phụ lục đánh giá của bài dạy</u></strong></div>
+                </div>
+                <div className="sub-menu-row">
+                    <div><strong>Số lượt tải: </strong>25</div>
+                    <div className='right-action'></div>
+                </div>
+                <div className="sub-menu-row">
+                    <div><strong>Số lượt thích: </strong> 0 người</div>
+                    <div className='right-action'></div>
+                </div>
+            </div>
+            <Dialog
+                open={openReport}
+                onClose={handleCloseReport}
+                maxWidth={"md"}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+
+            >
+                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
+                    Báo cáo tài liệu
+                </DialogTitle>
+
+                {
+                    login ? (
+                        <>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
+                                    <div className="report-row">
+                                        <div className='report-title'>Tài liệu</div>
+                                        <div className='report-detail'>
+                                            Giáo án tài liệu A
+                                        </div>
+                                    </div>
+                                    <div className="report-row">
+                                        <div className='report-title'>
+                                            Lý do báo cáo
+                                        </div>
+                                        <div className='report-detail' style={{ display: "flex", flexDirection: "column" }}>
+                                            <FormControlLabel value="" control={<Radio />} label="Có lỗi kỹ thuật ..." />
+                                            <FormControlLabel value="" control={<Radio />} label="Không dùng để dạy học" />
+                                            <FormControlLabel value="" control={<Radio />} label="Vi phạm bản quyền" />
+                                            <FormControlLabel value="" control={<Radio />} label="Lý do khác" />
+                                        </div>
+                                    </div>
+                                    <div className="report-row">
+                                        <div className='report-title'>Chi tiết lỗi</div>
+                                        <div className='report-detail'>
+                                            <span style={{ whiteSpace: "nowrap" }}>Đề nghị cung cấp lý do và chỉ ra các điểm không chính xác</span>
+                                            <br />
+                                            <textarea name="" id="" rows={10} />
+                                        </div>
+                                    </div>
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions >
+                                <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
+                                <Button onClick={handleCloseReport} className='button-mui' autoFocus>
+                                    Gửi báo cáo
+                                </Button>
+                            </DialogActions></>
+                    ) : (
+                        <>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", fontWeight: 600, marginBottom: "12px" }}>
+                                    Bạn cần đăng nhập để thực hiện chức năng
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions >
+                                <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
+                                <Button onClick={() => setLogin(true)} className='button-mui' autoFocus>
+                                    Đăng nhập
+                                </Button>
+                            </DialogActions>
+                        </>
+                    )
+                }
+            </Dialog>
+            <Dialog
+                open={openFeedback}
+                onClose={handleCloseFeedback}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+
+            >
+                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
+                    Chuyển tới đánh giá
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", fontWeight: 600, marginBottom: "12px" }}>
+                        Chú ý trước khi chuyển trang:
+                    </DialogContentText>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
+                        Đảm bảo thông tin bài dạy được lưu lại theo đúng mong muốn trước khi chuyển sang bước đánh giá bài dạy !
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions >
+                    <Button onClick={handleCloseFeedback} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
+                    <Button onClick={() => navigate('/sub-menu-5')} className='button-mui' autoFocus>
+                        Click vào đây để sang phụ lục 5
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div >
     )
 }

@@ -20,7 +20,11 @@ code {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "SVN-Poppins", Arial, sans-serif !important;
+  /* font-family: "SVN-Poppins", Arial, sans-serif; */
+}
+
+sub-menu-content {
+  font-family: 'Times New Roman', serif !important;
 }
 
 body {

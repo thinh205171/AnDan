@@ -16,6 +16,7 @@ import SubMenu5DetailPage from './pages/SubMenu5Detail';
 import ScromPage from './pages/ScromPage';
 import ScromTypePage from './pages/ScromTypePage';
 import UploadScromPage from './pages/UploadScromPage';
+import UploadPhuLuc4Page from './pages/UploadPhuLuc4Page';
 
 const App = () => {
   return (
@@ -37,10 +38,12 @@ const App = () => {
           <Route path="/sub-menu-4/detail-edit" element={<SubMenu4DetailPage />} />
           <Route path="/sub-menu-4/detail-view" element={<SubMenu4DetailPage />} />
           <Route path="/sub-menu-5" element={<SubMenu5Page />} />
+          <Route path="/sub-menu-5/detail-view" element={<SubMenu5DetailPage />} />
           <Route path="/sub-menu-5/detail-edit" element={<SubMenu5DetailPage />} />
           <Route path="/bai-giang-scrom" element={<ScromPage />} />
           <Route path="/bai-giang-scrom/:type" element={<ScromTypePage />} />
           <Route path="/upload-bai-giang" element={<UploadScromPage />} />
+          <Route path="/upload-sub-menu-4" element={<UploadPhuLuc4Page />} />
         </Routes>
       </div>
     </Router>

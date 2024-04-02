@@ -7,9 +7,6 @@ const SubMenu4 = () => {
     const grades = [6, 7, 8, 9]
     const subMenu = [1, 2, 3];
     const navigate = useNavigate()
-    const handleAddSubMenu = () => {
-        navigate("/sub-menu-4/detail-edit")
-    }
 
     return (
         <div className='home-panel4'>
@@ -17,8 +14,9 @@ const SubMenu4 = () => {
                 <div className="home-panel4-content-sub-menu">
                     <div className="home-panel4-content-sub-menu-list">
                         <div className="home-panel4-content-sub-menu-item-name">
+                            <div>Phụ lục 4</div>
                             <div className='add-row-button'>
-                                <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu} />
+                                <Add style={{ color: "black" }} className='add-row-icon' onClick={() => navigate('/upload-sub-menu-4')} />
                             </div>
                         </div>
                         {

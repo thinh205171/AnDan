@@ -1,10 +1,10 @@
-import React, { useMemo, useRef, useState } from 'react'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useMemo, useState } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import './style.scss'
 import { Add, Remove } from '@mui/icons-material';
 import { useLocation } from 'react-router-dom';
-import { data } from '../PhuLuc/phuluc1';
-import { Editor } from '@tinymce/tinymce-react';
+import DocViewer, { PDFRenderer } from '@cyntler/react-doc-viewer';
 
 interface Row1 {
     stt: number | null;
@@ -43,10 +43,24 @@ const SubMenu1Detail = () => {
     const [rows4, setRows4] = useState<Row4[]>([{ stt: null, chuyenDe: '', soTiet: null, yeuCau: '' }]);
     const [login, setLogin] = useState(false);
     const [open, setOpen] = useState(false);
-    const [openDownload, setOpenDownload] = useState(false);
     const [openReport, setOpenReport] = useState(false);
-    const [openFeedback, setOpenFeedback] = useState(false);
-    const editorRef = useRef<Editor | null>(null);
+
+    const [truong, setTruong] = useState('');
+    const [to, setTo] = useState('');
+    const [hoadDong, setHoatDong] = useState('');
+    const [khoiLop, setKhoiLop] = useState('');
+    const [startYear, setStartYear] = useState('');
+    const [endYear, setEndYear] = useState('');
+    const [soLop, setSoLop] = useState('');
+    const [soHocSinh, setSoHocSinh] = useState('');
+    const [soHocSinhChuyenDe, setSoHocSinhChuyenDe] = useState('');
+    const [soGiaoVien, setSoGiaoVien] = useState('');
+    const [caoDang, setCaoDang] = useState('');
+    const [daiHoc, setDaiHoc] = useState('');
+    const [trenDaiHoc, setTrenDaiHoc] = useState('');
+    const [tot, setTot] = useState('');
+    const [kha, setKha] = useState('');
+    const [chuaDat, setChuaDat] = useState('');
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -56,28 +70,12 @@ const SubMenu1Detail = () => {
         setOpen(false);
     };
 
-    const handleClickOpenDownload = () => {
-        setOpenDownload(true);
-    };
-
-    const handleCloseDownload = () => {
-        setOpenDownload(false);
-    };
-
     const handleClickOpenReport = () => {
         setOpenReport(true);
     };
 
     const handleCloseReport = () => {
         setOpenReport(false);
-    };
-
-    const handleClickOpenFeedback = () => {
-        setOpenFeedback(true);
-    };
-
-    const handleCloseFeedback = () => {
-        setOpenFeedback(false);
     };
 
     const docs = useMemo(() => [
@@ -154,6 +152,10 @@ const SubMenu1Detail = () => {
             setRows4(updatedRows);
         }
     };
+
+    const displayRow1 = () => {
+        setOpen(false)
+    }
     return (
         <div className='sub-menu-container'>
             {
@@ -172,8 +174,8 @@ const SubMenu1Detail = () => {
                                 </div>
                                 <div className="sub-menu-content-header-infomation">
                                     <div className='sub-menu-content-header-infomation-detail' >
-                                        <div style={{ display: "flex" }}> <div><strong>TRƯỜNG: </strong><input type="text" placeholder='...........' /></div></div>
-                                        <div style={{ display: "flex" }}> <div><strong>TỔ: </strong><input type="text" placeholder='...........' /></div></div>
+                                        <div style={{ display: "flex" }}> <div><strong>TRƯỜNG: </strong><input type="text" placeholder='...........' onChange={e => setTruong(e.target.value)} /></div></div>
+                                        <div style={{ display: "flex" }}> <div><strong>TỔ: </strong><input type="text" placeholder='...........' onChange={e => setTo(e.target.value)} /></div></div>
                                     </div>
                                     <div className='sub-menu-content-header-infomation-slogan'>
                                         <div> <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></div>
@@ -185,10 +187,10 @@ const SubMenu1Detail = () => {
                             <div className="sub-menu-content-title">
                                 <div><strong>KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN</strong></div>
                                 <div style={{ display: "flex", justifyContent: "center" }}>
-                                    <div><strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong><input type="text" placeholder='..............' style={{ width: "50px" }} /></div>
-                                    <div><strong>, KHỐI LỚP</strong><input type="number" placeholder='...........' style={{ width: "50px" }} /></div>
+                                    <div><strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong><input type="text" placeholder='..............' style={{ width: "50px" }} onChange={e => setHoatDong(e.target.value)} /></div>
+                                    <div><strong>, KHỐI LỚP</strong><input type="number" placeholder='...........' style={{ width: "50px" }} onChange={e => setKhoiLop(e.target.value)} /></div>
                                 </div>
-                                <div>(Năm học 20<input type="text" placeholder='...........' style={{ width: "15px" }} /> - 20<input type="text" placeholder='...........' style={{ width: "15px" }} />)</div>
+                                <div>(Năm học 20<input type="text" placeholder='...........' style={{ width: "15px" }} onChange={e => setStartYear(e.target.value)} /> - 20<input type="text" placeholder='...........' style={{ width: "15px" }} onChange={e => setEndYear(e.target.value)} />)</div>
                             </div>
 
                             <div className='sub-menu-content-main'>
@@ -197,26 +199,26 @@ const SubMenu1Detail = () => {
                                         <div><strong>I. Đặc điểm tình hình</strong></div>
                                     </div>
                                     <div className="sub-menu-content-main-feature-item">
-                                        <div><strong>1. Số lớp: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                                        <div><strong>Số học sinh: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                                        <div><strong>Số học sinh học chuyên để lựa chọn</strong>(nếu có)<input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
+                                        <div><strong>1. Số lớp: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} onChange={e => setSoLop(e.target.value)} /></div>
+                                        <div><strong>Số học sinh: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} onChange={e => setSoHocSinh(e.target.value)} /></div>
+                                        <div><strong>Số học sinh học chuyên để lựa chọn</strong>(nếu có)<input type="number" placeholder='..............' style={{ width: "50px" }} onChange={e => setSoHocSinhChuyenDe(e.target.value)} /></div>
                                     </div>
                                     <div className="sub-menu-content-main-feature-item">
                                         <div><strong>2. Tình hình đội ngũ: </strong></div>
-                                        <div><strong>Số giáo viên: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
+                                        <div><strong>Số giáo viên: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} onChange={e => setSoGiaoVien(e.target.value)} /></div>
                                         <div style={{ display: "flex" }}>
                                             <strong>Trình độ đào tạo:</strong>
-                                            <div style={{ marginLeft: "6px" }}><strong>Cao đẳng: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                                            <div><strong>; Đại học: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                                            <div><strong>; Trên đại học: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
+                                            <div style={{ marginLeft: "6px" }}><strong>Cao đẳng: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} onChange={e => setCaoDang(e.target.value)} /></div>
+                                            <div><strong>; Đại học: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} onChange={e => setDaiHoc(e.target.value)} /></div>
+                                            <div><strong>; Trên đại học: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} onChange={e => setTrenDaiHoc(e.target.value)} /></div>
                                         </div>
                                     </div>
                                     <div className="sub-menu-content-main-feature-item" style={{ justifyContent: "flex-end" }}>
                                         <div><strong>Mức độ đạt chuẩn nghề nghiệp giáo viên:  </strong></div>
                                         <div style={{ display: "flex" }}>
-                                            <div>Tốt: <input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                                            <div>; Khá: <input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
-                                            <div>; Chưa đạt: <input type="number" placeholder='..............' style={{ width: "50px" }} /></div>
+                                            <div>Tốt: <input type="number" placeholder='..............' style={{ width: "50px" }} onChange={e => setTot(e.target.value)} /></div>
+                                            <div>; Khá: <input type="number" placeholder='..............' style={{ width: "50px" }} onChange={e => setKha(e.target.value)} /></div>
+                                            <div>; Chưa đạt: <input type="number" placeholder='..............' style={{ width: "50px" }} onChange={e => setChuaDat(e.target.value)} /></div>
                                         </div>
                                     </div>
                                     <div className="sub-menu-content-main-feature-table">
@@ -484,7 +486,7 @@ const SubMenu1Detail = () => {
                             <Button onClick={handleClickOpen} >Xác nhận xét duyệt</Button>
                         </div>
                     </div> : <>
-                        {/* <DocViewer documents={docs} pluginRenderers={[PDFRenderer]}
+                        <DocViewer documents={docs} pluginRenderers={[PDFRenderer]}
                             config={{
                                 header: {
                                     disableHeader: true,
@@ -493,11 +495,8 @@ const SubMenu1Detail = () => {
                                 },
                                 pdfVerticalScrollByDefault: true,
                             }}
-                        /> */}
-                        {/* <div
-                            dangerouslySetInnerHTML={{ __html: data }}
-                        /> */}
-                        <Editor
+                        />
+                        {/* <Editor
                             apiKey="qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc"
                             initialValue={data}
                             init={{
@@ -517,11 +516,10 @@ const SubMenu1Detail = () => {
                                 content_style: 'body { font-family: Times New Roman, Times, serif; font-size:14px }'
                             }}
                         // toolbar="code"
-                        />
+                        /> */}
                         <div className="sub-menu-infomation">
                             <div className="sub-menu-row">
                                 <div><i>(Tài liệu chưa được thẩm định)</i></div>
-                                <div className='right-action' onClick={handleClickOpenDownload}><strong><u className='underline-blue'>Nhấn vào đây để tải về</u></strong></div>
                             </div>
                             <div className="sub-menu-row">
                                 <div><strong>Nguồn: </strong> https://baigiang.violet.vn</div>
@@ -543,7 +541,6 @@ const SubMenu1Detail = () => {
                             </div>
                             <div className="sub-menu-row">
                                 <div><strong>Dung lượng: </strong> 19/9 KB</div>
-                                <div className='right-action' onClick={handleClickOpenFeedback}><strong><u className='underline-blue'>Đi đến phụ lục đánh giá của bài dạy</u></strong></div>
                             </div>
                             <div className="sub-menu-row">
                                 <div><strong>Số lượt tải: </strong>25</div>
@@ -588,36 +585,8 @@ const SubMenu1Detail = () => {
                 </DialogContent>
                 <DialogActions >
                     <Button onClick={handleClose} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
-                    <Button onClick={handleClose} className='button-mui' autoFocus>
+                    <Button onClick={displayRow1} className='button-mui' autoFocus>
                         Đồng ý
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog
-                open={openDownload}
-                onClose={handleCloseDownload}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-
-            >
-                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
-                    Tải về thư mục
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", fontWeight: 600, marginBottom: "12px" }}>
-                        Chú ý khi tải tài liệu:
-                    </DialogContentText>
-                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
-                        Tài liệu học tập này chỉ dành cho mục đích giáo dục và nghiên cứu. Việc sử dụng không đúng mục đích,
-                        bao gồm nhưng không giới hạn ở việc sao chép, phân phối lại, hoặc sử dụng thương mại mà không có sự cho phép
-                        của tác giả, là vi phạm bản quyền và có thể dẫn đến hậu quả pháp lý. Người sử dụng phải chịu trách nhiệm đầy
-                        đủ về việc tuân thủ các quy định liên quan đến bản quyền và sử dụng hợp pháp của tài liệu.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions >
-                    <Button onClick={handleCloseDownload} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
-                    <Button onClick={handleCloseDownload} className='button-mui' autoFocus>
-                        Tiếp tục tải
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -687,31 +656,6 @@ const SubMenu1Detail = () => {
                         </>
                     )
                 }
-            </Dialog>
-            <Dialog
-                open={openFeedback}
-                onClose={handleCloseFeedback}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-
-            >
-                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
-                    Chuyển tới đánh giá
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", fontWeight: 600, marginBottom: "12px" }}>
-                        Chú ý trước khi chuyển trang:
-                    </DialogContentText>
-                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
-                        Đảm bảo thông tin bài dạy được lưu lại theo đúng mong muốn trước khi chuyển sang bước đánh giá bài dạy !
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions >
-                    <Button onClick={handleCloseFeedback} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
-                    <Button onClick={handleCloseFeedback} className='button-mui' autoFocus>
-                        Click vào đây để sang phụ lục 5
-                    </Button>
-                </DialogActions>
             </Dialog>
         </div >
     )
