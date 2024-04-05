@@ -124,8 +124,12 @@ const ApproveList = () => {
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [isComplete, setIsCompleted] = React.useState(true)
 
-    const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    const emptyRows1 =
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows1.length) : 0;
+
+
+    const emptyRows2 =
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows2.length) : 0;
 
     const handleChangePage = (
         event: React.MouseEvent<HTMLButtonElement> | null,
@@ -191,8 +195,8 @@ const ApproveList = () => {
                                         </TableCell>
                                     </TableRow>
                                 ))}
-                                {emptyRows > 0 && (
-                                    <TableRow style={{ height: 53 * emptyRows }}>
+                                {emptyRows1 > 0 && (
+                                    <TableRow style={{ height: 53 * emptyRows1 }}>
                                         <TableCell colSpan={6} />
                                     </TableRow>
                                 )}
@@ -260,8 +264,8 @@ const ApproveList = () => {
                                         </TableCell>
                                     </TableRow>
                                 ))}
-                                {emptyRows > 0 && (
-                                    <TableRow style={{ height: 53 * emptyRows }}>
+                                {emptyRows2 > 0 && (
+                                    <TableRow style={{ height: 53 * emptyRows2 }}>
                                         <TableCell colSpan={6} />
                                     </TableRow>
                                 )}
