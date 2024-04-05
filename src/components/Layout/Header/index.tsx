@@ -70,19 +70,19 @@ const Header = () => {
                             <Link to="/">PHỤ LỤC</Link>
                             <ul className="dropdown">
                                 <li>
-                                    <Link to="/sub-menu-1">PHỤ LỤC 1</Link>
+                                    <Link to="/sub-menu/1">PHỤ LỤC 1</Link>
                                 </li>
                                 <li>
-                                    <Link to="/sub-menu-2">PHỤ LỤC 2</Link>
+                                    <Link to="/sub-menu/2">PHỤ LỤC 2</Link>
                                 </li>
                                 <li>
-                                    <Link to="/sub-menu-3">PHỤ LỤC 3</Link>
+                                    <Link to="/sub-menu/3">PHỤ LỤC 3</Link>
                                 </li>
                                 <li>
-                                    <Link to="/sub-menu-4">PHỤ LỤC 4</Link>
+                                    <Link to="/sub-menu/4">PHỤ LỤC 4</Link>
                                 </li>
                                 <li>
-                                    <Link to="/sub-menu-5">PHỤ LỤC 5</Link>
+                                    <Link to="/sub-menu/5">PHỤ LỤC 5</Link>
                                 </li>
                             </ul>
                         </div>

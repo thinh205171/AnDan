@@ -1,0 +1,26 @@
+.request-approve-switch {
+    padding-top: 16px;
+    display: flex;
+    column-gap: 24px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #1E2F41;
+    margin-bottom: 24px;
+
+    span {
+        cursor: pointer;
+    }
+
+    .isClicked {
+        color: #e10422;
+    }
+}
+
+.table-footer {
+    width: 100%;
+    padding-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    column-gap: 60px;
+}

@@ -1,14 +1,17 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Add } from '@mui/icons-material';
 import './style.scss'
 
-const SubMenu1 = () => {
+const SubMenu = () => {
+    const location = useLocation();
+    const navigate = useNavigate()
+
+    const indexSubMenu = location.pathname.split('/')[2];
     const grades = [6, 7, 8, 9]
     const subMenu = [1, 2, 3];
-    const navigate = useNavigate()
     const handleAddSubMenu = () => {
-        navigate("/sub-menu-1/detail-edit")
+        navigate(`/sub-menu-${indexSubMenu}/detail-edit`)
     }
 
     return (
@@ -18,7 +21,7 @@ const SubMenu1 = () => {
                     <div className="home-panel1-content-sub-menu-list">
                         <div className="home-panel1-content-sub-menu-item-name">
                             <div>
-                                Phụ lục 1
+                                Phụ lục {indexSubMenu}
                             </div>
                             <div className='add-row-button'>
                                 <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu} />
@@ -33,7 +36,7 @@ const SubMenu1 = () => {
                                     >
                                         {
                                             subMenu?.map((item, index) => (
-                                                <div key={index} className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
+                                                <div key={index} className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-${indexSubMenu}/detail-view`)}>
                                                 </div>
                                             ))
                                         }
@@ -48,4 +51,4 @@ const SubMenu1 = () => {
     )
 }
 
-export default SubMenu1
+export default SubMenu

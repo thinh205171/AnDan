@@ -29,6 +29,8 @@ const SubMenu5Detail = () => {
 
     const [login, setLogin] = useState(false);
     const [open, setOpen] = useState(false);
+    const [openAccept, setOpenAccept] = useState(false);
+    const [openDeny, setOpenDeny] = useState(false);
     const [openReport, setOpenReport] = useState(false);
 
     const handleClickOpen = () => {
@@ -37,6 +39,22 @@ const SubMenu5Detail = () => {
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const handleClickOpenAccept = () => {
+        setOpenAccept(true);
+    };
+
+    const handleCloseAccept = () => {
+        setOpenAccept(false);
+    };
+
+    const handleClickOpenDeny = () => {
+        setOpenDeny(true);
+    };
+
+    const handleCloseDeny = () => {
+        setOpenDeny(false);
     };
 
     const handleClickOpenReport = () => {
@@ -391,8 +409,8 @@ const SubMenu5Detail = () => {
                                     <div className="verify">
                                         <span>Tình trạng thẩm định:</span>
                                         <div style={{ display: "flex", columnGap: "10px" }}>
-                                            <div className='action-button'>Chấp thuận</div>
-                                            <div className='action-button'>Từ chối</div>
+                                            <div className='action-button' onClick={handleClickOpenAccept}>Chấp thuận</div>
+                                            <div className='action-button' onClick={handleClickOpenDeny}>Từ chối</div>
                                         </div>
                                     </div>
                                 </div>
@@ -492,6 +510,50 @@ const SubMenu5Detail = () => {
                         </>
                     )
                 }
+            </Dialog>
+            <Dialog
+                open={openAccept}
+                onClose={handleCloseAccept}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+
+            >
+                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
+                    Bạn có chắc chắn không
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "center", fontWeight: 600 }}>
+                        Bạn có chắc muốn đưa phụ lục này vào thẩm duyệt
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions >
+                    <Button onClick={handleCloseAccept} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
+                    <Button onClick={handleCloseAccept} className='button-mui' autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openDeny}
+                onClose={handleCloseDeny}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+
+            >
+                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
+                    Bạn có chắc chắn không
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "center", fontWeight: 600 }}>
+                        Bạn có chắc muốn từ chối đưa phụ lục này vào thẩm duyệt
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions >
+                    <Button onClick={handleCloseDeny} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
+                    <Button onClick={handleCloseDeny} className='button-mui' autoFocus>
+                        Từ chối
+                    </Button>
+                </DialogActions>
             </Dialog>
         </div >
     )
