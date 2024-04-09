@@ -28,9 +28,6 @@ const Scrom = () => {
                                         {
                                             subMenu?.map((item, index) => (
                                                 <div key={index} className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-                                                    <div className="remove-row-button">
-
-                                                    </div>
                                                 </div>
                                             ))
                                         }

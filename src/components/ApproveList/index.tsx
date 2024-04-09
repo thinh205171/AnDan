@@ -85,38 +85,30 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
     );
 }
 
-function createData(creator: string, approver: string, date: Date, status: boolean) {
-    return { creator, approver, date, status };
+function createData(id: number, creator: string, approver: string, date: Date, status: boolean) {
+    return { id, creator, approver, date, status };
 }
 
-function createData2(creator: string, approver: string, date: Date) {
-    return { creator, approver, date };
+function createData2(id: number, creator: string, approver: string, date: Date) {
+    return { id, creator, approver, date };
 }
 
 const rows1 = [
-    createData('John', 'Alice', new Date(2024, 3, 1), true),
-    createData('Alice', 'Bob', new Date(2024, 2, 28), false),
-    createData('Emma', 'John', new Date(2024, 3, 2), true),
-    createData('Bob', 'Emma', new Date(2024, 2, 30), true),
-    createData('Sarah', 'Alice', new Date(2024, 2, 25), false),
-    createData('Alice', 'John', new Date(2024, 3, 3), true),
-    createData('John', 'Emma', new Date(2024, 3, 4), false),
-    createData('Bob', 'Sarah', new Date(2024, 2, 27), true),
-    createData('Emma', 'Bob', new Date(2024, 2, 29), false),
-    createData('Alice', 'Sarah', new Date(2024, 3, 5), true),
+    createData(1, 'John', 'Alice', new Date(2024, 3, 1), true),
+    createData(2, 'Alice', 'Bob', new Date(2024, 2, 28), false),
+    createData(3, 'Emma', 'John', new Date(2024, 3, 2), true),
+    createData(4, 'Bob', 'Emma', new Date(2024, 2, 30), true),
+    createData(5, 'Sarah', 'Alice', new Date(2024, 2, 25), false),
+    createData(6, 'Alice', 'John', new Date(2024, 3, 3), true),
 ].sort((a, b) => a.date.getTime() - b.date.getTime());
 
 const rows2 = [
-    createData2('John', 'Alice', new Date(2024, 3, 1)),
-    createData2('Alice', 'Bob', new Date(2024, 2, 28)),
-    createData2('Emma', 'John', new Date(2024, 3, 2)),
-    createData2('Bob', 'Emma', new Date(2024, 2, 30)),
-    createData2('Sarah', 'Alice', new Date(2024, 2, 25)),
-    createData2('Alice', 'John', new Date(2024, 3, 3)),
-    createData2('John', 'Emma', new Date(2024, 3, 4)),
-    createData2('Bob', 'Sarah', new Date(2024, 2, 27)),
-    createData2('Emma', 'Bob', new Date(2024, 2, 29)),
-    createData2('Alice', 'Sarah', new Date(2024, 3, 5)),
+    createData2(1, 'John', 'Alice', new Date(2024, 3, 1)),
+    createData2(2, 'Alice', 'Bob', new Date(2024, 2, 28)),
+    createData2(3, 'Emma', 'John', new Date(2024, 3, 2)),
+    createData2(4, 'Bob', 'Emma', new Date(2024, 2, 30)),
+    createData2(5, 'Sarah', 'Alice', new Date(2024, 2, 25)),
+    createData2(6, 'Alice', 'John', new Date(2024, 3, 3)),
 ].sort((a, b) => a.date.getTime() - b.date.getTime());
 
 const ApproveList = () => {
@@ -176,7 +168,7 @@ const ApproveList = () => {
                                     ? rows1.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     : rows1
                                 ).map((row) => (
-                                    <TableRow key={row.approver} sx={{ 'td': { border: 1 } }}>
+                                    <TableRow key={row.id} sx={{ 'td': { border: 1 } }}>
                                         <TableCell >
                                             {row.creator}
                                         </TableCell>
@@ -249,7 +241,7 @@ const ApproveList = () => {
                                     ? rows2.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     : rows2
                                 ).map((row) => (
-                                    <TableRow key={row.approver} sx={{ 'td': { border: 1 } }}>
+                                    <TableRow key={row.id} sx={{ 'td': { border: 1 } }}>
                                         <TableCell >
                                             {row.creator}
                                         </TableCell>

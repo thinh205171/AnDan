@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
 import './style.scss'
 import { useEffect, useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
+import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Tooltip } from '@mui/material';
+import { AccountCircle } from '@mui/icons-material';
 
 const Header = () => {
     const [isScrolling, setIsScrolling] = useState(false);
     const [openLogin, setOpenlogin] = useState(false);
     const [openRegister, setOpenRegister] = useState(false);
+    const [isLogin, setIsLogin] = useState(false)
 
     useEffect(() => {
         const handleScroll = () => {
@@ -31,13 +33,13 @@ const Header = () => {
         setOpenlogin(false);
     };
 
-    const handleRegisterClickOpen = () => {
-        setOpenRegister(true);
-    };
-
     const handleRegisterClose = () => {
         setOpenRegister(false);
     };
+
+    const handleLogout = () => {
+        setIsLogin(false)
+    }
 
     return (
         <div className={`header  ${isScrolling ? "scroll" : ""}`}>
@@ -81,9 +83,6 @@ const Header = () => {
                                 <li>
                                     <Link to="/sub-menu/4">PHỤ LỤC 4</Link>
                                 </li>
-                                <li>
-                                    <Link to="/sub-menu/5">PHỤ LỤC 5</Link>
-                                </li>
                             </ul>
                         </div>
                         <div className="item-header">
@@ -110,15 +109,56 @@ const Header = () => {
                             <Link to="/">HỖ TRỢ</Link>
                         </div>
                         <div className="item-header">
-
-                            <div className="action-header">
-                                <button className="login" onClick={handleLoginClickOpen}>
-                                    ĐĂNG NHẬP
-                                </button>
-                                <button className="signup" onClick={handleRegisterClickOpen}>
-                                    ĐĂNG KÝ
-                                </button>
-                            </div>
+                            {
+                                !isLogin ? (
+                                    <div className="action-header">
+                                        <button className="login" onClick={handleLoginClickOpen}>
+                                            ĐĂNG NHẬP
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <Tooltip
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "white",
+                                                        position: "absolute",
+                                                        right: "-100px",
+                                                        left: "auto",
+                                                        top: "-15px",
+                                                        padding: "12px 0 12px 0",
+                                                        width: "200px",
+                                                        textAlign: "center"
+                                                    },
+                                                },
+                                            }}
+                                            title={
+                                                <Container>
+                                                    <ul>
+                                                        <div style={{ borderBottom: "1px solid  #ccc" }}>
+                                                            <Link to="/profile" style={{ fontSize: "16px" }}>Thông tin tài khoản</Link>
+                                                        </div>
+                                                        <div style={{ borderBottom: "1px solid  #ccc", paddingTop: "12px" }}>
+                                                            <Link to="/yeu-cau-phe-duyet" style={{ fontSize: "16px" }}>Yêu cầu phê duyệt</Link>
+                                                        </div>
+                                                        <div>
+                                                            <span
+                                                                onClick={handleLogout}
+                                                                style={{ cursor: "pointer" }}
+                                                            >
+                                                                Đăng xuất
+                                                            </span>
+                                                        </div>
+                                                    </ul>
+                                                </Container>
+                                            }
+                                        >
+                                            <AccountCircle style={{ width: "32px", height: "32px", color: "#CD8D7A" }} />
+                                        </Tooltip>
+                                    </div>
+                                )
+                            }
                         </div>
                     </div>
                 </div>
@@ -158,10 +198,16 @@ const Header = () => {
                     onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
                         event.preventDefault();
                         const formData = new FormData(event.currentTarget);
-                        const formJson = Object.fromEntries((formData as any).entries());
+                        const formJson = Object.fromEntries(formData.entries());
                         const email = formJson.email;
-                        console.log(email);
-                        handleLoginClose();
+                        const password = formJson.password;
+                        if (email === "admin@gmail.com" && password === "123456") {
+                            alert("Đăng nhập thành công")
+                            handleLoginClose();
+                            setIsLogin(true)
+                        }
+                        else
+                            alert("Sai email hoặc mật khẩu. Vui lòng kiểm tra lại")
                     },
                 }}
             >
@@ -192,6 +238,16 @@ const Header = () => {
                         fullWidth
                         variant="standard"
                     />
+                    <div style={{ paddingTop: "12px" }}>
+                        Chưa có tài khoản?
+                        <span
+                            style={{ cursor: "pointer", fontStyle: "italic", marginLeft: "6px" }}
+                            onClick={() => {
+                                setOpenlogin(false)
+                                setOpenRegister(true)
+                            }}
+                        ><u>Đăng ký ngay</u></span>
+                    </div>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleLoginClickOpen}>Cancel</Button>
@@ -248,7 +304,7 @@ const Header = () => {
                     <Button type="submit">Register</Button>
                 </DialogActions>
             </Dialog>
-        </div>
+        </div >
     )
 }
 

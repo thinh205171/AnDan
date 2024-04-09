@@ -24,7 +24,12 @@ const SubMenu = () => {
                                 Phụ lục {indexSubMenu}
                             </div>
                             <div className='add-row-button'>
-                                <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu} />
+                               {
+                                    indexSubMenu !== "4" ?  
+                                        <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu} />
+                                        : 
+                                        <Add style={{ color: "black" }} className='add-row-icon' onClick={() => navigate('/upload-sub-menu-4')} />
+                               }
                             </div>
                         </div>
                         {
