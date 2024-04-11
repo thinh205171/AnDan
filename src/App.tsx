@@ -22,16 +22,21 @@ const App = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/sub-menu/:index" element={<SubMenuPage />} />
-          <Route path="/sub-menu-1/detail-edit" element={<SubMenu1DetailPage />} />
-          <Route path="/sub-menu-1/detail-view" element={<SubMenu1DetailPage />} />
-          <Route path="/sub-menu-2/detail-edit" element={<SubMenu2DetailPage />} />
-          <Route path="/sub-menu-2/detail-view" element={<SubMenu2DetailPage />} />
-          <Route path="/sub-menu-3/detail-edit" element={<SubMenu3DetailPage />} />
-          <Route path="/sub-menu-3/detail-view" element={<SubMenu3DetailPage />} />
-          <Route path="/sub-menu-4/detail-edit" element={<SubMenu4DetailPage />} />
-          <Route path="/sub-menu-4/detail-view" element={<SubMenu4DetailPage />} />
-          <Route path="/sub-menu-5/detail-view" element={<SubMenu5DetailPage />} />
-          <Route path="/sub-menu-5/detail-edit" element={<SubMenu5DetailPage />} />
+          <Route path="/sub-menu-1/detail-add" element={<SubMenu1DetailPage />} />
+          <Route path="/sub-menu-1/detail-view/:index" element={<SubMenu1DetailPage />} />
+          <Route path="/sub-menu-1/detail-edit/:index" element={<SubMenu1DetailPage />} />
+          <Route path="/sub-menu-2/detail-add" element={<SubMenu2DetailPage />} />
+          <Route path="/sub-menu-2/detail-view/:index" element={<SubMenu2DetailPage />} />
+          <Route path="/sub-menu-2/detail-edit/:index" element={<SubMenu2DetailPage />} />
+          <Route path="/sub-menu-3/detail-add" element={<SubMenu3DetailPage />} />
+          <Route path="/sub-menu-3/detail-view/:index" element={<SubMenu3DetailPage />} />
+          <Route path="/sub-menu-3/detail-edit/:index" element={<SubMenu3DetailPage />} />
+          <Route path="/sub-menu-4/detail-add" element={<SubMenu4DetailPage />} />
+          <Route path="/sub-menu-4/detail-view/:index" element={<SubMenu4DetailPage />} />
+          <Route path="/sub-menu-4/detail-edit/:index" element={<SubMenu4DetailPage />} />
+          <Route path="/sub-menu-5/detail-add" element={<SubMenu5DetailPage />} />
+          <Route path="/sub-menu-5/detail-view/:index" element={<SubMenu5DetailPage />} />
+          <Route path="/sub-menu-5/detail-edit/:index" element={<SubMenu5DetailPage />} />
           <Route path="/bai-giang-scrom" element={<ScromPage />} />
           <Route path="/bai-giang-scrom/:type" element={<ScromTypePage />} />
           <Route path="/upload-bai-giang" element={<UploadScromPage />} />

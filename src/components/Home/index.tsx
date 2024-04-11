@@ -8,18 +8,18 @@ import { Add } from '@mui/icons-material';
 const Home = () => {
     const navigate = useNavigate()
     const handleAddSubMenu1 = () => {
-        navigate("/sub-menu-1/detail-edit")
+        navigate("/sub-menu-1/detail-add")
     }
 
     const handleAddSubMenu2 = () => {
-        navigate("/sub-menu-2/detail-edit")
+        navigate("/sub-menu-2/detail-add")
     }
 
     const handleAddSubMenu3 = () => {
-        navigate("/sub-menu-3/detail-edit")
+        navigate("/sub-menu-3/detail-add")
     }
 
-
+    const arr = [1, 2, 3, 4, 5, 6]
     return (
         <div className='home-panel'>
             <div className='home-panel-content'>
@@ -45,31 +45,15 @@ const Home = () => {
                                 slidesPerView={3}
                                 loop={true}
                             >
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
+                                {
+                                    arr?.map((a, index) => (
+                                        <SwiperSlide>
+                                            <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-1/detail-view/${index}`)}>
 
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-1/detail-view')}>
-
-                                    </div>
-                                </SwiperSlide>
+                                            </div>
+                                        </SwiperSlide>
+                                    ))
+                                }
                             </Swiper>
                         </div>
                     </div>
@@ -96,31 +80,15 @@ const Home = () => {
                                 slidesPerView={3}
                                 loop={true}
                             >
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail-view')}>
+                                {
+                                    arr?.map((a, index) => (
+                                        <SwiperSlide>
+                                            <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-2/detail-view/${index}`)}>
 
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail-view')}>
-
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail-view')}>
-
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail-view')}>
-
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-2/detail-view')}>
-
-                                    </div>
-                                </SwiperSlide>
+                                            </div>
+                                        </SwiperSlide>
+                                    ))
+                                }
                             </Swiper>
                         </div>
                     </div>
@@ -147,31 +115,15 @@ const Home = () => {
                                 slidesPerView={3}
                                 loop={true}
                             >
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail-view')}>
+                                {
+                                    arr?.map((a, index) => (
+                                        <SwiperSlide>
+                                            <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-3/detail-view/${index}`)}>
 
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail-view')}>
-
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail-view')}>j
-
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail-view')}>
-
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div className='sub-menu-content-detail' onClick={() => navigate('/sub-menu-3/detail-view')}>
-
-                                    </div>
-                                </SwiperSlide>
+                                            </div>
+                                        </SwiperSlide>
+                                    ))
+                                }
                             </Swiper>
                         </div>
                     </div>

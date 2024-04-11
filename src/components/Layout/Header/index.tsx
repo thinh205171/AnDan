@@ -3,12 +3,21 @@ import './style.scss'
 import { useEffect, useState } from 'react';
 import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Tooltip } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
+import { useAppDispatch } from '../../../hook/useTypedSelector';
+import { loginUser } from '../../../features/user/userSlice';
 
 const Header = () => {
+    const dispatch = useAppDispatch();
     const [isScrolling, setIsScrolling] = useState(false);
     const [openLogin, setOpenlogin] = useState(false);
     const [openRegister, setOpenRegister] = useState(false);
     const [isLogin, setIsLogin] = useState(false)
+    const [user, setUser] = useState<string | null>('');
+
+    useEffect(() => {
+        const userFromStorage = localStorage.getItem("user");
+        setUser(userFromStorage)
+    }, [isLogin])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -38,6 +47,8 @@ const Header = () => {
     };
 
     const handleLogout = () => {
+        localStorage.removeItem("user");
+        window.location.reload();
         setIsLogin(false)
     }
 
@@ -110,7 +121,7 @@ const Header = () => {
                         </div>
                         <div className="item-header">
                             {
-                                !isLogin ? (
+                                !user ? (
                                     <div className="action-header">
                                         <button className="login" onClick={handleLoginClickOpen}>
                                             ĐĂNG NHẬP
@@ -136,16 +147,19 @@ const Header = () => {
                                             title={
                                                 <Container>
                                                     <ul>
-                                                        <div style={{ borderBottom: "1px solid  #ccc" }}>
+                                                        <div style={{ borderBottom: "1px solid  #ccc", paddingTop: "12px" }}>
+                                                            <span style={{ fontSize: "16px", color: "#000" }}>{user}</span>
+                                                        </div>
+                                                        <div style={{ borderBottom: "1px solid  #ccc", paddingTop: "12px" }}>
                                                             <Link to="/profile" style={{ fontSize: "16px" }}>Thông tin tài khoản</Link>
                                                         </div>
                                                         <div style={{ borderBottom: "1px solid  #ccc", paddingTop: "12px" }}>
                                                             <Link to="/yeu-cau-phe-duyet" style={{ fontSize: "16px" }}>Yêu cầu phê duyệt</Link>
                                                         </div>
-                                                        <div>
+                                                        <div style={{ paddingTop: "12px" }}>
                                                             <span
                                                                 onClick={handleLogout}
-                                                                style={{ cursor: "pointer" }}
+                                                                style={{ cursor: "pointer", color: "#000", fontSize: "16px" }}
                                                             >
                                                                 Đăng xuất
                                                             </span>
@@ -195,19 +209,17 @@ const Header = () => {
                 onClose={handleLoginClose}
                 PaperProps={{
                     component: 'form',
-                    onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+                    onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
                         event.preventDefault();
                         const formData = new FormData(event.currentTarget);
                         const formJson = Object.fromEntries(formData.entries());
-                        const email = formJson.email;
+                        const username = formJson.username;
                         const password = formJson.password;
-                        if (email === "admin@gmail.com" && password === "123456") {
-                            alert("Đăng nhập thành công")
-                            handleLoginClose();
-                            setIsLogin(true)
+                        try {
+                            await dispatch(loginUser({ username, password }));
+                        } catch (e) {
+                            console.log(e);
                         }
-                        else
-                            alert("Sai email hoặc mật khẩu. Vui lòng kiểm tra lại")
                     },
                 }}
             >
@@ -220,10 +232,10 @@ const Header = () => {
                         autoFocus
                         required
                         margin="dense"
-                        id="name"
-                        name="email"
-                        label="Email Address"
-                        type="email"
+                        id="username"
+                        name="username"
+                        label="username"
+                        type="text"
                         fullWidth
                         variant="standard"
                     />

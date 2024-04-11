@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
 import './style.scss'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Radio } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
 
 const SubMenu4Detail = () => {
-    const navigate = useNavigate();
+    const location = useLocation()
+    const navigate = useNavigate()
     const [login, setLogin] = useState(false);
     const [open, setOpen] = useState(false);
     const [openReport, setOpenReport] = useState(false);
     const [openFeedback, setOpenFeedback] = useState(false);
+    const [openRemove, setOpenRemove] = useState(false);
 
     const handleClickOpenReport = () => {
         setOpenReport(true);
@@ -27,6 +29,18 @@ const SubMenu4Detail = () => {
         setOpenFeedback(false);
     };
 
+    const handleClickOpenRemove = () => {
+        setOpenRemove(true);
+    };
+
+    const handleCloseRemove = () => {
+        setOpenRemove(false);
+    };
+
+    const handleClickSave = () => {
+        navigate(`/sub-menu-4/detail-edit/${location.pathname.split('/')[3]}`)
+    };
+
     const docs = [{ uri: require("./phuluc4.pdf") }]
 
     return (
@@ -41,7 +55,16 @@ const SubMenu4Detail = () => {
                     pdfVerticalScrollByDefault: true,
                 }}
             />
-
+            <div>
+                <div className="sub-menu-action">
+                    <div className="verify" style={{ justifyContent: "center" }}>
+                        <div style={{ display: "flex", columnGap: "10px" }}>
+                            <div className='action-button' onClick={handleClickSave}>Sửa</div>
+                            <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div className="sub-menu-infomation">
                 <div className="sub-menu-row">
                     <div><i>(Tài liệu chưa được thẩm định)</i></div>
@@ -166,6 +189,28 @@ const SubMenu4Detail = () => {
                     <Button onClick={handleCloseFeedback} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
                     <Button onClick={() => navigate('/sub-menu-5')} className='button-mui' autoFocus>
                         Click vào đây để sang phụ lục 5
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openRemove}
+                onClose={handleCloseRemove}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+
+            >
+                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
+                    Bạn có chắc chắn không
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "center", fontWeight: 600 }}>
+                        Bạn có chắc muốn xóa thay đổi không?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions >
+                    <Button onClick={handleCloseRemove} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
+                    <Button onClick={handleCloseRemove} className='button-mui' autoFocus>
+                        Xóa
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -3,7 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import './style.scss'
 import { Add, Remove } from '@mui/icons-material';
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface Row {
     stt: number | null;
@@ -16,6 +16,7 @@ interface Row {
 
 const SubMenu3Detail = () => {
     const location = useLocation()
+    const navigate = useNavigate()
     const [rows1, setRows1] = useState<Row[]>([{ stt: null, baiHoc: '', thietBiDayHoc: '', soTiet: null, thoiDiem: '', diaDiem: '' }]);
     const [rows2, setRows2] = useState<Row[]>([{ stt: null, baiHoc: '', thietBiDayHoc: '', soTiet: null, thoiDiem: '', diaDiem: '' }]);
     const [login, setLogin] = useState(false);
@@ -23,6 +24,7 @@ const SubMenu3Detail = () => {
     const [openAccept, setOpenAccept] = useState(false);
     const [openDeny, setOpenDeny] = useState(false);
     const [openReport, setOpenReport] = useState(false);
+    const [openRemove, setOpenRemove] = useState(false);
 
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
@@ -70,6 +72,18 @@ const SubMenu3Detail = () => {
 
     const handleCloseReport = () => {
         setOpenReport(false);
+    };
+
+    const handleClickOpenRemove = () => {
+        setOpenRemove(true);
+    };
+
+    const handleCloseRemove = () => {
+        setOpenRemove(false);
+    };
+
+    const handleClickSave = () => {
+        navigate(`/sub-menu-3/detail-edit/${location.pathname.split('/')[3]}`)
     };
 
     const docs = [{ uri: require("./phuluc3.pdf") }]
@@ -393,6 +407,16 @@ const SubMenu3Detail = () => {
                                 pdfVerticalScrollByDefault: true,
                             }}
                         />
+                        <div>
+                            <div className="sub-menu-action">
+                                <div className="verify" style={{ justifyContent: "center" }}>
+                                    <div style={{ display: "flex", columnGap: "10px" }}>
+                                        <div className='action-button' onClick={handleClickSave}>Sửa</div>
+                                        <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div className="sub-menu-infomation">
                             <div className="sub-menu-row">
                                 <div><i>(Tài liệu chưa được thẩm định)</i></div>
@@ -574,6 +598,28 @@ const SubMenu3Detail = () => {
                     <Button onClick={handleCloseDeny} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
                     <Button onClick={handleCloseDeny} className='button-mui' autoFocus>
                         Từ chối
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openRemove}
+                onClose={handleCloseRemove}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+
+            >
+                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
+                    Bạn có chắc chắn không
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "center", fontWeight: 600 }}>
+                        Bạn có chắc muốn xóa thay đổi không?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions >
+                    <Button onClick={handleCloseRemove} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
+                    <Button onClick={handleCloseRemove} className='button-mui' autoFocus>
+                        Xóa
                     </Button>
                 </DialogActions>
             </Dialog>

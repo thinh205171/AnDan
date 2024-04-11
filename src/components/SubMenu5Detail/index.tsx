@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './style.scss'
 import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
 
 const SubMenu5Detail = () => {
     const location = useLocation()
+    const navigate = useNavigate()
     const [baiDay, setBaiDay] = useState('');
     const [monHoc, setMonHoc] = useState('');
     const [lop, setLop] = useState('');
@@ -32,6 +33,7 @@ const SubMenu5Detail = () => {
     const [openAccept, setOpenAccept] = useState(false);
     const [openDeny, setOpenDeny] = useState(false);
     const [openReport, setOpenReport] = useState(false);
+    const [openRemove, setOpenRemove] = useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -63,6 +65,18 @@ const SubMenu5Detail = () => {
 
     const handleCloseReport = () => {
         setOpenReport(false);
+    };
+
+    const handleClickOpenRemove = () => {
+        setOpenRemove(true);
+    };
+
+    const handleCloseRemove = () => {
+        setOpenRemove(false);
+    };
+
+    const handleClickSave = () => {
+        navigate(`/sub-menu-5/detail-edit/${location.pathname.split('/')[3]}`)
     };
 
     const docs = [{ uri: require("./phuluc5.pdf") }]
@@ -370,6 +384,16 @@ const SubMenu5Detail = () => {
                                     pdfVerticalScrollByDefault: true,
                                 }}
                             />
+                            <div>
+                                <div className="sub-menu-action">
+                                    <div className="verify" style={{ justifyContent: "center" }}>
+                                        <div style={{ display: "flex", columnGap: "10px" }}>
+                                            <div className='action-button' onClick={handleClickSave}>Sửa</div>
+                                            <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div className="sub-menu-infomation">
                                 <div className="sub-menu-row">
                                     <div><i>(Tài liệu chưa được thẩm định)</i></div>
@@ -552,6 +576,28 @@ const SubMenu5Detail = () => {
                     <Button onClick={handleCloseDeny} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
                     <Button onClick={handleCloseDeny} className='button-mui' autoFocus>
                         Từ chối
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openRemove}
+                onClose={handleCloseRemove}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+
+            >
+                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
+                    Bạn có chắc chắn không
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "center", fontWeight: 600 }}>
+                        Bạn có chắc muốn xóa thay đổi không?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions >
+                    <Button onClick={handleCloseRemove} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
+                    <Button onClick={handleCloseRemove} className='button-mui' autoFocus>
+                        Xóa
                     </Button>
                 </DialogActions>
             </Dialog>

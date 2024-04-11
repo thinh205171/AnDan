@@ -11,7 +11,7 @@ const SubMenu = () => {
     const grades = [6, 7, 8, 9]
     const subMenu = [1, 2, 3];
     const handleAddSubMenu = () => {
-        navigate(`/sub-menu-${indexSubMenu}/detail-edit`)
+        navigate(`/sub-menu-${indexSubMenu}/detail-add`)
     }
 
     return (
@@ -24,12 +24,12 @@ const SubMenu = () => {
                                 Phụ lục {indexSubMenu}
                             </div>
                             <div className='add-row-button'>
-                               {
-                                    indexSubMenu !== "4" ?  
+                                {
+                                    indexSubMenu !== "4" ?
                                         <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu} />
-                                        : 
+                                        :
                                         <Add style={{ color: "black" }} className='add-row-icon' onClick={() => navigate('/upload-sub-menu-4')} />
-                               }
+                                }
                             </div>
                         </div>
                         {
@@ -41,7 +41,7 @@ const SubMenu = () => {
                                     >
                                         {
                                             subMenu?.map((item, index) => (
-                                                <div key={index} className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-${indexSubMenu}/detail-view`)}>
+                                                <div key={index} className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-${indexSubMenu}/detail-view/${index}`)}>
                                                 </div>
                                             ))
                                         }
