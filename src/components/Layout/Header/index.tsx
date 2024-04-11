@@ -3,8 +3,8 @@ import './style.scss'
 import { useEffect, useState } from 'react';
 import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Tooltip } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
-import { useAppDispatch } from '../../../hook/useTypedSelector';
-import { loginUser } from '../../../features/user/userSlice';
+import { useAppDispatch, useAppSelector } from '../../../hook/useTypedSelector';
+import { checkAuthenticationUser, loginUser } from '../../../features/user/userSlice';
 
 const Header = () => {
     const dispatch = useAppDispatch();
@@ -12,12 +12,17 @@ const Header = () => {
     const [openLogin, setOpenlogin] = useState(false);
     const [openRegister, setOpenRegister] = useState(false);
     const [isLogin, setIsLogin] = useState(false)
-    const [user, setUser] = useState<string | null>('');
+    // const [user, setUser] = useState<string | null>('');
+
+    const user = useAppSelector(state => state.auth.user)
+    console.log("user: ", user)
 
     useEffect(() => {
-        const userFromStorage = localStorage.getItem("user");
-        setUser(userFromStorage)
-    }, [isLogin])
+        const verifyToken = async () => {
+            await dispatch(checkAuthenticationUser());
+        }
+        verifyToken()
+    }, [])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -148,7 +153,7 @@ const Header = () => {
                                                 <Container>
                                                     <ul>
                                                         <div style={{ borderBottom: "1px solid  #ccc", paddingTop: "12px" }}>
-                                                            <span style={{ fontSize: "16px", color: "#000" }}>{user}</span>
+                                                            <span style={{ fontSize: "16px", color: "#000" }}>{user.username}</span>
                                                         </div>
                                                         <div style={{ borderBottom: "1px solid  #ccc", paddingTop: "12px" }}>
                                                             <Link to="/profile" style={{ fontSize: "16px" }}>Thông tin tài khoản</Link>

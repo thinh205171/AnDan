@@ -13,6 +13,14 @@ const login = async (userData: any): Promise<any> => {
   }
 };
 
+const checkAuthentication = async (): Promise<any> => {
+  const res: AxiosResponse = await axios.get(
+    `${base_url}Account/CheckAuthenciation`, config);
+  if (res.data) {
+    return res.data;
+  }
+};
+
 const logout = async (): Promise<any> => {
   const res: AxiosResponse = await axios.get(`${base_url}user/logout`, config);
   if (res.data) {
@@ -24,4 +32,5 @@ const logout = async (): Promise<any> => {
 export const authService = {
   login,
   logout,
+  checkAuthentication
 };
