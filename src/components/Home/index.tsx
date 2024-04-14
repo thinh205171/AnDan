@@ -4,9 +4,34 @@ import { Autoplay } from "swiper/modules"
 import 'swiper/css';
 import { useNavigate } from 'react-router-dom';
 import { Add } from '@mui/icons-material';
+import { useEffect, useState } from 'react';
+import { apiGetSubMenu1 } from '../../api/subMenu1';
+import { Tooltip } from '@mui/material';
+import { SubMenuData } from '../../models/subMenu';
+import { apiGetSubMenu2 } from '../../api/subMenu2';
+import { apiGetSubMenu3 } from '../../api/subMenu3';
 
 const Home = () => {
     const navigate = useNavigate()
+    const [subMenu1Data, setSubMenu1Data] = useState<SubMenuData[]>([]);
+    const [subMenu2Data, setSubMenu2Data] = useState<SubMenuData[]>([]);
+    const [subMenu3Data, setSubMenu3Data] = useState<SubMenuData[]>([]);
+
+    useEffect(() => {
+        const fetchList = async () => {
+            const res1 = await apiGetSubMenu1();
+            const res2 = await apiGetSubMenu2();
+            const res3 = await apiGetSubMenu3();
+            if (res1)
+                setSubMenu1Data(res1.data)
+            if (res2)
+                setSubMenu2Data(res2.data)
+            if (res3)
+                setSubMenu3Data(res3.data)
+        }
+        fetchList();
+    }, [])
+
     const handleAddSubMenu1 = () => {
         navigate("/sub-menu-1/detail-add")
     }
@@ -27,7 +52,7 @@ const Home = () => {
                     <div className="home-panel-content-sub-menu-list">
                         <div className="home-panel-content-sub-menu-item-name">
                             <span>
-                                Phụ lục 1
+                                KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC
                             </span>
                             <div className='add-row-button'>
                                 <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu1} />
@@ -46,11 +71,15 @@ const Home = () => {
                                 loop={true}
                             >
                                 {
-                                    arr?.map((a, index) => (
+                                    subMenu1Data?.map((subMenu1, index) => (
                                         <SwiperSlide>
-                                            <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-1/detail-view/${index}`)}>
-
-                                            </div>
+                                            <Tooltip title={subMenu1?.name} arrow placement="top" key={index}>
+                                                <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-1/detail-view/${subMenu1?.id}`)}>
+                                                    <div className='sub-menu-subject-name'>
+                                                        {subMenu1.subjectName} {subMenu1.gradeName}
+                                                    </div>
+                                                </div>
+                                            </Tooltip>
                                         </SwiperSlide>
                                     ))
                                 }
@@ -81,11 +110,15 @@ const Home = () => {
                                 loop={true}
                             >
                                 {
-                                    arr?.map((a, index) => (
+                                    subMenu2Data?.map((subMenu2, index) => (
                                         <SwiperSlide>
-                                            <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-2/detail-view/${index}`)}>
-
-                                            </div>
+                                            <Tooltip title={subMenu2?.name} arrow placement="top" key={index}>
+                                                <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-2/detail-view/${subMenu2?.id}`)}>
+                                                    <div className='sub-menu-subject-name'>
+                                                        {subMenu2.subjectName} {subMenu2.gradeName}
+                                                    </div>
+                                                </div>
+                                            </Tooltip>
                                         </SwiperSlide>
                                     ))
                                 }
@@ -116,11 +149,15 @@ const Home = () => {
                                 loop={true}
                             >
                                 {
-                                    arr?.map((a, index) => (
+                                    subMenu3Data?.map((subMenu3, index) => (
                                         <SwiperSlide>
-                                            <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-3/detail-view/${index}`)}>
-
-                                            </div>
+                                            <Tooltip title={subMenu3?.name} arrow placement="top" key={index}>
+                                                <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-3/detail-view/${subMenu3?.id}`)}>
+                                                    <div className='sub-menu-subject-name'>
+                                                        {subMenu3.subjectName} {subMenu3.gradeName}
+                                                    </div>
+                                                </div>
+                                            </Tooltip>
                                         </SwiperSlide>
                                     ))
                                 }

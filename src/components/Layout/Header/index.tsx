@@ -15,14 +15,13 @@ const Header = () => {
     // const [user, setUser] = useState<string | null>('');
 
     const user = useAppSelector(state => state.auth.user)
-    console.log("user: ", user)
 
     useEffect(() => {
         const verifyToken = async () => {
             await dispatch(checkAuthenticationUser());
         }
         verifyToken()
-    }, [])
+    }, [dispatch, isLogin])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -222,6 +221,8 @@ const Header = () => {
                         const password = formJson.password;
                         try {
                             await dispatch(loginUser({ username, password }));
+                            setIsLogin(true)
+                            setOpenlogin(false)
                         } catch (e) {
                             console.log(e);
                         }

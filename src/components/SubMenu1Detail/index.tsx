@@ -5,6 +5,8 @@ import './style.scss'
 import { Add, Remove } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DocViewer, { PDFRenderer } from '@cyntler/react-doc-viewer';
+import { useAppSelector } from '../../hook/useTypedSelector';
+import { apiPostSubMenu1 } from '../../api/subMenu1';
 
 interface Row1 {
     stt: number | null;
@@ -38,6 +40,7 @@ interface Row4 {
 const SubMenu1Detail = () => {
     const location = useLocation()
     const navigate = useNavigate()
+    const user = useAppSelector(state => state.auth.user)
     const [rows1, setRows1] = useState<Row1[]>([{ stt: null, thietBiDayHoc: '', soLuong: null, baiThiNghiem: '', ghiChu: '' }]);
     const [rows2, setRows2] = useState<Row2[]>([{ stt: null, tenPhong: '', soLuong: null, phamViNoiDung: '', ghiChu: '' }]);
     const [rows3, setRows3] = useState<Row3[]>([{ stt: null, baiHoc: '', soTiet: null, yeuCau: '' }]);
@@ -65,10 +68,27 @@ const SubMenu1Detail = () => {
     const [tot, setTot] = useState('');
     const [kha, setKha] = useState('');
     const [chuaDat, setChuaDat] = useState('');
+    const [documentId, setDocumentId] = useState('');
 
-    const handleClickOpen = () => {
+    const handleClickOpen = async () => {
         setOpen(true);
+        if (khoiLop && user && hoadDong) {
+            const post = await apiPostSubMenu1({
+                name: "KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC",
+                subjectName: hoadDong,
+                gradeName: khoiLop,
+                username: user.username,
+                note: "",
+                status: true,
+                approveByName: ""
+            })
+            if (post)
+                // setDocumentId(post?.id)
+                console.log(post)
+        }
     };
+
+    console.log("user: ", user)
 
     const handleClose = () => {
         setOpen(false);
@@ -107,7 +127,7 @@ const SubMenu1Detail = () => {
     };
 
     const handleClickSave = () => {
-        navigate(`/sub-menu-1/detail-edit/${location.pathname.split('/')[3]}`)
+        navigate(`/sub-menu-1/detail-edit/${location.pathname.split('/')[1].split('-')[2]}`)
     };
 
     const docs = useMemo(() => [

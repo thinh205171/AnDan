@@ -26,3 +26,12 @@ export const apiPostSubMenu1 = async (data: any) => {
         return null;
 }
 
+export const apiPostSubMenu1TeachingEquipment = async (data: any) => {
+    const result = await axios.post(`${base_url}Document1`, data);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+

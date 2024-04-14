@@ -41,7 +41,6 @@ export const checkAuthenticationUser = createAsyncThunk(
       const usernameArr = words.filter((word: string) => word !== email && word !== role);
       const username = usernameArr.join(' ');
       const result = { username, email, role }
-      console.log("result: ", result)
       return { result, status: AUTHENTICATION_STATUS.SUCCESS };
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -108,9 +107,9 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.token = action.payload.res;
+        state.user = action.payload.res;
         state.loginStatus = 1;
-        localStorage.setItem('token', action.payload.res);
+        localStorage.setItem('token', action.payload.res.token);
         toast.success("User login successfully", { autoClose: 1500 });
       })
       .addCase(checkAuthenticationUser.pending, (state) => {
