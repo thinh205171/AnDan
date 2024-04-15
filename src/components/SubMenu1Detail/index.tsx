@@ -1,12 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useMemo, useState } from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import React, { useEffect, useMemo, useState } from 'react'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, MenuItem, Paper, Radio, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import './style.scss'
 import { Add, Remove } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DocViewer, { PDFRenderer } from '@cyntler/react-doc-viewer';
 import { useAppSelector } from '../../hook/useTypedSelector';
 import { apiPostSubMenu1 } from '../../api/subMenu1';
+import { apiGetGrade } from '../../api/grade';
+import { Grade } from '../../models/grade';
+import { apiGetSubject } from '../../api/subject';
+import { Subject } from '../../models/subject';
 
 interface Row1 {
     stt: number | null;
@@ -51,6 +55,8 @@ const SubMenu1Detail = () => {
     const [openDeny, setOpenDeny] = useState(false);
     const [openReport, setOpenReport] = useState(false);
     const [openRemove, setOpenRemove] = useState(false);
+    const [grades, setGrades] = useState<Grade[]>([]);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
 
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
@@ -70,6 +76,27 @@ const SubMenu1Detail = () => {
     const [chuaDat, setChuaDat] = useState('');
     const [documentId, setDocumentId] = useState('');
 
+    useEffect(() => {
+        const fetchGrade = async () => {
+            const res = await apiGetGrade();
+            if (res && res.data) {
+                const gradeData: Grade[] = res.data;
+                setGrades(gradeData);
+            }
+        }
+
+        const fetchSubject = async () => {
+            const res = await apiGetSubject();
+            if (res && res.data) {
+                const subjectData: Subject[] = res.data;
+                setSubjects(subjectData);
+            }
+        }
+
+        fetchGrade();
+        fetchSubject();
+    }, []);
+
     const handleClickOpen = async () => {
         setOpen(true);
         if (khoiLop && user && hoadDong) {
@@ -87,8 +114,6 @@ const SubMenu1Detail = () => {
                 console.log(post)
         }
     };
-
-    console.log("user: ", user)
 
     const handleClose = () => {
         setOpen(false);
@@ -239,10 +264,31 @@ const SubMenu1Detail = () => {
                             <div className="sub-menu-content-title">
                                 <div><strong>KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN</strong></div>
                                 <div style={{ display: "flex", justifyContent: "center" }}>
-                                    <div><strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong><input type="text" placeholder='..............' style={{ width: "50px" }} onChange={e => setHoatDong(e.target.value)} /></div>
-                                    <div><strong>, KHỐI LỚP</strong><input type="number" placeholder='...........' style={{ width: "50px" }} onChange={e => setKhoiLop(e.target.value)} /></div>
+                                    <div><strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong>
+                                        <select id="grades" style={{ width: "100px", marginLeft: "4px" }}>
+                                            <option value="" disabled>Chọn môn học</option>
+                                            {
+                                                subjects?.map((item) => (
+                                                    <option value={item?.id}>{item?.name}</option>
+                                                ))
+                                            }
+                                        </select>
+
+                                        {/* <input type="text" placeholder='..............' style={{ width: "50px" }} onChange={e => setHoatDong(e.target.value)} /> */}
+                                    </div>
+                                    <div><strong>, KHỐI LỚP</strong>
+                                        <select id="grades" style={{ width: "50px", marginLeft: "4px" }}>
+                                            <option value="" disabled>Chọn lớp</option>
+                                            {
+                                                grades?.map((item) => (
+                                                    <option value={item?.id}>{item?.name}</option>
+                                                ))
+                                            }
+                                        </select>
+                                        {/* <input type="number" placeholder='...........' style={{ width: "50px" }} onChange={e => setKhoiLop(e.target.value)} /> */}
+                                    </div>
                                 </div>
-                                <div>(Năm học 20<input type="text" placeholder='...........' style={{ width: "15px" }} onChange={e => setStartYear(e.target.value)} /> - 20<input type="text" placeholder='...........' style={{ width: "15px" }} onChange={e => setEndYear(e.target.value)} />)</div>
+                                <div>(Năm học 2023 - 2024)</div>
                             </div>
 
                             <div className='sub-menu-content-main'>

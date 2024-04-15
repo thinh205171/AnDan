@@ -4,6 +4,7 @@ import { Add } from '@mui/icons-material';
 import './style.scss'
 import { apiGetSubMenu1 } from '../../api/subMenu1';
 import { SubMenuData } from '../../models/subMenu';
+import { apiGetSubMenu4 } from '../../api/subMenu4';
 
 const SubMenu = () => {
     const location = useLocation();
@@ -27,6 +28,13 @@ const SubMenu = () => {
         const fetchList = async () => {
             if (indexSubMenu === '1') {
                 const res = await apiGetSubMenu1();
+                if (res)
+                    setSubMenu1Data(res.data)
+                else
+                    setSubMenu1Data([])
+            }
+            if (indexSubMenu === '4') {
+                const res = await apiGetSubMenu4();
                 if (res)
                     setSubMenu1Data(res.data)
                 else

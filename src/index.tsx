@@ -9,7 +9,7 @@ import { ToastContainer } from 'react-toastify';
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <App />
-    <ToastContainer
+    {/* <ToastContainer
       position="top-right"
       autoClose={2000}
       hideProgressBar={false}
@@ -20,6 +20,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       draggable
       pauseOnHover
       theme="light"
-    />
+    /> */}
   </Provider>,
 );

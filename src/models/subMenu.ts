@@ -6,5 +6,9 @@ export interface SubMenuData {
     userName: string,
     note: string,
     status: boolean,
-    approveByName: string
+    approveByName: string,
+    teachingPlannerId: number,
+    createdDate: Date,
+    linkFile: string,
+    linkImage: string
 }

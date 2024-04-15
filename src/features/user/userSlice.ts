@@ -35,13 +35,19 @@ export const checkAuthenticationUser = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const res = await authService.checkAuthentication();
-      const words = res.split(' ');
-      const email = words.find((word: string) => word.includes('@'));
-      const role = words.pop();
-      const usernameArr = words.filter((word: string) => word !== email && word !== role);
-      const username = usernameArr.join(' ');
-      const result = { username, email, role }
-      return { result, status: AUTHENTICATION_STATUS.SUCCESS };
+      console.log("res: ", res)
+      if (res !== "  ") {
+        const words = res.split(' ');
+        const email = words.find((word: string) => word.includes('@'));
+        const role = words.pop();
+        const usernameArr = words.filter((word: string) => word !== email && word !== role);
+        const username = usernameArr.join(' ');
+        const result = { username, email, role }
+        return { result, status: AUTHENTICATION_STATUS.SUCCESS };
+      }
+      else {
+        return { res, status: AUTHENTICATION_STATUS.FAIL };
+      }
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
