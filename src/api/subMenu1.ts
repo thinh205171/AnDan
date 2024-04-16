@@ -35,8 +35,8 @@ export const apiDeleteSubMenu1 = async (data: any) => {
 }
 
 
-export const apiPostSubMenu1TeachingEquipment = async (data: any) => {
-    const result = await axios.put(`${base_url}Document1`, data);
+export const apiPostSubMenu1TeachingEquipment = async (data: any, docId: any) => {
+    const result = await axios.put(`${base_url}Document1TeachingEquipment?documentId=${docId}`, data);
     if (result)
         return result;
     else
