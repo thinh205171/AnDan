@@ -19,7 +19,7 @@
             &-avatar {
                 width: 187px;
                 height: 240px;
-                background-color: #F5E8DD;
+                object-fit: cover;
             }
 
             &-description {
@@ -31,6 +31,20 @@
 
                     .profile-detail-field {
                         width: 120px;
+                    }
+
+                    .profile-edit-btn {
+                        margin-top: 16px;
+                        font-size: 16px;
+                        padding: 8px 12px;
+                        border: 1px solid #ccc;
+                        display: flex;
+                        align-items: center;
+                        cursor: pointer;
+
+                        &:hover {
+                            background-color: #ffebeb;
+                        }
                     }
                 }
             }

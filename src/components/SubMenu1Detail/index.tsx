@@ -6,22 +6,30 @@ import { Add, Remove } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DocViewer, { PDFRenderer } from '@cyntler/react-doc-viewer';
 import { useAppSelector } from '../../hook/useTypedSelector';
-import { apiPostSubMenu1 } from '../../api/subMenu1';
+import { apiDeleteSubMenu1, apiPostSubMenu1 } from '../../api/subMenu1';
 import { apiGetGrade } from '../../api/grade';
 import { Grade } from '../../models/grade';
 import { apiGetSubject } from '../../api/subject';
 import { Subject } from '../../models/subject';
+import { TeachingEquipment } from '../../models/teachingEquipment';
+import { apiGetTeachingEquipment } from '../../api/teachingEquipment';
+import { SubjectRoom } from '../../models/SubjectRoom';
+import { SelectedTopic } from '../../models/SelectedTopic';
+import { CurriculumDistribution } from '../../models/CurriculumDistribution';
+import { apiGetSubjectRoom } from '../../api/subjectRoom';
+import { apiGetSelectedTopic } from '../../api/selectedTopic';
+import { apiGetCurriculumDistribution } from '../../api/curriculumDistribution';
 
 interface Row1 {
     stt: number | null;
-    thietBiDayHoc: string;
+    thietBiDayHoc: number | null;
     soLuong: number | null;
     baiThiNghiem: string;
     ghiChu: string;
 }
 interface Row2 {
     stt: number | null;
-    tenPhong: string;
+    tenPhong: number | null;
     soLuong: number | null;
     phamViNoiDung: string;
     ghiChu: string;
@@ -29,26 +37,35 @@ interface Row2 {
 
 interface Row3 {
     stt: number | null;
-    baiHoc: string;
+    baiHoc: number | null;
     soTiet: number | null;
     yeuCau: string;
 }
 
 interface Row4 {
     stt: number | null;
-    chuyenDe: string;
+    chuyenDe: number | null;
     soTiet: number | null;
     yeuCau: string;
+}
+
+interface Row5 {
+    stt: number | null;
+    thoiGian: Date | null;
+    thoiDiem: Date | null;
+    yeuCau: string;
+    hinhthuc: string;
 }
 
 const SubMenu1Detail = () => {
     const location = useLocation()
     const navigate = useNavigate()
     const user = useAppSelector(state => state.auth.user)
-    const [rows1, setRows1] = useState<Row1[]>([{ stt: null, thietBiDayHoc: '', soLuong: null, baiThiNghiem: '', ghiChu: '' }]);
-    const [rows2, setRows2] = useState<Row2[]>([{ stt: null, tenPhong: '', soLuong: null, phamViNoiDung: '', ghiChu: '' }]);
-    const [rows3, setRows3] = useState<Row3[]>([{ stt: null, baiHoc: '', soTiet: null, yeuCau: '' }]);
-    const [rows4, setRows4] = useState<Row4[]>([{ stt: null, chuyenDe: '', soTiet: null, yeuCau: '' }]);
+    const [rows1, setRows1] = useState<Row1[]>([{ stt: null, thietBiDayHoc: null, soLuong: null, baiThiNghiem: '', ghiChu: '' }]);
+    const [rows2, setRows2] = useState<Row2[]>([{ stt: null, tenPhong: null, soLuong: null, phamViNoiDung: '', ghiChu: '' }]);
+    const [rows3, setRows3] = useState<Row3[]>([{ stt: null, baiHoc: null, soTiet: null, yeuCau: '' }]);
+    const [rows4, setRows4] = useState<Row4[]>([{ stt: null, chuyenDe: null, soTiet: null, yeuCau: '' }]);
+    const [rows5, setRows5] = useState<Row5[]>([{ stt: null, thoiGian: null, thoiDiem: null, yeuCau: '', hinhthuc: '' }]);
     const [login, setLogin] = useState(false);
     const [open, setOpen] = useState(false);
     const [openAccept, setOpenAccept] = useState(false);
@@ -57,6 +74,10 @@ const SubMenu1Detail = () => {
     const [openRemove, setOpenRemove] = useState(false);
     const [grades, setGrades] = useState<Grade[]>([]);
     const [subjects, setSubjects] = useState<Subject[]>([]);
+    const [teachingEquipment, setTeachingEquipment] = useState<TeachingEquipment[]>([]);
+    const [subjectRoom, setSubjectRoom] = useState<SubjectRoom[]>([]);
+    const [selectedTopic, setSelectedTopic] = useState<SelectedTopic[]>([]);
+    const [curriculumDistribution, setCurriculumDistribution] = useState<CurriculumDistribution[]>([]);
 
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
@@ -74,7 +95,7 @@ const SubMenu1Detail = () => {
     const [tot, setTot] = useState('');
     const [kha, setKha] = useState('');
     const [chuaDat, setChuaDat] = useState('');
-    const [documentId, setDocumentId] = useState('');
+    const [documentId, setDocumentId] = useState(null);
 
     useEffect(() => {
         const fetchGrade = async () => {
@@ -93,30 +114,75 @@ const SubMenu1Detail = () => {
             }
         }
 
+        const fetchTeachingEquipment = async () => {
+            const res = await apiGetTeachingEquipment();
+            if (res && res.data) {
+                const teachingEquipmentData: TeachingEquipment[] = res.data;
+                setTeachingEquipment(teachingEquipmentData);
+            }
+        }
+
+        const fetchSubjectRoom = async () => {
+            const res = await apiGetSubjectRoom();
+            if (res && res.data) {
+                const subjectRoomData: SubjectRoom[] = res.data;
+                setSubjectRoom(subjectRoomData);
+            }
+        }
+
+        const fetchSelectedTopic = async () => {
+            const res = await apiGetSelectedTopic();
+            if (res && res.data) {
+                const selectedTopicData: SelectedTopic[] = res.data;
+                setSelectedTopic(selectedTopicData);
+            }
+        }
+
+        const fetchCurriculumDistribution = async () => {
+            const res = await apiGetCurriculumDistribution();
+            if (res && res.data) {
+                const curriculumDistributionData: CurriculumDistribution[] = res.data;
+                setCurriculumDistribution(curriculumDistributionData);
+            }
+        }
+
         fetchGrade();
         fetchSubject();
+        fetchTeachingEquipment();
+        fetchSelectedTopic();
+        fetchSubjectRoom();
+        fetchCurriculumDistribution()
     }, []);
 
     const handleClickOpen = async () => {
-        setOpen(true);
         if (khoiLop && user && hoadDong) {
+            setOpen(true);
             const post = await apiPostSubMenu1({
                 name: "KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC",
-                subjectName: hoadDong,
-                gradeName: khoiLop,
-                username: user.username,
+                subjectId: hoadDong,
+                gradeId: khoiLop,
+                userId: user.userId,
                 note: "",
                 status: true,
                 approveByName: ""
             })
-            if (post)
-                // setDocumentId(post?.id)
-                console.log(post)
+            if (post) {
+                setDocumentId(post?.data?.id)
+            }
         }
+        else
+            alert("Nhập đầy đủ thông tin!")
     };
 
-    const handleClose = () => {
+    console.log("documentId: ", documentId)
+    const handleClose = async () => {
         setOpen(false);
+        try {
+            const result = await apiDeleteSubMenu1(documentId);
+            console.log("result: ", result)
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleClickOpenAccept = () => {
@@ -162,7 +228,7 @@ const SubMenu1Detail = () => {
     const handleAddRow1 = () => {
         const newRow = {
             stt: null,
-            thietBiDayHoc: '',
+            thietBiDayHoc: null,
             soLuong: null,
             baiThiNghiem: '',
             ghiChu: ''
@@ -172,7 +238,7 @@ const SubMenu1Detail = () => {
     const handleAddRow2 = () => {
         const newRow = {
             stt: null,
-            tenPhong: '',
+            tenPhong: null,
             soLuong: null,
             phamViNoiDung: '',
             ghiChu: ''
@@ -182,7 +248,7 @@ const SubMenu1Detail = () => {
     const handleAddRow3 = () => {
         const newRow = {
             stt: null,
-            baiHoc: '',
+            baiHoc: null,
             soTiet: null,
             yeuCau: '',
         };
@@ -191,11 +257,21 @@ const SubMenu1Detail = () => {
     const handleAddRow4 = () => {
         const newRow = {
             stt: null,
-            chuyenDe: '',
+            chuyenDe: null,
             soTiet: null,
             yeuCau: '',
         };
         setRows4([...rows4, newRow]);
+    };
+    const handleAddRow5 = () => {
+        const newRow = {
+            stt: null,
+            thoiGian: null,
+            thoiDiem: null,
+            yeuCau: '',
+            hinhthuc: ''
+        };
+        setRows5([...rows5, newRow]);
     };
 
     const handleRemoveRow1 = () => {
@@ -215,7 +291,7 @@ const SubMenu1Detail = () => {
     };
 
     const handleRemoveRow3 = () => {
-        if (rows1.length > 1) {
+        if (rows3.length > 1) {
             const updatedRows = [...rows3];
             updatedRows.pop();
             setRows3(updatedRows);
@@ -223,10 +299,18 @@ const SubMenu1Detail = () => {
     };
 
     const handleRemoveRow4 = () => {
-        if (rows1.length > 1) {
+        if (rows3.length > 1) {
             const updatedRows = [...rows4];
             updatedRows.pop();
             setRows4(updatedRows);
+        }
+    };
+
+    const handleRemoveRow5 = () => {
+        if (rows5.length > 1) {
+            const updatedRows = [...rows5];
+            updatedRows.pop();
+            setRows5(updatedRows);
         }
     };
 
@@ -265,7 +349,10 @@ const SubMenu1Detail = () => {
                                 <div><strong>KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN</strong></div>
                                 <div style={{ display: "flex", justifyContent: "center" }}>
                                     <div><strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong>
-                                        <select id="grades" style={{ width: "100px", marginLeft: "4px" }}>
+                                        <select id="grades" style={{ width: "120px", marginLeft: "4px" }}
+                                            onChange={(e) => setHoatDong(e.target.value)}
+                                            defaultValue={''}
+                                        >
                                             <option value="" disabled>Chọn môn học</option>
                                             {
                                                 subjects?.map((item) => (
@@ -277,7 +364,10 @@ const SubMenu1Detail = () => {
                                         {/* <input type="text" placeholder='..............' style={{ width: "50px" }} onChange={e => setHoatDong(e.target.value)} /> */}
                                     </div>
                                     <div><strong>, KHỐI LỚP</strong>
-                                        <select id="grades" style={{ width: "50px", marginLeft: "4px" }}>
+                                        <select id="grades" style={{ width: "70px", marginLeft: "4px" }}
+                                            onChange={(e) => setKhoiLop(e.target.value)}
+                                            defaultValue={''}
+                                        >
                                             <option value="" disabled>Chọn lớp</option>
                                             {
                                                 grades?.map((item) => (
@@ -337,15 +427,15 @@ const SubMenu1Detail = () => {
                                                         <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                             <TableCell align="center">{index + 1}</TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.thietBiDayHoc}
-                                                                    onChange={(e) => {
-                                                                        const newValue = e.target.value;
-                                                                        const updatedRows = [...rows1];
-                                                                        updatedRows[index].thietBiDayHoc = newValue;
-                                                                        setRows1(updatedRows);
-                                                                    }}
-                                                                />
+                                                                <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                    defaultValue={''}>
+                                                                    <option value="" disabled>Chọn lớp</option>
+                                                                    {
+                                                                        teachingEquipment?.map((item) => (
+                                                                            <option value={item?.id}>{item?.name}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
                                                             </TableCell>
                                                             <TableCell align="center">
                                                                 <textarea
@@ -397,7 +487,7 @@ const SubMenu1Detail = () => {
                                                 <TableHead>
                                                     <TableRow sx={{ 'th': { border: 1 } }}>
                                                         <TableCell align="center">STT</TableCell>
-                                                        <TableCell align="center">Thiết bị dạy học</TableCell>
+                                                        <TableCell align="center">Tên phòng</TableCell>
                                                         <TableCell align="center">Số lượng</TableCell>
                                                         <TableCell align="center">Các bài thí nghiệm thực hành</TableCell>
                                                         <TableCell align="center">Ghi chú</TableCell>
@@ -408,15 +498,14 @@ const SubMenu1Detail = () => {
                                                         <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                             <TableCell align="center">{index + 1}</TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.tenPhong}
-                                                                    onChange={(e) => {
-                                                                        const newValue = e.target.value;
-                                                                        const updatedRows = [...rows2];
-                                                                        updatedRows[index].tenPhong = newValue;
-                                                                        setRows2(updatedRows);
-                                                                    }}
-                                                                />
+                                                                <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }} defaultValue={''}>
+                                                                    <option value="" disabled>Chọn phòng học</option>
+                                                                    {
+                                                                        subjectRoom?.map((item) => (
+                                                                            <option value={item?.id}>{item?.name}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
                                                             </TableCell>
                                                             <TableCell align="center">
                                                                 <textarea
@@ -484,7 +573,14 @@ const SubMenu1Detail = () => {
                                                         <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                             <TableCell align="center">{index + 1}</TableCell>
                                                             <TableCell align="center">
-                                                                <textarea name="" id="" style={{ width: "100%", border: 0 }}></textarea>
+                                                                <select id="teachingEquipment" style={{ width: "210px", height: "40px", marginLeft: "4px" }} defaultValue={''}>
+                                                                    <option value="" disabled>Chọn phân phối chương trình</option>
+                                                                    {
+                                                                        curriculumDistribution?.map((item) => (
+                                                                            <option value={item?.id}>{item?.name}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
                                                             </TableCell>
                                                             <TableCell align="center">
                                                                 <textarea
@@ -535,15 +631,14 @@ const SubMenu1Detail = () => {
                                                         <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                             <TableCell align="center">{index + 1}</TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.chuyenDe}
-                                                                    onChange={(e) => {
-                                                                        const newValue = e.target.value;
-                                                                        const updatedRows = [...rows4];
-                                                                        updatedRows[index].chuyenDe = newValue;
-                                                                        setRows4(updatedRows);
-                                                                    }}
-                                                                />
+                                                                <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }} defaultValue={''}>
+                                                                    <option value="" disabled>Chọn chuyên đề</option>
+                                                                    {
+                                                                        selectedTopic?.map((item) => (
+                                                                            <option value={item?.id}>{item?.name}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
                                                             </TableCell>
                                                             <TableCell align="center">
                                                                 <textarea
@@ -594,27 +689,6 @@ const SubMenu1Detail = () => {
                                 pdfVerticalScrollByDefault: true,
                             }}
                         />
-                        {/* <Editor
-                            apiKey="qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc"
-                            initialValue={data}
-                            init={{
-                                height: 1000,
-                                menubar: true,
-                                plugins: [
-                                    "advlist autolink lists link image charmap print preview anchor",
-                                    "searchreplace visualblocks code fullscreen textcolor ",
-                                    "insertdatetime media table paste code help wordcount"
-                                ],
-                                // toolbar: 'undo redo | formatselect | ' +
-                                //     'bold italic backcolor | fontsizeselect | alignleft aligncenter ' +
-                                //     'alignright alignjustify | bullist numlist outdent indent | ' +
-                                //     'removeformat | help',
-                                toolbar:
-                                    "undo redo | styleselect | fontsizeselect| code | bold italic | alignleft aligncenter alignright alignjustify | outdent indent ",
-                                content_style: 'body { font-family: Times New Roman, Times, serif; font-size:14px }'
-                            }}
-                        // toolbar="code"
-                        /> */}
                         <div>
                             <div className="sub-menu-action">
                                 <div className="verify" style={{ justifyContent: "center" }}>
@@ -678,7 +752,11 @@ const SubMenu1Detail = () => {
             }
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={async (event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleClose();
+                    }
+                }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
 
@@ -700,7 +778,11 @@ const SubMenu1Detail = () => {
             </Dialog>
             <Dialog
                 open={openReport}
-                onClose={handleCloseReport}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleCloseReport();
+                    }
+                }}
                 maxWidth={"md"}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
@@ -767,7 +849,11 @@ const SubMenu1Detail = () => {
             </Dialog>
             <Dialog
                 open={openAccept}
-                onClose={handleCloseAccept}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleCloseAccept();
+                    }
+                }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
 
@@ -789,7 +875,11 @@ const SubMenu1Detail = () => {
             </Dialog>
             <Dialog
                 open={openDeny}
-                onClose={handleCloseDeny}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleCloseDeny();
+                    }
+                }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
 
@@ -811,7 +901,11 @@ const SubMenu1Detail = () => {
             </Dialog>
             <Dialog
                 open={openRemove}
-                onClose={handleCloseRemove}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleCloseRemove();
+                    }
+                }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
 

@@ -39,10 +39,11 @@ export const checkAuthenticationUser = createAsyncThunk(
       if (res !== "  ") {
         const words = res.split(' ');
         const email = words.find((word: string) => word.includes('@'));
+        const userId = words.pop();
         const role = words.pop();
         const usernameArr = words.filter((word: string) => word !== email && word !== role);
         const username = usernameArr.join(' ');
-        const result = { username, email, role }
+        const result = { username, email, role, userId }
         return { result, status: AUTHENTICATION_STATUS.SUCCESS };
       }
       else {
@@ -116,6 +117,7 @@ export const authSlice = createSlice({
         state.user = action.payload.res;
         state.loginStatus = 1;
         localStorage.setItem('token', action.payload.res.token);
+        window.location.reload();
         toast.success("User login successfully", { autoClose: 1500 });
       })
       .addCase(checkAuthenticationUser.pending, (state) => {

@@ -5,12 +5,19 @@ import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentT
 import { AccountCircle } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../hook/useTypedSelector';
 import { checkAuthenticationUser, loginUser } from '../../../features/user/userSlice';
+import { apiPostSendEmail } from '../../../api/auth';
+
+const dialogProps = {
+    disableBackdropClick: true,
+    disableEscapeKeyDown: true
+};
 
 const Header = () => {
     const dispatch = useAppDispatch();
     const [isScrolling, setIsScrolling] = useState(false);
     const [openLogin, setOpenlogin] = useState(false);
     const [openRegister, setOpenRegister] = useState(false);
+    const [openCode, setOpenCode] = useState(false);
     const [isLogin, setIsLogin] = useState(false)
     // const [user, setUser] = useState<string | null>('');
 
@@ -50,8 +57,12 @@ const Header = () => {
         setOpenRegister(false);
     };
 
+    const handleCodeClose = () => {
+        setOpenCode(false);
+    };
+
     const handleLogout = () => {
-        localStorage.removeItem("user");
+        localStorage.removeItem("token");
         window.location.reload();
         setIsLogin(false)
     }
@@ -240,7 +251,7 @@ const Header = () => {
                         margin="dense"
                         id="username"
                         name="username"
-                        label="username"
+                        label="Username"
                         type="text"
                         fullWidth
                         variant="standard"
@@ -257,14 +268,14 @@ const Header = () => {
                         variant="standard"
                     />
                     <div style={{ paddingTop: "12px" }}>
-                        Chưa có tài khoản?
+                        Bạn quên mật khẩu?
                         <span
                             style={{ cursor: "pointer", fontStyle: "italic", marginLeft: "6px" }}
                             onClick={() => {
                                 setOpenlogin(false)
                                 setOpenRegister(true)
                             }}
-                        ><u>Đăng ký ngay</u></span>
+                        ><u>Lấy lại mật khẩu</u></span>
                     </div>
                 </DialogContent>
                 <DialogActions>
@@ -276,23 +287,33 @@ const Header = () => {
                 fullWidth={true}
                 maxWidth="md"
                 open={openRegister}
-                onClose={handleRegisterClose}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleRegisterClose();
+                    }
+                }}
                 PaperProps={{
                     component: 'form',
-                    onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+                    onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
                         event.preventDefault();
                         const formData = new FormData(event.currentTarget);
                         const formJson = Object.fromEntries((formData as any).entries());
                         const email = formJson.email;
-                        console.log(email);
-                        handleRegisterClose();
+                        try {
+                            const result = await apiPostSendEmail(email)
+                            handleRegisterClose();
+                            setOpenCode(true)
+                        } catch (e) {
+                            console.log(e);
+                            alert("User Not Found")
+                        }
                     },
                 }}
             >
-                <DialogTitle style={{ textAlign: "center" }}>Đăng ký</DialogTitle>
+                <DialogTitle style={{ textAlign: "center" }}>Quên mật khẩu</DialogTitle>
                 <DialogContent style={{ textAlign: "center" }}>
                     <DialogContentText>
-                        Điền đầy đủ thông tin đăng ký
+                        Nhập email đă đăng ký để lấy lại mật khẩu
                     </DialogContentText>
                     <TextField
                         autoFocus
@@ -302,6 +323,70 @@ const Header = () => {
                         name="email"
                         label="Email Address"
                         type="email"
+                        fullWidth
+                        variant="standard"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleRegisterClose}>Cancel</Button>
+                    <Button type="submit">Send</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                fullWidth={true}
+                maxWidth="md"
+                open={openCode}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleCodeClose();
+                    }
+                }}
+                PaperProps={{
+                    component: 'form',
+                    onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        const formJson = Object.fromEntries((formData as any).entries());
+                        const username = formJson.username;
+                        const code = formJson.code;
+                        const password = formJson.password;
+                        const cfPassword = formJson.cfPassword;
+                        try {
+                            if (password !== cfPassword)
+                                alert("Confirm password not match")
+                            // const result = await apiPostSendEmail(email)
+                            handleRegisterClose();
+                        } catch (e) {
+                            console.log(e);
+                            alert("User Not Found")
+                        }
+                    },
+                }}
+            >
+                <DialogTitle style={{ textAlign: "center" }}>Nhập mật khẩu mới</DialogTitle>
+                <DialogContent style={{ textAlign: "center" }}>
+                    <DialogContentText>
+                        Nhập code và mật khẩu mới
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        required
+                        margin="dense"
+                        id="username"
+                        name="username"
+                        label="Username"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                    />
+                    <TextField
+                        autoFocus
+                        required
+                        margin="dense"
+                        id="code"
+                        name="code"
+                        label="Code"
+                        type="password"
                         fullWidth
                         variant="standard"
                     />
@@ -316,10 +401,21 @@ const Header = () => {
                         fullWidth
                         variant="standard"
                     />
+                    <TextField
+                        autoFocus
+                        required
+                        margin="dense"
+                        id="cfPassword"
+                        name="cfPassword"
+                        label="Confirm Password"
+                        type="password"
+                        fullWidth
+                        variant="standard"
+                    />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleRegisterClose}>Cancel</Button>
-                    <Button type="submit">Register</Button>
+                    <Button onClick={handleCodeClose}>Cancel</Button>
+                    <Button type="submit">Send</Button>
                 </DialogActions>
             </Dialog>
         </div >
