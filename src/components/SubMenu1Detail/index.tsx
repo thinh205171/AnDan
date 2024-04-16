@@ -224,6 +224,10 @@ const SubMenu1Detail = () => {
         navigate(`/sub-menu-1/detail-edit/${location.pathname.split('/')[1].split('-')[2]}`)
     };
 
+    const handleClickCreate = () => {
+        navigate(`/sub-menu-3/detail-edit/${location.pathname.split('/')[3]}`)
+    };
+
     const docs = useMemo(() => [
         { uri: require("./phuluc1.pdf") },
     ], []);
@@ -774,6 +778,7 @@ const SubMenu1Detail = () => {
                             <div className="sub-menu-action">
                                 <div className="verify" style={{ justifyContent: "center" }}>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
+                                        <div className='action-button' onClick={handleClickCreate}>Tạo giáo án</div>
                                         <div className='action-button' onClick={handleClickSave}>Sửa</div>
                                         <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                                     </div>

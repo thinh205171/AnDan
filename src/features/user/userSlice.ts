@@ -115,7 +115,7 @@ export const authSlice = createSlice({
         state.isSuccess = true;
         state.user = action.payload.res;
         state.loginStatus = 1;
-        localStorage.setItem('token', action.payload.res.token);
+        localStorage.setItem('token', action.payload.res);
         window.location.reload();
         toast.success("User login successfully", { autoClose: 1500 });
       })

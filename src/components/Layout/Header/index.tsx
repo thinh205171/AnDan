@@ -5,12 +5,7 @@ import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentT
 import { AccountCircle } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../hook/useTypedSelector';
 import { checkAuthenticationUser, loginUser } from '../../../features/user/userSlice';
-import { apiPostSendEmail } from '../../../api/auth';
-
-const dialogProps = {
-    disableBackdropClick: true,
-    disableEscapeKeyDown: true
-};
+import { apiCheckVerifyPassword, apiPostSendEmail } from '../../../api/auth';
 
 const Header = () => {
     const dispatch = useAppDispatch();
@@ -279,7 +274,7 @@ const Header = () => {
                     </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleLoginClickOpen}>Cancel</Button>
+                    <Button onClick={handleLoginClose}>Cancel</Button>
                     <Button type="submit">Login</Button>
                 </DialogActions>
             </Dialog>
@@ -348,17 +343,20 @@ const Header = () => {
                         const formData = new FormData(event.currentTarget);
                         const formJson = Object.fromEntries((formData as any).entries());
                         const username = formJson.username;
-                        const code = formJson.code;
+                        const curPass = formJson.curPass;
                         const password = formJson.password;
                         const cfPassword = formJson.cfPassword;
                         try {
                             if (password !== cfPassword)
                                 alert("Confirm password not match")
-                            // const result = await apiPostSendEmail(email)
+                            if (password && cfPassword && username && curPass) {
+                                const res = await apiCheckVerifyPassword(null, { username: username, currentPassword: curPass, newPassword: password })
+                                setOpenCode(false)
+                            }
                             handleRegisterClose();
                         } catch (e) {
                             console.log(e);
-                            alert("User Not Found")
+                            alert("Something went wrong")
                         }
                     },
                 }}
@@ -366,7 +364,7 @@ const Header = () => {
                 <DialogTitle style={{ textAlign: "center" }}>Nhập mật khẩu mới</DialogTitle>
                 <DialogContent style={{ textAlign: "center" }}>
                     <DialogContentText>
-                        Nhập code và mật khẩu mới
+                        Nhập mật khẩu hiện tại và mật khẩu mới
                     </DialogContentText>
                     <TextField
                         autoFocus
@@ -383,9 +381,9 @@ const Header = () => {
                         autoFocus
                         required
                         margin="dense"
-                        id="code"
-                        name="code"
-                        label="Code"
+                        id="curPass"
+                        name="curPass"
+                        label="Current password"
                         type="password"
                         fullWidth
                         variant="standard"

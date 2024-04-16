@@ -1,13 +1,29 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import "./style.scss"
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
 import { Edit } from '@mui/icons-material';
+import { useAppSelector } from '../../hook/useTypedSelector';
+import { apiGetUser } from '../../api/user';
 
 const Profile = () => {
     const [openEdit, setOpenEdit] = useState(false);
     const openHandleEdit = () => {
         setOpenEdit(!openEdit)
     }
+    const [userInfo, setUserInfo] = useState<any>()
+
+    const user = useAppSelector(state => state.auth.user)
+    console.log("userInfo: ", userInfo)
+    useEffect(() => {
+        const fetchUser = async () => {
+            if (user) {
+                const res = await apiGetUser(user?.userId)
+                if (res)
+                    setUserInfo(res.data)
+            }
+        }
+        fetchUser()
+    }, [user?.userId, user])
 
     return (
         <div className='profile-panel'>
@@ -22,27 +38,23 @@ const Profile = () => {
                     <div className="profile-panel-container-detail-description">
                         <div className="profile-panel-container-detail-description-content">
                             <div className='profile-detail-field'>Họ và tên</div>
-                            <div className='profile-detail-value'>Trần Đại An</div>
-                        </div>
-                        <div className="profile-panel-container-detail-description-content">
-                            <div className='profile-detail-field'>Vai trò</div>
-                            <div className='profile-detail-value'>Người dùng</div>
+                            <div className='profile-detail-value'>{userInfo?.fullName}</div>
                         </div>
                         <div className="profile-panel-container-detail-description-content">
                             <div className='profile-detail-field'>Email</div>
-                            <div className='profile-detail-value'>email@gmail.com</div>
+                            <div className='profile-detail-value'>{userInfo?.email}</div>
                         </div>
                         <div className="profile-panel-container-detail-description-content">
                             <div className='profile-detail-field'>Giới tinh</div>
-                            <div className='profile-detail-value'>Nữ</div>
+                            <div className='profile-detail-value'>{userInfo?.gender}</div>
                         </div>
                         <div className="profile-panel-container-detail-description-content">
                             <div className='profile-detail-field'>Tuổi</div>
-                            <div className='profile-detail-value'>26</div>
+                            <div className='profile-detail-value'>{userInfo?.age}</div>
                         </div>
                         <div className="profile-panel-container-detail-description-content">
-                            <div className='profile-detail-field'>Ngày sinh</div>
-                            <div className='profile-detail-value'>02/09/1998</div>
+                            <div className='profile-detail-field'>Nơi sinh</div>
+                            <div className='profile-detail-value'>{userInfo?.placeOfBirth}</div>
                         </div>
                         <div className="profile-panel-container-detail-description-content">
                             <div className='profile-edit-btn' onClick={() => setOpenEdit(true)}><Edit /> Chỉnh sửa thông tin</div>
