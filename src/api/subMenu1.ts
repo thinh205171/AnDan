@@ -10,6 +10,22 @@ export const apiGetSubMenu1 = async () => {
         return null;
 }
 
+export const apiGetAllTestingCategory = async () => {
+    const result = await axios.get(`${base_url}Document1PeriodicAssessment/GetAllTestingCategory`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiGetAllFormCategory = async () => {
+    const result = await axios.get(`${base_url}Document1PeriodicAssessment/GetAllFormCategory`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
 export const apiGetSubMenu1ById = async (id: string) => {
     const result = await axios.get(`${base_url}Document1/ById/${id}`);
     if (result)
@@ -43,32 +59,32 @@ export const apiPostSubMenu1TeachingEquipment = async (data: any, docId: any) =>
         return null;
 }
 
-export const apiPostSubMenu1CuriculumDistribution = async (data: any) => {
-    const result = await axios.put(`${base_url}Document1CuriculumDistribution`, data);
+export const apiPostSubMenu1CuriculumDistribution = async (data: any, docId: any) => {
+    const result = await axios.put(`${base_url}Document1CuriculumDistribution?documentId=${docId}`, data);
     if (result)
         return result;
     else
         return null;
 }
 
-export const apiPostSubMenu1SelectedTopic = async (data: any) => {
-    const result = await axios.put(`${base_url}Document1SelectedTopic`, data);
+export const apiPostSubMenu1SelectedTopic = async (data: any, docId: any) => {
+    const result = await axios.put(`${base_url}Document1SelectedTopic?documentId=${docId}`, data);
     if (result)
         return result;
     else
         return null;
 }
 
-export const apiPostSubMenu1SubjectRooms = async (data: any) => {
-    const result = await axios.put(`${base_url}Document1SubjectRooms`, data);
+export const apiPostSubMenu1SubjectRooms = async (data: any, docId: any) => {
+    const result = await axios.put(`${base_url}Document1SubjectRooms?documentId=${docId}`, data);
     if (result)
         return result;
     else
         return null;
 }
 
-export const apiPostSubMenu1PeriodicAssessment = async (data: any) => {
-    const result = await axios.put(`${base_url}Document1PeriodicAssessment`, data);
+export const apiPostSubMenu1PeriodicAssessment = async (data: any, docId: any) => {
+    const result = await axios.put(`${base_url}Document1PeriodicAssessment?documentId=${docId}`, data);
     if (result)
         return result;
     else

@@ -6,7 +6,7 @@ import { Add, Remove } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DocViewer, { PDFRenderer } from '@cyntler/react-doc-viewer';
 import { useAppSelector } from '../../hook/useTypedSelector';
-import { apiDeleteSubMenu1, apiPostSubMenu1, apiPostSubMenu1TeachingEquipment } from '../../api/subMenu1';
+import { apiDeleteSubMenu1, apiGetAllFormCategory, apiGetAllTestingCategory, apiPostSubMenu1, apiPostSubMenu1CuriculumDistribution, apiPostSubMenu1PeriodicAssessment, apiPostSubMenu1SelectedTopic, apiPostSubMenu1SubjectRooms, apiPostSubMenu1TeachingEquipment } from '../../api/subMenu1';
 import { apiGetGrade } from '../../api/grade';
 import { Grade } from '../../models/grade';
 import { apiGetSubject } from '../../api/subject';
@@ -20,6 +20,8 @@ import { apiGetSubjectRoom } from '../../api/subjectRoom';
 import { apiGetSelectedTopic } from '../../api/selectedTopic';
 import { apiGetCurriculumDistribution } from '../../api/curriculumDistribution';
 import { formatDate } from '../../utils/date';
+import { TestingCategory } from '../../models/testingCategory';
+import { FormCategory } from '../../models/formCategory';
 
 interface Row1 {
     teachingEquipmentId: number | null;
@@ -48,17 +50,18 @@ interface Row4 {
 
 interface Row5 {
     baiKiemTra: string;
-    thoiGian: number | null;
-    thoiDiem: string;
+    testingCategoryId: number,
+    time: number | null;
+    date: string;
     description: string;
-    hinhthuc: string;
+    formCategoryId: number | null;
 }
 
 const defaultRows: Row5[] = [
-    { baiKiemTra: 'Giữa Học kỳ 1', thoiGian: null, thoiDiem: '', description: '', hinhthuc: '' },
-    { baiKiemTra: 'Cuối Học kỳ 1', thoiGian: null, thoiDiem: '', description: '', hinhthuc: '' },
-    { baiKiemTra: 'Giữa Học kỳ 2', thoiGian: null, thoiDiem: '', description: '', hinhthuc: '' },
-    { baiKiemTra: 'Cuối Học kỳ 2', thoiGian: null, thoiDiem: '', description: '', hinhthuc: '' },
+    { baiKiemTra: 'Giữa Học kỳ 1', testingCategoryId: 1, time: null, date: '', description: '', formCategoryId: null },
+    { baiKiemTra: 'Cuối Học kỳ 1', testingCategoryId: 2, time: null, date: '', description: '', formCategoryId: null },
+    { baiKiemTra: 'Giữa Học kỳ 2', testingCategoryId: 3, time: null, date: '', description: '', formCategoryId: null },
+    { baiKiemTra: 'Cuối Học kỳ 2', testingCategoryId: 4, time: null, date: '', description: '', formCategoryId: null },
 ];
 
 const SubMenu1Detail = () => {
@@ -82,6 +85,8 @@ const SubMenu1Detail = () => {
     const [subjectRoom, setSubjectRoom] = useState<SubjectRoom[]>([]);
     const [selectedTopic, setSelectedTopic] = useState<SelectedTopic[]>([]);
     const [curriculumDistribution, setCurriculumDistribution] = useState<CurriculumDistribution[]>([]);
+    const [testingCategory, setTestingCategory] = useState<TestingCategory[]>([]);
+    const [formCategory, setFormCategory] = useState<FormCategory[]>([]);
 
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
@@ -150,12 +155,30 @@ const SubMenu1Detail = () => {
             }
         }
 
+        const fetchTestingCategory = async () => {
+            const res = await apiGetAllTestingCategory();
+            if (res && res.data) {
+                const testingCategoryData: TestingCategory[] = res.data;
+                setTestingCategory(testingCategoryData);
+            }
+        }
+
+        const fetchFormCategory = async () => {
+            const res = await apiGetAllFormCategory();
+            if (res && res.data) {
+                const FormCategoryData: FormCategory[] = res.data;
+                setFormCategory(FormCategoryData);
+            }
+        }
+
         fetchGrade();
         fetchSubject();
         fetchTeachingEquipment();
         fetchSelectedTopic();
         fetchSubjectRoom();
-        fetchCurriculumDistribution()
+        fetchCurriculumDistribution();
+        fetchTestingCategory();
+        fetchFormCategory();
     }, []);
 
     const handleClickOpen = async () => {
@@ -181,8 +204,7 @@ const SubMenu1Detail = () => {
     const handleClose = async () => {
         setOpen(false);
         try {
-            const result = await apiDeleteSubMenu1(documentId);
-            console.log("result: ", result)
+            await apiDeleteSubMenu1(documentId);
         } catch (error) {
             console.error(error);
         }
@@ -266,16 +288,6 @@ const SubMenu1Detail = () => {
         };
         setRows4([...rows4, newRow]);
     };
-    const handleAddRow5 = () => {
-        const newRow = {
-            baiKiemTra: '',
-            thoiGian: null,
-            thoiDiem: '',
-            description: '',
-            hinhthuc: ''
-        };
-        setRows5([...rows5, newRow]);
-    };
 
     const handleRemoveRow1 = () => {
         if (rows1.length > 1) {
@@ -313,8 +325,16 @@ const SubMenu1Detail = () => {
         if (rows1 && rows2 && rows3 && rows4 && rows5) {
             const rows1WithDocumentId = rows1.map(row => ({ ...row, document1Id: documentId }));
             const res1 = await apiPostSubMenu1TeachingEquipment(rows1WithDocumentId, documentId);
+            const rows2WithDocumentId = rows2.map(row => ({ ...row, document1Id: documentId }));
+            const res2 = await apiPostSubMenu1SubjectRooms(rows2WithDocumentId, documentId);
+            const rows3WithDocumentId = rows3.map(row => ({ ...row, document1Id: documentId }));
+            const res3 = await apiPostSubMenu1CuriculumDistribution(rows3WithDocumentId, documentId);
+            const rows4WithDocumentId = rows4.map(row => ({ ...row, document1Id: documentId }));
+            const res4 = await apiPostSubMenu1SelectedTopic(rows4WithDocumentId, documentId);
+            const rows5WithDocumentId = rows5.map(row => ({ ...row, document1Id: documentId }));
+            const res5 = await apiPostSubMenu1PeriodicAssessment(rows5WithDocumentId, documentId);
         }
-        console.log("row1: ", rows1)
+        console.log("row5: ", rows5)
         setOpen(false)
     }
     return (
@@ -585,7 +605,7 @@ const SubMenu1Detail = () => {
                                                         <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                             <TableCell align="center">{index + 1}</TableCell>
                                                             <TableCell align="center">
-                                                                <select id="teachingEquipment" style={{ width: "210px", height: "40px", marginLeft: "4px" }} defaultValue={''}
+                                                                <select id="curriculumDistribution" style={{ width: "210px", height: "40px", marginLeft: "4px" }} defaultValue={''}
                                                                     onChange={(e) => {
                                                                         const newValue = parseInt(e.target.value);
                                                                         const updatedRows = [...rows3];
@@ -649,7 +669,13 @@ const SubMenu1Detail = () => {
                                                         <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                             <TableCell align="center">{index + 1}</TableCell>
                                                             <TableCell align="center">
-                                                                <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }} defaultValue={''}>
+                                                                <select id="selectedTopic" style={{ width: "150px", height: "40px", marginLeft: "4px" }} defaultValue={''}
+                                                                    onChange={(e) => {
+                                                                        const newValue = parseInt(e.target.value);
+                                                                        const updatedRows = [...rows4];
+                                                                        updatedRows[index].selectedTopicsId = newValue;
+                                                                        setRows4(updatedRows);
+                                                                    }}>
                                                                     <option value="" disabled>Chọn chuyên đề</option>
                                                                     {
                                                                         selectedTopic?.map((item) => (
@@ -709,22 +735,22 @@ const SubMenu1Detail = () => {
                                                             <TableCell align="center">{row.baiKiemTra}</TableCell>
                                                             <TableCell align="center">
                                                                 <textarea
-                                                                    value={row.thoiGian ?? ''}
+                                                                    value={row.time ?? ''}
                                                                     onChange={(e) => {
                                                                         const newValue = parseInt(e.target.value);
                                                                         const updatedRows = [...rows5];
-                                                                        updatedRows[index].thoiGian = newValue;
+                                                                        updatedRows[index].time = newValue;
                                                                         setRows5(updatedRows);
                                                                     }}
                                                                 />
                                                             </TableCell>
                                                             <TableCell align="center">
                                                                 <textarea
-                                                                    value={row.thoiDiem}
+                                                                    value={row.date}
                                                                     onChange={(e) => {
                                                                         const newValue = e.target.value;
                                                                         const updatedRows = [...rows5];
-                                                                        updatedRows[index].thoiDiem = newValue;
+                                                                        updatedRows[index].date = newValue;
                                                                         setRows5(updatedRows);
                                                                     }}
                                                                 />
@@ -741,15 +767,20 @@ const SubMenu1Detail = () => {
                                                                 />
                                                             </TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.hinhthuc}
+                                                                <select id="formCategory" style={{ width: "150px", height: "40px", marginLeft: "4px" }} defaultValue={''}
                                                                     onChange={(e) => {
-                                                                        const newValue = e.target.value;
+                                                                        const newValue = parseInt(e.target.value);
                                                                         const updatedRows = [...rows5];
-                                                                        updatedRows[index].hinhthuc = newValue;
+                                                                        updatedRows[index].formCategoryId = newValue;
                                                                         setRows5(updatedRows);
-                                                                    }}
-                                                                />
+                                                                    }}>
+                                                                    <option value="" disabled>Chọn hình thức</option>
+                                                                    {
+                                                                        formCategory?.map((item) => (
+                                                                            <option value={item?.id}>{item?.name}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
                                                             </TableCell>
                                                         </TableRow>
                                                     ))}

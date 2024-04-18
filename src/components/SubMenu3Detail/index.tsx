@@ -82,10 +82,6 @@ const SubMenu3Detail = () => {
         setOpenRemove(false);
     };
 
-    const handleClickSave = () => {
-        navigate(`/sub-menu-3/detail-edit/${location.pathname.split('/')[3]}`)
-    };
-
     const docs = [{ uri: require("./phuluc3.pdf") }]
 
     const handleAddRow1 = () => {
@@ -166,7 +162,7 @@ const SubMenu3Detail = () => {
                                         <input type="text" placeholder='..............' style={{ width: "50px" }} onChange={e => setKhoiLop(e.target.value)} />
                                     </div>
                                 </div>
-                                <div>(Năm học 20<input type="text" placeholder='...........' style={{ width: "15px" }} onChange={e => setStartYear(e.target.value)} /> - 20<input type="text" placeholder='...........' style={{ width: "15px" }} onChange={e => setEndYear(e.target.value)} />)</div>
+                                <div>(Năm học 2023 - 2024)</div>
                             </div>
 
                             <div className='sub-menu-content-main'>
@@ -411,7 +407,6 @@ const SubMenu3Detail = () => {
                             <div className="sub-menu-action">
                                 <div className="verify" style={{ justifyContent: "center" }}>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
-                                        <div className='action-button' onClick={handleClickSave}>Sửa</div>
                                         <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                                     </div>
                                 </div>
