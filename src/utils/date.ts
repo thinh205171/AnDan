@@ -1,6 +1,7 @@
-export const formatDate = (date: Date): string => {
+export const formatDate = (dateString: any) => {
+    const date = new Date(dateString);
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
     return `${year}-${month}-${day}`;
-}
+};

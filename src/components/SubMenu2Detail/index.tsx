@@ -11,7 +11,8 @@ import { apiGetAllGetUser } from '../../api/user';
 import { Grade } from '../../models/grade';
 import { apiGetGrade } from '../../api/grade';
 import { useAppSelector } from '../../hook/useTypedSelector';
-import { apiPostSubMenu2 } from '../../api/subMenu2';
+import { apiDeleteSubMenu2, apiPostSubMenu2, apiPostSubMenu2Grade } from '../../api/subMenu2';
+import { formatDate } from '../../utils/date';
 
 interface Row {
     gradeId: number | null;
@@ -85,28 +86,36 @@ const SubMenu2Detail = () => {
 
     const handleClickOpen = async () => {
         const today = new Date();
-        const createdDate = `${today.getFullYear()}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getDate().toString().padStart(2, '0')}`;
-        console.log("createdDate: ", createdDate)
+        const createdDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
         if (user) {
             setOpen(true);
-            const post = await apiPostSubMenu2({
-                name: "KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN",
-                userId: user.userId,
-                userName: user.username,
-                createdDate: createdDate,
-                status: true,
-                approveByName: ""
-            })
-            if (post) {
-                setDocumentId(post?.data?.id)
+            try {
+                const post = await apiPostSubMenu2({
+                    name: "KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN",
+                    userId: user.userId,
+                    userName: user.username,
+                    createdDate: createdDate,
+                    status: true,
+                    approveByName: ""
+                })
+                if (post) {
+                    setDocumentId(post?.data?.id)
+                }
+            } catch (error) {
+                alert("Something went wrong")
             }
         }
         else
             alert("Something went wrong!")
     };
 
-    const handleClose = () => {
+    const handleClose = async () => {
         setOpen(false);
+        try {
+            await apiDeleteSubMenu2(documentId);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleClickOpenAccept = () => {
@@ -180,22 +189,40 @@ const SubMenu2Detail = () => {
     };
 
 
-    const handleAddGrade = () => {
-        const newSubRow = [{ gradeId: null, titleName: '', description: '', slot: null, time: '', place: '', hostBy: null, collaborateWith: '', condition: '' }];
+    const handleAddGrade = (indexGrade: number) => {
+        const newSubRow = [{ gradeId: indexGrade, titleName: '', description: '', slot: null, time: '', place: '', hostBy: null, collaborateWith: '', condition: '' }];
         setMultiRows([...multiRows, newSubRow]);
+        const newGradeId = { gradeId: indexGrade };
+        setGradeIds([...gradeIds, newGradeId]);
     }
 
     const handleAddDoc2 = async () => {
-        console.log("grade: ", gradeIds)
         const formatMultiRow = multiRows?.map((rows, index) => {
             rows?.forEach(row => {
                 row.gradeId = gradeIds[index]?.gradeId ?? null;
             });
             return rows;
         });
-        console.log("formatMultiRow: ", formatMultiRow.flat());
-        setOpen(false)
-    }
+        const flattenedRows = formatMultiRow.reduce((accumulator, currentValue) => {
+            accumulator.push(...currentValue);
+            return accumulator;
+        }, []);
+        const rowsWithDocumentId = flattenedRows.map(row => {
+            return { ...row, document2Id: documentId };
+        });
+
+        if (rowsWithDocumentId) {
+            try {
+                const res = await apiPostSubMenu2Grade(rowsWithDocumentId, documentId);
+                if (res) {
+                    alert("Tạo thành công");
+                }
+            } catch (error) {
+                alert("Đã xảy ra lỗi");
+            }
+        }
+        setOpen(false);
+    };
 
     return (
         <div className='sub-menu-container'>
@@ -233,7 +260,7 @@ const SubMenu2Detail = () => {
                             <div className='sub-menu-content-main'>
                                 {multiRows.map((subRows, indexGrade) => (
                                     <Tooltip key={indexGrade} disableFocusListener placement="right"
-                                        title={<h2 onClick={handleAddGrade} style={{ cursor: "pointer" }}>Add</h2>}
+                                        title={<h2 onClick={() => handleAddGrade(indexGrade)} style={{ cursor: "pointer" }}>Add</h2>}
                                     >
                                         <div className="sub-menu-content-main-feature">
                                             <div className="sub-menu-content-main-feature-item" style={{ display: "flex", alignItems: "center", columnGap: "6px" }}>
@@ -242,11 +269,11 @@ const SubMenu2Detail = () => {
                                                         onChange={(e) => {
                                                             const newValue = parseInt(e.target.value);
                                                             const updatedGradeIds = [...gradeIds];
-                                                            if (indexGrade >= 0 && indexGrade < updatedGradeIds.length) {
+                                                            if (indexGrade >= 0) {
                                                                 updatedGradeIds[indexGrade].gradeId = newValue;
                                                                 setGradeIds(updatedGradeIds);
                                                             }
-                                                            console.log("updatedGradeIds: ", updatedGradeIds)
+                                                            console.log("gradeIds: ", gradeIds)
                                                         }}>
                                                         <option value="" disabled>Chọn khối lớp</option>
                                                         {
@@ -312,8 +339,9 @@ const SubMenu2Detail = () => {
                                                                         />
                                                                     </TableCell>
                                                                     <TableCell align="center">
-                                                                        <textarea
-                                                                            value={row.time ?? null}
+                                                                        <input
+                                                                            type="date"
+                                                                            value={row.time ? formatDate(row.time) : ''}
                                                                             onChange={(e) => {
                                                                                 const newValue = e.target.value;
                                                                                 const updatedRows = [...multiRows];
@@ -500,7 +528,11 @@ const SubMenu2Detail = () => {
             }
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={async (event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleClose();
+                    }
+                }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
 

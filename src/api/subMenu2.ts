@@ -26,3 +26,18 @@ export const apiPostSubMenu2 = async (data: any) => {
         return null;
 }
 
+export const apiPostSubMenu2Grade = async (data: any, docId: any) => {
+    const result = await axios.put(`${base_url}Document2Grade/${docId}`, data);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiDeleteSubMenu2 = async (docId: any) => {
+    const result = await axios.delete(`${base_url}Document2/${docId}`);
+    if (result)
+        return result;
+    else
+        return null;
+}

@@ -745,8 +745,9 @@ const SubMenu1Detail = () => {
                                                                 />
                                                             </TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.date}
+                                                                <input
+                                                                    type="date"
+                                                                    value={row.date ? formatDate(row.date) : ''}
                                                                     onChange={(e) => {
                                                                         const newValue = e.target.value;
                                                                         const updatedRows = [...rows5];
