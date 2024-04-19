@@ -810,7 +810,9 @@ const SubMenu1Detail = () => {
                             <div className="sub-menu-action">
                                 <div className="verify" style={{ justifyContent: "center" }}>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
-                                        <div className='action-button' onClick={handleClickCreate}>Tạo giáo án</div>
+                                        {
+                                            !location.pathname.includes('-add') && <div className='action-button' onClick={handleClickCreate}>Tạo giáo án</div>
+                                        }
                                         <div className='action-button' onClick={handleClickSave}>Sửa</div>
                                         <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                                     </div>
