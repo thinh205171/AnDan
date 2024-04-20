@@ -90,3 +90,20 @@ export const apiPostSubMenu1PeriodicAssessment = async (data: any, docId: any) =
     else
         return null;
 }
+
+
+export const apiGetTotalClassByGradeId = async (data: any) => {
+    const result = await axios.get(`${base_url}Document1/GetTotalClassByGradeId?gradeId=${data}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiGetTeacherInformation = async (data: any) => {
+    const result = await axios.get(`${base_url}Document1/GetTeacherInformation?specializedDepartmentId=${data}`);
+    if (result)
+        return result;
+    else
+        return null;
+}

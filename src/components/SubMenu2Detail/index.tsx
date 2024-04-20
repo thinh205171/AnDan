@@ -96,7 +96,34 @@ const SubMenu2Detail = () => {
                     userName: user.username,
                     createdDate: createdDate,
                     status: true,
-                    approveByName: ""
+                    approveByName: "",
+                    isApprove: 1
+                })
+                if (post) {
+                    setDocumentId(post?.data?.id)
+                }
+            } catch (error) {
+                alert("Something went wrong")
+            }
+        }
+        else
+            alert("Something went wrong!")
+    };
+
+    const handleClickOpen1 = async () => {
+        const today = new Date();
+        const createdDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+        if (user) {
+            setOpen(true);
+            try {
+                const post = await apiPostSubMenu2({
+                    name: "KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN",
+                    userId: user.userId,
+                    userName: user.username,
+                    createdDate: createdDate,
+                    status: true,
+                    approveByName: "",
+                    isApprove: 2
                 })
                 if (post) {
                     setDocumentId(post?.data?.id)
@@ -156,6 +183,10 @@ const SubMenu2Detail = () => {
 
     const handleClickSave = () => {
         navigate(`/sub-menu-2/detail-edit/${location.pathname.split('/')[1].split('-')[2]}`)
+    };
+
+    const handleClickAdd = () => {
+        navigate(`/sub-menu-2/detail-create`)
     };
 
     const docs = [{ uri: require("./phuluc2.pdf") }]
@@ -227,7 +258,7 @@ const SubMenu2Detail = () => {
     return (
         <div className='sub-menu-container'>
             {
-                location.pathname?.includes("edit") ?
+                location.pathname?.includes("edit") || location.pathname?.includes("create") ?
                     <div>
                         <div className='sub-menu-content'>
                             <div className="sub-menu-content-header">
@@ -453,6 +484,7 @@ const SubMenu2Detail = () => {
                             </div>
                         </div>
                         <div className="sub-menu-content-action">
+                            <Button onClick={handleClickOpen1} >Lưu bản nháp</Button>
                             <Button onClick={handleClickOpen} >Xác nhận xét duyệt</Button>
                         </div>
                     </div> : <>
@@ -470,7 +502,11 @@ const SubMenu2Detail = () => {
                             <div className="sub-menu-action">
                                 <div className="verify" style={{ justifyContent: "center" }}>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
-                                        <div className='action-button' onClick={handleClickSave}>Sửa</div>
+                                        <div className='action-button' onClick={location.pathname.includes('add') ? handleClickAdd : handleClickSave}>
+                                            {
+                                                location.pathname.includes('create') ? "Tạo mới" : "Sửa"
+                                            }
+                                        </div>
                                         <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                                     </div>
                                 </div>

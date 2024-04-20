@@ -22,14 +22,14 @@ const App = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/sub-menu/:index" element={<SubMenuPage />} />
-          <Route path="/sub-menu-1/detail-add" element={<SubMenu1DetailPage />} />
+          <Route path="/sub-menu-1/detail-create" element={<SubMenu1DetailPage />} />
           <Route path="/sub-menu-1/detail-view/:index" element={<SubMenu1DetailPage />} />
           <Route path="/sub-menu-1/detail-edit/:index" element={<SubMenu1DetailPage />} />
-          <Route path="/sub-menu-2/detail-add" element={<SubMenu2DetailPage />} />
+          <Route path="/sub-menu-2/detail-create" element={<SubMenu2DetailPage />} />
           <Route path="/sub-menu-2/detail-view/:index" element={<SubMenu2DetailPage />} />
           <Route path="/sub-menu-2/detail-edit/:index" element={<SubMenu2DetailPage />} />
-          <Route path="/sub-menu-3/detail-add" element={<SubMenu3DetailPage />} />
           <Route path="/sub-menu-3/detail-view/:index" element={<SubMenu3DetailPage />} />
+          <Route path="/sub-menu-3/detail-create/:index" element={<SubMenu3DetailPage />} />
           <Route path="/sub-menu-3/detail-edit/:index" element={<SubMenu3DetailPage />} />
           <Route path="/sub-menu-4/detail-add" element={<SubMenu4DetailPage />} />
           <Route path="/sub-menu-4/detail-view/:index" element={<SubMenu4DetailPage />} />

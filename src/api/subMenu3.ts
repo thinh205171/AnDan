@@ -26,3 +26,19 @@ export const apiPostSubMenu3 = async (data: any) => {
         return null;
 }
 
+export const apiPostSubMenu3CuriculumDistribution = async (data: any, docId: any) => {
+    const result = await axios.put(`${base_url}Document3CuriculumDistribution?documentId=${docId}`, data);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiPostSubMenu3SelectedTopics = async (data: any, docId: any) => {
+    const result = await axios.put(`${base_url}Document3SelectedTopics?documentId=${docId}`, data);
+    if (result)
+        return result;
+    else
+        return null;
+}
+

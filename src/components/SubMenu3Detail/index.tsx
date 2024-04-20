@@ -1,9 +1,20 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import './style.scss'
 import { Add, Remove } from '@mui/icons-material';
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Subject } from '../../models/subject';
+import { Class } from '../../models/class';
+import { apiGetSubject } from '../../api/subject';
+import { apiGetClassByGradeId } from '../../api/class';
+import { Document1 } from '../../models/document1';
+import { apiGetSubMenu1ById } from '../../api/subMenu1';
+import { apiGetUser } from '../../api/user';
+import { User } from '../../models/User';
+import { useAppSelector } from '../../hook/useTypedSelector';
+import { Department } from '../../models/department';
+import { apiGetSpecializedDepartmentById } from '../../api/specializedDepartment';
 
 interface Row {
     stt: number | null;
@@ -17,6 +28,8 @@ interface Row {
 const SubMenu3Detail = () => {
     const location = useLocation()
     const navigate = useNavigate()
+    const document1Id = location.pathname.split('/')[3];
+    const user = useAppSelector(state => state.auth.user)
     const [rows1, setRows1] = useState<Row[]>([{ stt: null, baiHoc: '', thietBiDayHoc: '', soTiet: null, thoiDiem: '', diaDiem: '' }]);
     const [rows2, setRows2] = useState<Row[]>([{ stt: null, baiHoc: '', thietBiDayHoc: '', soTiet: null, thoiDiem: '', diaDiem: '' }]);
     const [login, setLogin] = useState(false);
@@ -25,11 +38,17 @@ const SubMenu3Detail = () => {
     const [openDeny, setOpenDeny] = useState(false);
     const [openReport, setOpenReport] = useState(false);
     const [openRemove, setOpenRemove] = useState(false);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
+    const [classes, setClasses] = useState<Class[]>([]);
+    const [document1Info, setDocument1Info] = useState<Document1>();
+    const [userInfoLogin, setUserInfoLogin] = useState<User>();
+    const [specializedDepartment, setSpecializedDepartment] = useState<Department>();
+    const [userInfoDocument, setUserInfoDocument] = useState<User[]>([]);
 
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
     const [giaoVien, setGiaoVien] = useState('');
-    const [hoadDong, setHoatDong] = useState('');
+    const [hoadDong, setHoatDong] = useState<number | null>(null);
     const [khoiLop, setKhoiLop] = useState('');
     const [startYear, setStartYear] = useState('');
     const [endYear, setEndYear] = useState('');
@@ -41,6 +60,82 @@ const SubMenu3Detail = () => {
     const [year, setYear] = useState('');
     const [nhiemVuKhac, setNhiemVuKhac] = useState('');
 
+    useEffect(() => {
+        const fetchUserInfoLogin = async () => {
+            if (user) {
+                const res = await apiGetUser(user?.userId)
+                if (res && res.data) {
+                    const userData: any = res.data;
+                    setUserInfoLogin(userData);
+                }
+            }
+        }
+        fetchUserInfoLogin()
+    }, [user])
+
+    useEffect(() => {
+        const fecthDoc1 = async () => {
+            const res = await apiGetSubMenu1ById(location.pathname.split('/')[3]);
+            if (res && res.data) {
+                const doc1Data: any = res.data;
+                setDocument1Info(doc1Data);
+            }
+        }
+        fecthDoc1();
+    }, [location.pathname])
+
+    useEffect(() => {
+        if (location.pathname.includes('create')) {
+            if (user)
+                setGiaoVien(user.username)
+        }
+    }, [location.pathname, user])
+
+    useEffect(() => {
+        const fetchSpecializedDepartmentById = async () => {
+            if (location.pathname.includes('create')) {
+                const fecthDoc1 = await apiGetSubMenu1ById(location.pathname.split('/')[3]);
+                if (fecthDoc1 && fecthDoc1.data) {
+                    const doc1Data: any = fecthDoc1.data;
+                    setDocument1Info(doc1Data);
+                    const fecthUserResult = await apiGetUser(doc1Data?.userId)
+                    if (fecthUserResult && fecthUserResult.data) {
+                        const userData: any = fecthUserResult.data;
+                        setUserInfoDocument(userData);
+                        const res = await apiGetSpecializedDepartmentById(userData?.specializedDepartmentId);
+                        if (res && res.data) {
+                            const departmentData: any = res.data;
+                            setSpecializedDepartment(departmentData);
+                        }
+                    }
+                }
+            }
+        }
+        fetchSpecializedDepartmentById()
+    }, [location.pathname])
+
+    useEffect(() => {
+        const fetchAllSubjects = async () => {
+            const res = await apiGetSubject();
+            if (res && res.data) {
+                const subjectData: Subject[] = res.data;
+                setSubjects(subjectData);
+            }
+        }
+
+        const fetchClasses = async () => {
+            if (document1Info?.gradeId) {
+                const res = await apiGetClassByGradeId(document1Info.gradeId);
+                if (res && res.data) {
+                    const classData: Class[] = res.data;
+                    setClasses(classData);
+                }
+            }
+        }
+
+        fetchAllSubjects();
+        fetchClasses();
+    }, [document1Info])
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -126,7 +221,7 @@ const SubMenu3Detail = () => {
     return (
         <div className='sub-menu-container'>
             {
-                location.pathname?.includes("edit") ?
+                location.pathname?.includes("edit") || location.pathname?.includes("create") ?
                     <div>
                         <div className='sub-menu-content'>
                             <div className="sub-menu-content-header">
@@ -142,8 +237,8 @@ const SubMenu3Detail = () => {
                                 <div className="sub-menu-content-header-infomation">
                                     <div className='sub-menu-content-header-infomation-detail' >
                                         <div style={{ display: "flex" }}> <div><strong>TRƯỜNG: </strong><input type="text" placeholder='...........' onChange={e => setTruong(e.target.value)} /></div></div>
-                                        <div style={{ display: "flex" }}> <div><strong>TỔ: </strong><input type="text" placeholder='...........' onChange={e => setTo(e.target.value)} /></div></div>
-                                        <div style={{ display: "flex" }}> <div>Họ và tên giáo viên:<input type="text" placeholder='...........' onChange={e => setGiaoVien(e.target.value)} /></div></div>
+                                        <div style={{ display: "flex" }}> <div><strong>TỔ: </strong>{specializedDepartment?.name}</div></div>
+                                        <div style={{ display: "flex" }}> <div>Họ và tên giáo viên:{giaoVien}</div></div>
                                     </div>
                                     <div className='sub-menu-content-header-infomation-slogan'>
                                         <div> <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></div>
@@ -157,9 +252,29 @@ const SubMenu3Detail = () => {
                                 <div style={{ display: "flex", justifyContent: "center" }}>
                                     <div>
                                         <strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong>
-                                        <input type="text" placeholder='..............' style={{ width: "50px" }} onChange={e => setHoatDong(e.target.value)} />
+                                        <select id="grades" style={{ width: "70px", marginLeft: "4px" }}
+                                            onChange={(e) => setHoatDong(parseInt(e.target.value))}
+                                            defaultValue={''}
+                                        >
+                                            <option value="" disabled>Chọn môn học</option>
+                                            {
+                                                subjects?.map((item) => (
+                                                    <option value={item?.id}>{item?.name}</option>
+                                                ))
+                                            }
+                                        </select>
                                         <strong>, LỚP</strong>
-                                        <input type="text" placeholder='..............' style={{ width: "50px" }} onChange={e => setKhoiLop(e.target.value)} />
+                                        <select id="grades" style={{ width: "70px", marginLeft: "4px" }}
+                                            onChange={(e) => setKhoiLop(e.target.value)}
+                                            defaultValue={''}
+                                        >
+                                            <option value="" disabled>Chọn lớp</option>
+                                            {
+                                                classes?.map((item) => (
+                                                    <option value={item?.id}>{item?.name}</option>
+                                                ))
+                                            }
+                                        </select>
                                     </div>
                                 </div>
                                 <div>(Năm học 2023 - 2024)</div>
