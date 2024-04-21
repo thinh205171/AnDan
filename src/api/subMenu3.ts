@@ -26,19 +26,43 @@ export const apiPostSubMenu3 = async (data: any) => {
         return null;
 }
 
-export const apiPostSubMenu3CuriculumDistribution = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document3CuriculumDistribution?documentId=${docId}`, data);
+export const apiUpdateSubMenu3 = async (data: any, id: any) => {
+    const result = await axios.put(`${base_url}Document3/${id}`, data);
     if (result)
         return result;
     else
         return null;
 }
 
-export const apiPostSubMenu3SelectedTopics = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document3SelectedTopics?documentId=${docId}`, data);
+export const apiPostSubMenu3CuriculumDistribution = async (data: any) => {
+    const result = await axios.put(`${base_url}Document3CuriculumDistribution`, data);
     if (result)
         return result;
     else
         return null;
 }
 
+export const apiPostSubMenu3SelectedTopics = async (data: any) => {
+    const result = await axios.put(`${base_url}Document3SelectedTopics`, data);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+
+export const apiGetSubMenu3CuriculumDistribution = async (docId: any) => {
+    const result = await axios.get(`${base_url}Document3CuriculumDistribution?id=${docId}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiGetSubMenu3SelectedTopics = async (docId: any) => {
+    const result = await axios.get(`${base_url}Document3SelectedTopics?id=${docId}`);
+    if (result)
+        return result;
+    else
+        return null;
+}

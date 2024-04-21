@@ -14,6 +14,7 @@ const Header = () => {
     const [openRegister, setOpenRegister] = useState(false);
     const [openCode, setOpenCode] = useState(false);
     const [isLogin, setIsLogin] = useState(false)
+    const loginStatus = useAppSelector(state => state.auth.loginStatus)
     // const [user, setUser] = useState<string | null>('');
 
     const user = useAppSelector(state => state.auth.user)
@@ -24,6 +25,12 @@ const Header = () => {
         }
         verifyToken()
     }, [dispatch, isLogin])
+
+    useEffect(() => {
+        if (loginStatus === 4) {
+            setOpenCode(true)
+        }
+    }, [loginStatus])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -295,7 +302,7 @@ const Header = () => {
                         const formJson = Object.fromEntries((formData as any).entries());
                         const email = formJson.email;
                         try {
-                            const result = await apiPostSendEmail(email)
+                            await apiPostSendEmail(email)
                             handleRegisterClose();
                             setOpenCode(true)
                         } catch (e) {

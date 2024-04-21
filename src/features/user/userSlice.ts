@@ -11,6 +11,7 @@ const LOGIN_STATUS = {
   SUCCESS: 1,
   USERNAME_NOT_FOUND: 2,
   WRONG_PASSWORD: 3,
+  FIRST_LOGIN: 4
 };
 
 const AUTHENTICATION_STATUS = {
@@ -152,10 +153,11 @@ export const authSlice = createSlice({
           state.message = action.error;
           console.log(action.payload.response);
           if (
-            action.payload.response?.data.status ===
-            LOGIN_STATUS.USERNAME_NOT_FOUND
-          )
-            toast.error("Username does not exist", { autoClose: 1500 });
+            action.payload.response.data === "Please change your password on first login."
+          ) {
+            alert("Please change your password on first login.")
+            state.loginStatus = 4
+          }
           else if (
             action.payload.response?.data.status === LOGIN_STATUS.WRONG_PASSWORD
           )

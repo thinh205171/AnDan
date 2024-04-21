@@ -4,10 +4,9 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import './style.scss'
 import { Add, Remove } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import DocViewer, { PDFRenderer } from '@cyntler/react-doc-viewer';
 import generatePDF, { Options } from "react-to-pdf";
 import { useAppSelector } from '../../hook/useTypedSelector';
-import { apiDeleteSubMenu1, apiGetAllFormCategory, apiGetAllTestingCategory, apiGetSubMenu1ById, apiGetTeacherInformation, apiGetTotalClassByGradeId, apiPostSubMenu1, apiPostSubMenu1CuriculumDistribution, apiPostSubMenu1PeriodicAssessment, apiPostSubMenu1SelectedTopic, apiPostSubMenu1SubjectRooms, apiPostSubMenu1TeachingEquipment } from '../../api/subMenu1';
+import { apiDeleteSubMenu1, apiGetAllFormCategory, apiGetAllTestingCategory, apiGetCurriculumDistributionByDoc1Id, apiGetPeriodicAssessmentByDoc1Id, apiGetSelectedTopicByDoc1Id, apiGetSubMenu1ById, apiGetSubjectsRoomByDoc1Id, apiGetTeacherInformation, apiGetTeachingEquipmentByDoc1Id, apiGetTotalClassByGradeId, apiPostSubMenu1, apiPostSubMenu1CuriculumDistribution, apiPostSubMenu1PeriodicAssessment, apiPostSubMenu1SelectedTopic, apiPostSubMenu1SubjectRooms, apiPostSubMenu1TeachingEquipment, apiUpdateSubMenu1 } from '../../api/subMenu1';
 import { apiGetGrade } from '../../api/grade';
 import { Grade } from '../../models/grade';
 import { apiGetSubject } from '../../api/subject';
@@ -31,6 +30,7 @@ import { Document1 } from '../../models/document1';
 import { TotalClass } from '../../models/totalClass';
 import { TeacherInfo } from '../../models/teacherInfo';
 import { options } from '../UploadPhuLuc4';
+import axios from 'axios';
 
 interface Row1 {
     teachingEquipmentId: number | null;
@@ -125,24 +125,22 @@ const SubMenu1Detail = () => {
     const getTargetElement = () => document.getElementById("main-content");
     // const downloadPdf = () => generatePDF(getTargetElement, options);
 
-    const downloadPdf = () => {
-        generatePDF(getTargetElement, options).then((pdf) => {
-            // Chuyển file PDF thành Blob
-            // Tạo một FormData object và thêm file PDF vào đó
+    const downloadPdf = async () => {
+        try {
+            const pdf = await generatePDF(getTargetElement, options);
             const formData = new FormData();
             formData.append('files', pdf.output("blob"), 'document.pdf');
 
-            // Gọi API để lưu file PDF vào cơ sở dữ liệu
-            fetch('https://localhost:7241/api/S3FileUpload/upload?prefix=doc1%2F', {
-                method: 'POST',
-                body: formData
-            }).then((response) => {
-                // Xử lý kết quả sau khi gửi file lên máy chủ
-                console.log('Các file PDF đã được lưu vào cơ sở dữ liệu.');
-            }).catch((error) => {
-                console.error('Lỗi khi gửi các file PDF lên máy chủ:', error);
-            });
-        });
+            const response = await axios.post('https://localhost:7241/api/S3FileUpload/upload?prefix=doc1%2F', formData);
+            if (response?.status === 200) {
+                const res = await apiUpdateSubMenu1({ id: documentId, linkFile: response?.data, subjectId: hoadDong, gradeId: khoiLop, userId: user?.userId })
+                if (res && documentId)
+                    navigate(`/sub-menu-1/detail-view/${documentId}`)
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     useEffect(() => {
@@ -170,7 +168,7 @@ const SubMenu1Detail = () => {
                 }
             }
             else if (location.pathname.split('/')[3]) {
-                const fecthDoc1 = await apiGetSubMenu1ById(location.pathname.split('/')[3]);
+                const fecthDoc1 = await apiGetSubMenu1ById(parseInt(location.pathname.split('/')[3]));
                 if (fecthDoc1 && fecthDoc1.data) {
                     const doc1Data: any = fecthDoc1.data;
                     setDocument1Info(doc1Data);
@@ -262,11 +260,64 @@ const SubMenu1Detail = () => {
         fetchFormCategory();
         fetchSpecializedDepartmentById()
     }, [location.pathname, userInfoLogin]);
+    useEffect(() => {
+        if (location.pathname.split('/')[3]) {
+            const fetchTeachingEquipmentByDocId = async () => {
+                const res = await apiGetTeachingEquipmentByDoc1Id(parseInt(location.pathname.split('/')[3]));
+                if (res && res.data) {
+                    const rowData: Row1[] = res.data;
+                    setRows1(rowData);
+                }
+            }
+
+            const fetchPeriodicAssessmentByDocId = async () => {
+                const res = await apiGetPeriodicAssessmentByDoc1Id(parseInt(location.pathname.split('/')[3]));
+                if (res && res.data) {
+                    const rowData: Row5[] = res.data;
+                    setRows5(rowData);
+                }
+            }
+
+            const fetchSelectedTopicByDocId = async () => {
+                const res = await apiGetSelectedTopicByDoc1Id(parseInt(location.pathname.split('/')[3]));
+                if (res && res.data) {
+                    const rowData: Row4[] = res.data;
+                    setRows4(rowData);
+                }
+            }
+
+            const fetchSubjectsRoomByDocId = async () => {
+                const res = await apiGetSubjectsRoomByDoc1Id(parseInt(location.pathname.split('/')[3]));
+                if (res && res.data) {
+                    const rowData: Row2[] = res.data;
+                    setRows2(rowData);
+                }
+            }
+
+            const fetchCurriculumDistributionByDocId = async () => {
+                const res = await apiGetCurriculumDistributionByDoc1Id(parseInt(location.pathname.split('/')[3]));
+                if (res && res.data) {
+                    const rowData: Row3[] = res.data;
+                    setRows3(rowData);
+                }
+            }
+            fetchTeachingEquipmentByDocId()
+            fetchPeriodicAssessmentByDocId()
+            fetchSelectedTopicByDocId()
+            fetchSubjectsRoomByDocId()
+            fetchCurriculumDistributionByDocId()
+        }
+    }, [location.pathname])
 
     useEffect(() => {
-        if (khoiLop) {
+        let gradeIdInit;
+        if (khoiLop)
+            gradeIdInit = khoiLop
+        if (document1Info?.gradeId)
+            gradeIdInit = document1Info?.gradeId
+        if (gradeIdInit) {
             const fecthTotalClass = async () => {
-                const res = await apiGetTotalClassByGradeId(khoiLop)
+                const res = await apiGetTotalClassByGradeId(gradeIdInit)
                 if (res && res.data) {
                     const totalClassData: TotalClass = res.data;
                     setTotalClass(totalClassData);
@@ -274,7 +325,7 @@ const SubMenu1Detail = () => {
             }
             fecthTotalClass();
         }
-    }, [khoiLop])
+    }, [document1Info?.gradeId, khoiLop])
 
     useEffect(() => {
         if (specializedDepartment) {
@@ -387,10 +438,6 @@ const SubMenu1Detail = () => {
         navigate(`/sub-menu-3/detail-create/${location.pathname.split('/')[3]}`)
     };
 
-    const docs = useMemo(() => [
-        { uri: require("./phuluc1.pdf") },
-    ], []);
-
     const handleAddRow1 = () => {
         const newRow = {
             teachingEquipmentId: null,
@@ -472,11 +519,11 @@ const SubMenu1Detail = () => {
             const res5 = await apiPostSubMenu1PeriodicAssessment(rows5WithDocumentId, documentId);
             if (res1 && res2 && res3 && res4 && res5) {
                 downloadPdf()
-                navigate(`/sub-menu-1/view-detail-${documentId}`)
             }
         }
         setOpen(false)
     }
+
     return (
         <div className='sub-menu-container'>
             {
@@ -512,7 +559,7 @@ const SubMenu1Detail = () => {
                                         <div><strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong>
                                             <select id="grades" style={{ width: "120px", marginLeft: "4px" }}
                                                 onChange={(e) => setHoatDong(e.target.value)}
-                                                defaultValue={''}
+                                                defaultValue={document1Info?.subjectId}
                                             >
                                                 <option value="" disabled>Chọn môn học</option>
                                                 {
@@ -527,7 +574,7 @@ const SubMenu1Detail = () => {
                                         <div><strong>, KHỐI LỚP</strong>
                                             <select id="grades" style={{ width: "70px", marginLeft: "4px" }}
                                                 onChange={(e) => setKhoiLop(e.target.value)}
-                                                defaultValue={''}
+                                                defaultValue={document1Info?.gradeId}
                                             >
                                                 <option value="" disabled>Chọn lớp</option>
                                                 {
@@ -589,7 +636,7 @@ const SubMenu1Detail = () => {
                                                                 <TableCell align="center">{index + 1}</TableCell>
                                                                 <TableCell align="center">
                                                                     <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
-                                                                        defaultValue={''}
+                                                                        value={row.teachingEquipmentId ?? ''}
                                                                         onChange={(e) => {
                                                                             const newValue = parseInt(e.target.value);
                                                                             const updatedRows = [...rows1];
@@ -664,7 +711,8 @@ const SubMenu1Detail = () => {
                                                             <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                                 <TableCell align="center">{index + 1}</TableCell>
                                                                 <TableCell align="center">
-                                                                    <select id="subjectRoomId" style={{ width: "150px", height: "40px", marginLeft: "4px" }} defaultValue={''}
+                                                                    <select id="subjectRoomId" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                        value={row.subjectRoomId ?? ''}
                                                                         onChange={(e) => {
                                                                             const newValue = parseInt(e.target.value);
                                                                             const updatedRows = [...rows2];
@@ -745,7 +793,8 @@ const SubMenu1Detail = () => {
                                                             <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                                 <TableCell align="center">{index + 1}</TableCell>
                                                                 <TableCell align="center">
-                                                                    <select id="curriculumDistribution" style={{ width: "210px", height: "40px", marginLeft: "4px" }} defaultValue={''}
+                                                                    <select id="curriculumDistribution" style={{ width: "210px", height: "40px", marginLeft: "4px" }}
+                                                                        value={row.curriculumId ?? ''}
                                                                         onChange={(e) => {
                                                                             const newValue = parseInt(e.target.value);
                                                                             const updatedRows = [...rows3];
@@ -809,7 +858,8 @@ const SubMenu1Detail = () => {
                                                             <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                                 <TableCell align="center">{index + 1}</TableCell>
                                                                 <TableCell align="center">
-                                                                    <select id="selectedTopic" style={{ width: "150px", height: "40px", marginLeft: "4px" }} defaultValue={''}
+                                                                    <select id="selectedTopic" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                        value={row.selectedTopicsId ?? ''}
                                                                         onChange={(e) => {
                                                                             const newValue = parseInt(e.target.value);
                                                                             const updatedRows = [...rows4];
@@ -938,16 +988,13 @@ const SubMenu1Detail = () => {
                             <Button onClick={handleClickOpen} >Xác nhận xét duyệt</Button>
                         </div>
                     </div> : <>
-                        <DocViewer documents={docs} pluginRenderers={[PDFRenderer]}
-                            config={{
-                                header: {
-                                    disableHeader: true,
-                                    disableFileName: true,
-                                    retainURLParams: true,
-                                },
-                                pdfVerticalScrollByDefault: true,
-                            }}
+                        <embed
+                            src={document1Info?.linkFile}
+                            width="100%"
+                            height="1000px"
+                            type="application/pdf"
                         />
+
                         <div>
                             <div className="sub-menu-action">
                                 <div className="verify" style={{ justifyContent: "center" }}>

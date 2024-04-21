@@ -3,6 +3,7 @@ export interface Document1 {
     name: string;
     subjectId: number,
     gradeId: number,
+    document1Id: number,
     userId: number,
     note: string,
     status: boolean,
@@ -14,5 +15,6 @@ export interface Document1 {
     otherTasks: string,
     userName: string,
     subjectName: string,
-    gradeName: string
+    gradeName: string,
+    claasName: string
 }

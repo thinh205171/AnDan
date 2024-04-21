@@ -8,11 +8,14 @@ import { apiGetSubMenu4 } from '../../api/subMenu4';
 import { apiGetSubMenu2 } from '../../api/subMenu2';
 import { apiGetSubMenu3 } from '../../api/subMenu3';
 import { apiGetSubMenu5 } from '../../api/subMenu5';
+import { apiGetSpecializedDepartment } from '../../api/specializedDepartment';
+import { Department } from '../../models/department';
 
 const SubMenu = () => {
     const location = useLocation();
     const navigate = useNavigate()
     const [subMenu1Data, setSubMenu1Data] = useState<SubMenuData[]>([]);
+    const [specializedDepartment, setSpecializedDepartment] = useState<Department[]>([]);
     const [subMenuName, setSubMenuName] = useState('');
     const [gradeData, setGradeData] = useState<{ gradeName: any; items: SubMenuData[] }[]>([]);
     const indexSubMenu = location.pathname.split('/')[2];
@@ -85,6 +88,14 @@ const SubMenu = () => {
         }
     }, [grades, subMenu1Data]);
 
+    useEffect(() => {
+        const fetchSpecializedDepartment = async () => {
+            const res = await apiGetSpecializedDepartment();
+            if (res && res.data)
+                setSpecializedDepartment(res.data)
+        }
+        fetchSpecializedDepartment()
+    }, [])
 
     const displayStyle = indexSubMenu === '3' ? 'none' : 'initial';
 

@@ -41,3 +41,11 @@ export const apiDeleteSubMenu2 = async (docId: any) => {
     else
         return null;
 }
+
+export const apiUpdateSubMenu2 = async (data: any, docId: any) => {
+    const result = await axios.put(`${base_url}Document2/${docId}`, data);
+    if (result)
+        return result;
+    else
+        return null;
+}

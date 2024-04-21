@@ -7,12 +7,19 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { apiGetSelectedTopic } from '../../api/selectedTopic';
 import { SelectedTopic } from '../../models/SelectedTopic';
 import { User } from '../../models/User';
-import { apiGetAllGetUser } from '../../api/user';
+import { apiGetAllGetUser, apiGetUser } from '../../api/user';
 import { Grade } from '../../models/grade';
 import { apiGetGrade } from '../../api/grade';
 import { useAppSelector } from '../../hook/useTypedSelector';
-import { apiDeleteSubMenu2, apiPostSubMenu2, apiPostSubMenu2Grade } from '../../api/subMenu2';
+import { apiDeleteSubMenu2, apiGetSubMenu2ById, apiPostSubMenu2, apiPostSubMenu2Grade, apiUpdateSubMenu2 } from '../../api/subMenu2';
 import { formatDate } from '../../utils/date';
+import { Department } from '../../models/department';
+import { apiGetSpecializedDepartmentById } from '../../api/specializedDepartment';
+import { FormCategory } from '../../models/formCategory';
+import { Document1 } from '../../models/document1';
+import { options } from '../UploadPhuLuc4';
+import generatePDF from 'react-to-pdf';
+import axios from 'axios';
 
 interface Row {
     gradeId: number | null;
@@ -43,8 +50,14 @@ const SubMenu2Detail = () => {
     const [openReport, setOpenReport] = useState(false);
     const [openRemove, setOpenRemove] = useState(false);
     const [users, setUsers] = useState<User[]>([]);
+    const [specializedDepartment, setSpecializedDepartment] = useState<Department>();
+    const [formCategory, setFormCategory] = useState<FormCategory[]>([]);
     const [grades, setGrades] = useState<Grade[]>([]);
     const [documentId, setDocumentId] = useState(null);
+    const [userInfoLogin, setUserInfoLogin] = useState<User>();
+    const [userInfoDocument, setUserInfoDocument] = useState<User[]>([]);
+    const [document2Info, setDocument2Info] = useState<Document1>();
+
 
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
@@ -62,6 +75,75 @@ const SubMenu2Detail = () => {
     const [dayOfMonth, setDayOfMonth] = useState('');
     const [month, setMonth] = useState('');
     const [year, setYear] = useState('');
+
+    const getTargetElement = () => document.getElementById("main-content");
+
+    const downloadPdf = async () => {
+        try {
+            const pdf = await generatePDF(getTargetElement, options);
+            const formData = new FormData();
+            formData.append('files', pdf.output("blob"), 'document.pdf');
+
+            const response = await axios.post('https://localhost:7241/api/S3FileUpload/upload?prefix=doc2%2F', formData);
+            if (response?.status === 200) {
+                const res = await apiUpdateSubMenu2({ id: documentId, linkFile: response?.data, userId: user?.userId }, documentId)
+                if (res && documentId)
+                    navigate(`/sub-menu-2/detail-view/${documentId}`)
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        const fetchUserInfoLogin = async () => {
+            if (user) {
+                const res = await apiGetUser(user?.userId)
+                if (res && res.data) {
+                    const userData: any = res.data;
+                    setUserInfoLogin(userData);
+                }
+            }
+        }
+        fetchUserInfoLogin()
+    }, [user])
+
+    // useEffect(() => {
+    //     iff
+    // })
+
+    useEffect(() => {
+        const fetchSpecializedDepartmentById = async () => {
+            if (!location.pathname.split('/')[3]) {
+                if (userInfoLogin) {
+                    const res = await apiGetSpecializedDepartmentById(userInfoLogin?.specializedDepartmentId);
+                    if (res && res.data) {
+                        const departmentData: any = res.data;
+                        setSpecializedDepartment(departmentData);
+                    }
+                }
+            }
+            else if (location.pathname.split('/')[3]) {
+                const fecthDoc2 = await apiGetSubMenu2ById(location.pathname.split('/')[3]);
+                if (fecthDoc2 && fecthDoc2.data) {
+                    const doc2Data: any = fecthDoc2.data;
+                    setDocument2Info(doc2Data);
+                    const fecthUserResult = await apiGetUser(doc2Data?.userId)
+                    if (fecthUserResult && fecthUserResult.data) {
+                        const userData: any = fecthUserResult.data;
+                        setUserInfoDocument(userData);
+                        const res = await apiGetSpecializedDepartmentById(userData?.specializedDepartmentId);
+                        if (res && res.data) {
+                            const departmentData: any = res.data;
+                            setSpecializedDepartment(departmentData);
+                        }
+                    }
+                }
+            }
+        }
+        fetchSpecializedDepartmentById()
+    }, [location.pathname, userInfoLogin])
 
     useEffect(() => {
         const fetchAllUser = async () => {
@@ -85,29 +167,36 @@ const SubMenu2Detail = () => {
     }, [])
 
     const handleClickOpen = async () => {
-        const today = new Date();
-        const createdDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
-        if (user) {
-            setOpen(true);
-            try {
-                const post = await apiPostSubMenu2({
-                    name: "KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN",
-                    userId: user.userId,
-                    userName: user.username,
-                    createdDate: createdDate,
-                    status: true,
-                    approveByName: "",
-                    isApprove: 1
-                })
-                if (post) {
-                    setDocumentId(post?.data?.id)
+        if (!location.pathname.split('/')[3]) {
+            const today = new Date();
+            const createdDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+            if (user) {
+                setOpen(true);
+                try {
+                    const post = await apiPostSubMenu2({
+                        name: "KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN",
+                        userId: user.userId,
+                        userName: user.username,
+                        createdDate: createdDate,
+                        status: true,
+                        approveByName: "",
+                        isApprove: 1
+                    })
+                    if (post) {
+                        setDocumentId(post?.data?.id)
+                    }
+                } catch (error) {
+                    alert("Something went wrong")
                 }
-            } catch (error) {
-                alert("Something went wrong")
+            }
+            else
+                alert("Something went wrong!")
+        }
+        else {
+            if (user) {
+                setOpen(true);
             }
         }
-        else
-            alert("Something went wrong!")
     };
 
     const handleClickOpen1 = async () => {
@@ -189,8 +278,6 @@ const SubMenu2Detail = () => {
         navigate(`/sub-menu-2/detail-create`)
     };
 
-    const docs = [{ uri: require("./phuluc2.pdf") }]
-
     const handleAddRow = (index: number) => {
         const newRow = {
             gradeId: null,
@@ -246,7 +333,8 @@ const SubMenu2Detail = () => {
             try {
                 const res = await apiPostSubMenu2Grade(rowsWithDocumentId, documentId);
                 if (res) {
-                    alert("Tạo thành công");
+                    alert("Thành công! Xin hãy đợi trong giây lát");
+                    downloadPdf();
                 }
             } catch (error) {
                 alert("Đã xảy ra lỗi");
@@ -260,7 +348,7 @@ const SubMenu2Detail = () => {
             {
                 location.pathname?.includes("edit") || location.pathname?.includes("create") ?
                     <div>
-                        <div className='sub-menu-content'>
+                        <div className='sub-menu-content' id='main-content'>
                             <div className="sub-menu-content-header">
                                 <strong className='phu-luc'>Phụ lục II</strong>
                                 <div className="sub-menu-content-header-title">
@@ -274,7 +362,7 @@ const SubMenu2Detail = () => {
                                 <div className="sub-menu-content-header-infomation">
                                     <div className='sub-menu-content-header-infomation-detail' >
                                         <div style={{ display: "flex" }}> <div><strong>TRƯỜNG: </strong><input type="text" placeholder='...........' onChange={e => setTruong(e.target.value)} /></div></div>
-                                        <div style={{ display: "flex" }}> <div><strong>TỔ: </strong><input type="text" placeholder='...........' onChange={e => setTo(e.target.value)} /></div></div>
+                                        <div style={{ display: "flex" }}> <div><strong>TỔ: </strong>{specializedDepartment?.name}</div></div>
                                     </div>
                                     <div className='sub-menu-content-header-infomation-slogan'>
                                         <div> <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></div>
@@ -296,7 +384,8 @@ const SubMenu2Detail = () => {
                                         <div className="sub-menu-content-main-feature">
                                             <div className="sub-menu-content-main-feature-item" style={{ display: "flex", alignItems: "center", columnGap: "6px" }}>
                                                 <div><strong>{indexGrade + 1}. Khối lớp: </strong>
-                                                    <select id="grade" style={{ width: "40px", height: "20px", marginLeft: "4px" }} defaultValue={''}
+                                                    <select id="grade" style={{ width: "40px", height: "20px", marginLeft: "4px" }}
+                                                        value={subRows[0].gradeId ?? ''}
                                                         onChange={(e) => {
                                                             const newValue = parseInt(e.target.value);
                                                             const updatedGradeIds = [...gradeIds];
@@ -393,7 +482,8 @@ const SubMenu2Detail = () => {
                                                                         />
                                                                     </TableCell>
                                                                     <TableCell align="center">
-                                                                        <select id="selectedTopic" style={{ width: "150px", height: "40px", marginLeft: "4px" }} defaultValue={''}
+                                                                        <select id="selectedTopic" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                            value={row.hostBy ?? ''}
                                                                             onChange={(e) => {
                                                                                 const newValue = parseInt(e.target.value);
                                                                                 const updatedRows = [...multiRows];
@@ -488,15 +578,11 @@ const SubMenu2Detail = () => {
                             <Button onClick={handleClickOpen} >Xác nhận xét duyệt</Button>
                         </div>
                     </div> : <>
-                        <DocViewer documents={docs} pluginRenderers={DocViewerRenderers}
-                            config={{
-                                header: {
-                                    disableHeader: true,
-                                    disableFileName: true,
-                                    retainURLParams: true,
-                                },
-                                pdfVerticalScrollByDefault: true,
-                            }}
+                        <embed
+                            src={document2Info?.linkFile}
+                            width="100%"
+                            height="1000px"
+                            type="application/pdf"
                         />
                         <div>
                             <div className="sub-menu-action">

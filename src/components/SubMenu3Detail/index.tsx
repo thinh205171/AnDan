@@ -9,20 +9,29 @@ import { Class } from '../../models/class';
 import { apiGetSubject } from '../../api/subject';
 import { apiGetClassByGradeId } from '../../api/class';
 import { Document1 } from '../../models/document1';
-import { apiGetSubMenu1ById } from '../../api/subMenu1';
+import { apiGetCurriculumDistributionByDoc1Id, apiGetSelectedTopicByDoc1Id, apiGetSubMenu1ById, apiGetSubjectsRoomByDoc1Id, apiGetTeachingEquipmentByDoc1Id } from '../../api/subMenu1';
 import { apiGetUser } from '../../api/user';
 import { User } from '../../models/User';
 import { useAppSelector } from '../../hook/useTypedSelector';
 import { Department } from '../../models/department';
 import { apiGetSpecializedDepartmentById } from '../../api/specializedDepartment';
+import { TeachingEquipment } from '../../models/teachingEquipment';
+import { SubjectRoom } from '../../models/SubjectRoom';
+import { CurriculumDistribution } from '../../models/CurriculumDistribution';
+import { formatDate } from '../../utils/date';
+import { apiGetSubMenu3ById, apiGetSubMenu3CuriculumDistribution, apiGetSubMenu3SelectedTopics, apiPostSubMenu3, apiPostSubMenu3CuriculumDistribution, apiPostSubMenu3SelectedTopics, apiUpdateSubMenu3 } from '../../api/subMenu3';
+import generatePDF from 'react-to-pdf';
+import { options } from '../UploadPhuLuc4';
+import axios from 'axios';
+import { SelectedTopic } from '../../models/SelectedTopic';
 
 interface Row {
-    stt: number | null;
-    baiHoc: string;
-    soTiet: number | null;
-    thietBiDayHoc: string;
-    thoiDiem: string;
-    diaDiem: string;
+    curriculumId: number | null;
+    selectedTopicsId: number | null;
+    slot: number | null;
+    equipmentId: number | null;
+    time: string;
+    subjectRoomName: number | null;
 }
 
 const SubMenu3Detail = () => {
@@ -30,8 +39,8 @@ const SubMenu3Detail = () => {
     const navigate = useNavigate()
     const document1Id = location.pathname.split('/')[3];
     const user = useAppSelector(state => state.auth.user)
-    const [rows1, setRows1] = useState<Row[]>([{ stt: null, baiHoc: '', thietBiDayHoc: '', soTiet: null, thoiDiem: '', diaDiem: '' }]);
-    const [rows2, setRows2] = useState<Row[]>([{ stt: null, baiHoc: '', thietBiDayHoc: '', soTiet: null, thoiDiem: '', diaDiem: '' }]);
+    const [rows1, setRows1] = useState<Row[]>([{ curriculumId: null, selectedTopicsId: null, equipmentId: null, slot: null, time: '', subjectRoomName: null }]);
+    const [rows2, setRows2] = useState<Row[]>([{ curriculumId: null, selectedTopicsId: null, equipmentId: null, slot: null, time: '', subjectRoomName: null }]);
     const [login, setLogin] = useState(false);
     const [open, setOpen] = useState(false);
     const [openAccept, setOpenAccept] = useState(false);
@@ -40,10 +49,16 @@ const SubMenu3Detail = () => {
     const [openRemove, setOpenRemove] = useState(false);
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [classes, setClasses] = useState<Class[]>([]);
+    const [specializedDepartment, setSpecializedDepartment] = useState<Department>();
+    const [teachingEquipment, setTeachingEquipment] = useState<TeachingEquipment[]>([]);
+    const [subjectRoom, setSubjectRoom] = useState<SubjectRoom[]>([]);
+    const [curriculumDistribution, setCurriculumDistribution] = useState<CurriculumDistribution[]>([]);
+    const [selectedTopics, setSelectedTopics] = useState<SelectedTopic[]>([]);
     const [document1Info, setDocument1Info] = useState<Document1>();
     const [userInfoLogin, setUserInfoLogin] = useState<User>();
-    const [specializedDepartment, setSpecializedDepartment] = useState<Department>();
+    const [documentId, setDocumentId] = useState(null);
     const [userInfoDocument, setUserInfoDocument] = useState<User[]>([]);
+    const [document3Info, setDocument3Info] = useState<Document1>();
 
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
@@ -60,6 +75,28 @@ const SubMenu3Detail = () => {
     const [year, setYear] = useState('');
     const [nhiemVuKhac, setNhiemVuKhac] = useState('');
 
+    console.log("row1: ", rows1)
+
+    const getTargetElement = () => document.getElementById("main-content");
+
+    const downloadPdf = async () => {
+        try {
+            const pdf = await generatePDF(getTargetElement, options);
+            const formData = new FormData();
+            formData.append('files', pdf.output("blob"), 'document.pdf');
+
+            const response = await axios.post('https://localhost:7241/api/S3FileUpload/upload?prefix=doc3%2F', formData);
+            if (response?.status === 200) {
+                const res = await apiUpdateSubMenu3({ id: documentId, document1Id: parseInt(document1Id), linkFile: response?.data, userId: user?.userId }, documentId)
+                if (res && documentId)
+                    navigate(`/sub-menu-3/detail-view/${documentId}`)
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     useEffect(() => {
         const fetchUserInfoLogin = async () => {
             if (user) {
@@ -74,14 +111,29 @@ const SubMenu3Detail = () => {
     }, [user])
 
     useEffect(() => {
-        const fecthDoc1 = async () => {
-            const res = await apiGetSubMenu1ById(location.pathname.split('/')[3]);
-            if (res && res.data) {
-                const doc1Data: any = res.data;
-                setDocument1Info(doc1Data);
+        if (!location.pathname.includes('create')) {
+            const fecthDoc3 = async () => {
+                const res = await apiGetSubMenu3ById(location.pathname.split('/')[3])
+                if (res && res.data) {
+                    const doc3Data: any = res.data
+                    setDocument3Info(doc3Data)
+                }
             }
+            fecthDoc3();
         }
-        fecthDoc1();
+    }, [location.pathname])
+
+    useEffect(() => {
+        if (location.pathname.includes('create')) {
+            const fecthDoc1 = async () => {
+                const res = await apiGetSubMenu1ById(parseInt(location.pathname.split('/')[3]));
+                if (res && res.data) {
+                    const doc1Data: any = res.data;
+                    setDocument1Info(doc1Data);
+                }
+            }
+            fecthDoc1();
+        }
     }, [location.pathname])
 
     useEffect(() => {
@@ -89,29 +141,151 @@ const SubMenu3Detail = () => {
             if (user)
                 setGiaoVien(user.username)
         }
-    }, [location.pathname, user])
+        else if (location.pathname.includes('edit')) {
+            if (document3Info) {
+                const fetchAuthor = async () => {
+                    const res = await apiGetUser(document3Info.userId)
+                    if (res && res.data) {
+                        setGiaoVien(res.data.fullName)
+                    }
+                }
+                fetchAuthor()
+            }
+        }
+    }, [location.pathname, user, document3Info])
 
     useEffect(() => {
         const fetchSpecializedDepartmentById = async () => {
-            if (location.pathname.includes('create')) {
-                const fecthDoc1 = await apiGetSubMenu1ById(location.pathname.split('/')[3]);
-                if (fecthDoc1 && fecthDoc1.data) {
-                    const doc1Data: any = fecthDoc1.data;
-                    setDocument1Info(doc1Data);
-                    const fecthUserResult = await apiGetUser(doc1Data?.userId)
-                    if (fecthUserResult && fecthUserResult.data) {
-                        const userData: any = fecthUserResult.data;
-                        setUserInfoDocument(userData);
-                        const res = await apiGetSpecializedDepartmentById(userData?.specializedDepartmentId);
-                        if (res && res.data) {
-                            const departmentData: any = res.data;
-                            setSpecializedDepartment(departmentData);
+            if (!location.pathname.includes('view')) {
+                let document1IdInit = 0;
+                if (location.pathname.includes('create'))
+                    document1IdInit = parseInt(location.pathname.split('/')[3])
+                else
+                    if (document3Info)
+                        document1IdInit = document3Info.document1Id
+                if (document1IdInit !== 0) {
+                    const fecthDoc1 = await apiGetSubMenu1ById(document1IdInit);
+                    if (fecthDoc1 && fecthDoc1.data) {
+                        const doc1Data: any = fecthDoc1.data;
+                        setDocument1Info(doc1Data);
+                        const fecthUserResult = await apiGetUser(doc1Data?.userId)
+                        if (fecthUserResult && fecthUserResult.data) {
+                            const userData: any = fecthUserResult.data;
+                            setUserInfoDocument(userData);
+                            const res = await apiGetSpecializedDepartmentById(userData?.specializedDepartmentId);
+                            if (res && res.data) {
+                                const departmentData: any = res.data;
+                                setSpecializedDepartment(departmentData);
+                            }
                         }
                     }
                 }
             }
         }
+
+        const fetchTeachingEquipment = async () => {
+            if (location.pathname.includes('create')) {
+                const res = await apiGetTeachingEquipmentByDoc1Id(location.pathname.split('/')[3]);
+                if (res && res.data) {
+                    const teachingEquipmentData: TeachingEquipment[] = res.data;
+                    setTeachingEquipment(teachingEquipmentData);
+                }
+            }
+            else if (location.pathname.includes('edit')) {
+                if (document3Info) {
+                    const res = await apiGetTeachingEquipmentByDoc1Id(document3Info.document1Id);
+                    if (res && res.data) {
+                        const teachingEquipmentData: TeachingEquipment[] = res.data;
+                        setTeachingEquipment(teachingEquipmentData);
+                    }
+                }
+            }
+        }
+
+        const fetchSubjectRoom = async () => {
+            if (location.pathname.includes('create')) {
+                const res = await apiGetSubjectsRoomByDoc1Id(location.pathname.split('/')[3]);
+                if (res && res.data) {
+                    const subjectRoomData: SubjectRoom[] = res.data;
+                    setSubjectRoom(subjectRoomData);
+                }
+            }
+            else if (location.pathname.includes('edit')) {
+                if (document3Info) {
+                    const res = await apiGetSubjectsRoomByDoc1Id(document3Info.document1Id);
+                    if (res && res.data) {
+                        const subjectRoomData: SubjectRoom[] = res.data;
+                        setSubjectRoom(subjectRoomData);
+                    }
+                }
+            }
+        }
+
+        const fetchCurriculumDistribution = async () => {
+            if (location.pathname.includes('create')) {
+                const res = await apiGetCurriculumDistributionByDoc1Id(location.pathname.split('/')[3]);
+                if (res && res.data) {
+                    const curriculumDistributionData: CurriculumDistribution[] = res.data;
+                    setCurriculumDistribution(curriculumDistributionData);
+                }
+            }
+            else if (location.pathname.includes('edit')) {
+                if (document3Info) {
+                    const res = await apiGetCurriculumDistributionByDoc1Id(document3Info.document1Id);
+                    if (res && res.data) {
+                        const curriculumDistributionData: CurriculumDistribution[] = res.data;
+                        setCurriculumDistribution(curriculumDistributionData);
+                    }
+                }
+            }
+        }
+
+        const fetchSelectedTopics = async () => {
+            if (location.pathname.includes('create')) {
+                const res = await apiGetSelectedTopicByDoc1Id(location.pathname.split('/')[3]);
+                if (res && res.data) {
+                    const selectedTopicsData: SelectedTopic[] = res.data;
+                    setSelectedTopics(selectedTopicsData);
+                }
+            }
+            else if (location.pathname.includes('edit')) {
+                if (document3Info) {
+                    const res = await apiGetSelectedTopicByDoc1Id(document3Info.document1Id);
+                    if (res && res.data) {
+                        const selectedTopicsData: SelectedTopic[] = res.data;
+                        setSelectedTopics(selectedTopicsData);
+                    }
+                }
+            }
+        }
+
         fetchSpecializedDepartmentById()
+        fetchTeachingEquipment();
+        fetchSubjectRoom();
+        fetchCurriculumDistribution()
+        fetchSelectedTopics()
+
+    }, [document3Info, location.pathname])
+
+    useEffect(() => {
+        if (location.pathname.includes('edit')) {
+            const fetchRow1 = async () => {
+                const res = await apiGetSubMenu3CuriculumDistribution(parseInt(location.pathname.split('/')[3]))
+                if (res && res.data) {
+                    const rowData: Row[] = res.data;
+                    setRows1(rowData);
+                }
+            }
+            const fetchRow2 = async () => {
+                const res = await apiGetSubMenu3SelectedTopics(parseInt(location.pathname.split('/')[3]))
+                if (res && res.data) {
+                    const rowData: Row[] = res.data;
+                    setRows2(rowData);
+                }
+            }
+            fetchRow1();
+            fetchRow2();
+        }
     }, [location.pathname])
 
     useEffect(() => {
@@ -137,13 +311,73 @@ const SubMenu3Detail = () => {
         fetchClasses();
     }, [document1Info])
 
-    const handleClickOpen = () => {
-        setOpen(true);
+    const handleClickOpen = async () => {
+        // setDisplayAddRow(!displayAddRow)
+        if (location.pathname.includes('create')) {
+            if (khoiLop && user) {
+                setOpen(true);
+                const post = await apiPostSubMenu3({
+                    name: "KẾ HOẠCH DẠY HỌC CỦA GIÁO VIÊN",
+                    document1Id: document1Id,
+                    claasName: khoiLop,
+                    userId: parseInt(user.userId),
+                    note: "",
+                    status: true,
+                    approveByName: "",
+                    isApprove: 1
+                })
+                if (post) {
+                    setDocumentId(post?.data?.id)
+                }
+            }
+            else
+                alert("Nhập đầy đủ thông tin!")
+        }
+        else {
+            if (user) {
+                setOpen(true);
+            }
+        }
+    };
+
+    const handleClickOpen1 = async () => {
+        // setDisplayAddRow(!displayAddRow)
+        if (khoiLop && user) {
+            setOpen(true);
+            const post = await apiPostSubMenu3({
+                name: "KẾ HOẠCH DẠY HỌC CỦA GIÁO VIÊN",
+                document1Id: document1Id,
+                claasName: khoiLop,
+                userId: user.userId,
+                note: "",
+                status: true,
+                approveByName: "",
+                isApprove: 2
+            })
+            if (post) {
+                setDocumentId(post?.data?.id)
+            }
+        }
+        else
+            alert("Nhập đầy đủ thông tin!")
     };
 
     const handleClose = () => {
         setOpen(false);
     };
+
+    const handleAddDoc3 = async () => {
+        if (rows1 && rows2) {
+            const rows1WithDocumentId = rows1.map(row => ({ ...row, document3Id: documentId }));
+            const res1 = await apiPostSubMenu3CuriculumDistribution(rows1WithDocumentId);
+            const rows2WithDocumentId = rows2.map(row => ({ ...row, document3Id: documentId }));
+            const res2 = await apiPostSubMenu3SelectedTopics(rows2WithDocumentId);
+            if (res1 && res2) {
+                downloadPdf()
+            }
+        }
+        setOpen(false)
+    }
 
     const handleClickOpenAccept = () => {
         setOpenAccept(true);
@@ -177,16 +411,15 @@ const SubMenu3Detail = () => {
         setOpenRemove(false);
     };
 
-    const docs = [{ uri: require("./phuluc3.pdf") }]
-
     const handleAddRow1 = () => {
         const newRow = {
             stt: null,
-            baiHoc: '',
-            thietBiDayHoc: '',
-            soTiet: null,
-            thoiDiem: '',
-            diaDiem: ''
+            selectedTopicsId: null,
+            curriculumId: null,
+            equipmentId: null,
+            slot: null,
+            time: '',
+            subjectRoomName: null
         };
         setRows1([...rows1, newRow]);
     };
@@ -194,11 +427,12 @@ const SubMenu3Detail = () => {
     const handleAddRow2 = () => {
         const newRow = {
             stt: null,
-            baiHoc: '',
-            thietBiDayHoc: '',
-            soTiet: null,
-            thoiDiem: '',
-            diaDiem: ''
+            curriculumId: null,
+            selectedTopicsId: null,
+            equipmentId: null,
+            slot: null,
+            time: '',
+            subjectRoomName: null
         };
         setRows2([...rows2, newRow]);
     };
@@ -223,7 +457,7 @@ const SubMenu3Detail = () => {
             {
                 location.pathname?.includes("edit") || location.pathname?.includes("create") ?
                     <div>
-                        <div className='sub-menu-content'>
+                        <div className='sub-menu-content' id='main-content'>
                             <div className="sub-menu-content-header">
                                 <strong className='phu-luc'>Phụ lục III</strong>
                                 <div className="sub-menu-content-header-title">
@@ -238,7 +472,7 @@ const SubMenu3Detail = () => {
                                     <div className='sub-menu-content-header-infomation-detail' >
                                         <div style={{ display: "flex" }}> <div><strong>TRƯỜNG: </strong><input type="text" placeholder='...........' onChange={e => setTruong(e.target.value)} /></div></div>
                                         <div style={{ display: "flex" }}> <div><strong>TỔ: </strong>{specializedDepartment?.name}</div></div>
-                                        <div style={{ display: "flex" }}> <div>Họ và tên giáo viên:{giaoVien}</div></div>
+                                        <div style={{ display: "flex" }}> <div style={{ marginLeft: "4px" }}>Họ và tên giáo viên:{giaoVien}</div></div>
                                     </div>
                                     <div className='sub-menu-content-header-infomation-slogan'>
                                         <div> <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></div>
@@ -252,26 +486,16 @@ const SubMenu3Detail = () => {
                                 <div style={{ display: "flex", justifyContent: "center" }}>
                                     <div>
                                         <strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong>
-                                        <select id="grades" style={{ width: "70px", marginLeft: "4px" }}
-                                            onChange={(e) => setHoatDong(parseInt(e.target.value))}
-                                            defaultValue={''}
-                                        >
-                                            <option value="" disabled>Chọn môn học</option>
-                                            {
-                                                subjects?.map((item) => (
-                                                    <option value={item?.id}>{item?.name}</option>
-                                                ))
-                                            }
-                                        </select>
+                                        <span style={{ marginLeft: "4px" }}>{document1Info?.subjectName}</span>
                                         <strong>, LỚP</strong>
-                                        <select id="grades" style={{ width: "70px", marginLeft: "4px" }}
+                                        <select id="classes" style={{ width: "70px", marginLeft: "4px" }}
                                             onChange={(e) => setKhoiLop(e.target.value)}
-                                            defaultValue={''}
+                                            defaultValue={document3Info?.claasName}
                                         >
                                             <option value="" disabled>Chọn lớp</option>
                                             {
                                                 classes?.map((item) => (
-                                                    <option value={item?.id}>{item?.name}</option>
+                                                    <option value={item?.name}>{item?.name}</option>
                                                 ))
                                             }
                                         </select>
@@ -299,63 +523,82 @@ const SubMenu3Detail = () => {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {rows1.map((row, index) => (
+                                                    {rows1?.map((row, index) => (
                                                         <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                             <TableCell align="center">{index + 1}</TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.baiHoc}
-                                                                    onChange={(e) => {
-                                                                        const newValue = e.target.value;
-                                                                        const updatedRows = [...rows1];
-                                                                        updatedRows[index].baiHoc = newValue;
-                                                                        setRows1(updatedRows);
-                                                                    }}
-                                                                />
-                                                            </TableCell>
-                                                            <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.soTiet ?? ''}
+                                                                <select id="curriculumDistribution" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                    value={row?.curriculumId ?? ''}
                                                                     onChange={(e) => {
                                                                         const newValue = parseInt(e.target.value);
                                                                         const updatedRows = [...rows1];
-                                                                        updatedRows[index].soTiet = newValue;
+                                                                        updatedRows[index].curriculumId = newValue;
+                                                                        setRows1(updatedRows);
+                                                                    }}>
+                                                                    <option value="" disabled>Chọn bài học</option>
+                                                                    {
+                                                                        curriculumDistribution?.map((item) => (
+                                                                            <option value={item?.curriculumId}>{item?.curriculumName}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
+                                                            </TableCell>
+                                                            <TableCell align="center">
+                                                                <textarea
+                                                                    value={row.slot ?? ''}
+                                                                    onChange={(e) => {
+                                                                        const newValue = parseInt(e.target.value);
+                                                                        const updatedRows = [...rows1];
+                                                                        updatedRows[index].slot = newValue;
                                                                         setRows1(updatedRows);
                                                                     }}
                                                                 />
                                                             </TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.thoiDiem}
+                                                                <input
+                                                                    type="date"
+                                                                    value={row.time ? formatDate(row.time) : ''}
                                                                     onChange={(e) => {
                                                                         const newValue = e.target.value;
                                                                         const updatedRows = [...rows1];
-                                                                        updatedRows[index].thoiDiem = newValue;
+                                                                        updatedRows[index].time = newValue;
                                                                         setRows1(updatedRows);
                                                                     }}
                                                                 />
                                                             </TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.thietBiDayHoc}
+                                                                <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                    value={row.equipmentId ?? ''}
                                                                     onChange={(e) => {
-                                                                        const newValue = e.target.value;
+                                                                        const newValue = parseInt(e.target.value);
                                                                         const updatedRows = [...rows1];
-                                                                        updatedRows[index].thietBiDayHoc = newValue;
+                                                                        updatedRows[index].equipmentId = newValue;
                                                                         setRows1(updatedRows);
-                                                                    }}
-                                                                />
+                                                                    }}>
+                                                                    <option value="" disabled>Chọn thiết bị dạy học</option>
+                                                                    {
+                                                                        teachingEquipment?.map((item) => (
+                                                                            <option value={item?.teachingEquipmentId}>{item?.teachingEquipmentName}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
                                                             </TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.diaDiem}
+                                                                <select id="subjectRoom" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                    value={row.subjectRoomName ?? ''}
                                                                     onChange={(e) => {
-                                                                        const newValue = e.target.value;
+                                                                        const newValue = parseInt(e.target.value);
                                                                         const updatedRows = [...rows1];
-                                                                        updatedRows[index].diaDiem = newValue;
+                                                                        updatedRows[index].subjectRoomName = newValue;
                                                                         setRows1(updatedRows);
-                                                                    }}
-                                                                />
+                                                                    }}>
+                                                                    <option value="" disabled>Chọn địa điểm</option>
+                                                                    {
+                                                                        subjectRoom?.map((item) => (
+                                                                            <option value={item?.subjectRoomName}>{item?.subjectRoomName}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
                                                             </TableCell>
                                                         </TableRow>
                                                     ))}
@@ -387,63 +630,82 @@ const SubMenu3Detail = () => {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {rows2.map((row, index) => (
+                                                    {rows2?.map((row, index) => (
                                                         <TableRow key={index} sx={{ 'td': { border: 1 } }}>
                                                             <TableCell align="center">{index + 1}</TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.baiHoc}
-                                                                    onChange={(e) => {
-                                                                        const newValue = e.target.value;
-                                                                        const updatedRows = [...rows2];
-                                                                        updatedRows[index].baiHoc = newValue;
-                                                                        setRows2(updatedRows);
-                                                                    }}
-                                                                />
-                                                            </TableCell>
-                                                            <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.soTiet ?? ''}
+                                                                <select id="curriculumDistribution" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                    value={row?.selectedTopicsId ?? ''}
                                                                     onChange={(e) => {
                                                                         const newValue = parseInt(e.target.value);
                                                                         const updatedRows = [...rows2];
-                                                                        updatedRows[index].soTiet = newValue;
+                                                                        updatedRows[index].selectedTopicsId = newValue;
+                                                                        setRows2(updatedRows);
+                                                                    }}>
+                                                                    <option value="" disabled>Chọn bài học</option>
+                                                                    {
+                                                                        selectedTopics?.map((item) => (
+                                                                            <option value={item?.selectedTopicsId}>{item?.selectedTopicsName}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
+                                                            </TableCell>
+                                                            <TableCell align="center">
+                                                                <textarea
+                                                                    value={row.slot ?? ''}
+                                                                    onChange={(e) => {
+                                                                        const newValue = parseInt(e.target.value);
+                                                                        const updatedRows = [...rows2];
+                                                                        updatedRows[index].slot = newValue;
                                                                         setRows2(updatedRows);
                                                                     }}
                                                                 />
                                                             </TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.thoiDiem}
+                                                                <input
+                                                                    type="date"
+                                                                    value={row.time ? formatDate(row.time) : ''}
                                                                     onChange={(e) => {
                                                                         const newValue = e.target.value;
                                                                         const updatedRows = [...rows2];
-                                                                        updatedRows[index].thoiDiem = newValue;
+                                                                        updatedRows[index].time = newValue;
                                                                         setRows2(updatedRows);
                                                                     }}
                                                                 />
                                                             </TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.thietBiDayHoc}
+                                                                <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                    value={row.equipmentId ?? ''}
                                                                     onChange={(e) => {
-                                                                        const newValue = e.target.value;
+                                                                        const newValue = parseInt(e.target.value);
                                                                         const updatedRows = [...rows2];
-                                                                        updatedRows[index].thietBiDayHoc = newValue;
+                                                                        updatedRows[index].equipmentId = newValue;
                                                                         setRows2(updatedRows);
-                                                                    }}
-                                                                />
+                                                                    }}>
+                                                                    <option value="" disabled>Chọn thiết bị dạy học</option>
+                                                                    {
+                                                                        teachingEquipment?.map((item) => (
+                                                                            <option value={item?.teachingEquipmentId}>{item?.teachingEquipmentName}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
                                                             </TableCell>
                                                             <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.diaDiem}
+                                                                <select id="subjectRoom" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                    value={row.subjectRoomName ?? ''}
                                                                     onChange={(e) => {
-                                                                        const newValue = e.target.value;
+                                                                        const newValue = parseInt(e.target.value);
                                                                         const updatedRows = [...rows2];
-                                                                        updatedRows[index].diaDiem = newValue;
+                                                                        updatedRows[index].subjectRoomName = newValue;
                                                                         setRows2(updatedRows);
-                                                                    }}
-                                                                />
+                                                                    }}>
+                                                                    <option value="" disabled>Chọn địa điểm</option>
+                                                                    {
+                                                                        subjectRoom?.map((item) => (
+                                                                            <option value={item?.subjectRoomName}>{item?.subjectRoomName}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
                                                             </TableCell>
                                                         </TableRow>
                                                     ))}
@@ -505,23 +767,21 @@ const SubMenu3Detail = () => {
                             </div>
                         </div>
                         <div className="sub-menu-content-action">
+                            <Button onClick={handleClickOpen1} >Lưu bản nháp</Button>
                             <Button onClick={handleClickOpen} >Xác nhận xét duyệt</Button>
                         </div>
                     </div> : <>
-                        <DocViewer documents={docs} pluginRenderers={DocViewerRenderers}
-                            config={{
-                                header: {
-                                    disableHeader: true,
-                                    disableFileName: true,
-                                    retainURLParams: true,
-                                },
-                                pdfVerticalScrollByDefault: true,
-                            }}
+                        <embed
+                            src={document3Info?.linkFile}
+                            width="100%"
+                            height="1000px"
+                            type="application/pdf"
                         />
                         <div>
                             <div className="sub-menu-action">
                                 <div className="verify" style={{ justifyContent: "center" }}>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
+                                        <div className='action-button' onClick={() => navigate(`/sub-menu-3/detail-edit/${location.pathname.split('/')[3]}`)}>Sửa</div>
                                         <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                                     </div>
                                 </div>
@@ -595,7 +855,7 @@ const SubMenu3Detail = () => {
                 </DialogContent>
                 <DialogActions >
                     <Button onClick={handleClose} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
-                    <Button onClick={handleClose} className='button-mui' autoFocus>
+                    <Button onClick={handleAddDoc3} className='button-mui' autoFocus>
                         Đồng ý
                     </Button>
                 </DialogActions>

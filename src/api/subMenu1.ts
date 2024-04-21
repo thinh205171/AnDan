@@ -10,6 +10,14 @@ export const apiGetSubMenu1 = async () => {
         return null;
 }
 
+export const apiUpdateSubMenu1 = async (data: any) => {
+    const result = await axios.put(`${base_url}Document1`, data);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
 export const apiGetAllTestingCategory = async () => {
     const result = await axios.get(`${base_url}Document1PeriodicAssessment/GetAllTestingCategory`);
     if (result)
@@ -26,7 +34,7 @@ export const apiGetAllFormCategory = async () => {
         return null;
 }
 
-export const apiGetSubMenu1ById = async (id: string) => {
+export const apiGetSubMenu1ById = async (id: number) => {
     const result = await axios.get(`${base_url}Document1/ById/${id}`);
     if (result)
         return result;
@@ -102,6 +110,55 @@ export const apiGetTotalClassByGradeId = async (data: any) => {
 
 export const apiGetTeacherInformation = async (data: any) => {
     const result = await axios.get(`${base_url}Document1/GetTeacherInformation?specializedDepartmentId=${data}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiGetDocument1ByDepartment = async (data: any) => {
+    const result = await axios.get(`${base_url}Document1/GetDocument1ByUserSpecialiedDepartment?specialDepartmentId=${data}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+
+export const apiGetCurriculumDistributionByDoc1Id = async (docId: any) => {
+    const result = await axios.get(`${base_url}Document1CuriculumDistribution/${docId}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiGetSubjectsRoomByDoc1Id = async (docId: any) => {
+    const result = await axios.get(`${base_url}Document1SubjectRooms?id=${docId}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiGetTeachingEquipmentByDoc1Id = async (docId: any) => {
+    const result = await axios.get(`${base_url}Document1TeachingEquipment?id=${docId}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiGetPeriodicAssessmentByDoc1Id = async (docId: any) => {
+    const result = await axios.get(`${base_url}Document1PeriodicAssessment/${docId}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiGetSelectedTopicByDoc1Id = async (docId: any) => {
+    const result = await axios.get(`${base_url}Document1SelectedTopic/${docId}`);
     if (result)
         return result;
     else
