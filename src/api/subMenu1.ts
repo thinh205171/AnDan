@@ -10,6 +10,14 @@ export const apiGetSubMenu1 = async () => {
         return null;
 }
 
+export const apiGetDocument1ByUserSpecialiedDepartment = async (query: any) => {
+    const result = await axios.get(`${base_url}Document1/GetDocument1ByUserSpecialiedDepartment?${query}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
 export const apiUpdateSubMenu1 = async (data: any) => {
     const result = await axios.put(`${base_url}Document1`, data);
     if (result)
@@ -84,21 +92,20 @@ export const apiPostSubMenu1SelectedTopic = async (data: any, docId: any) => {
 }
 
 export const apiPostSubMenu1SubjectRooms = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document1SubjectRooms?documentId=${docId}`, data);
+    const result = await axios.put(`${base_url}Document1SubjectRooms`, data);
     if (result)
         return result;
     else
         return null;
 }
 
-export const apiPostSubMenu1PeriodicAssessment = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document1PeriodicAssessment?documentId=${docId}`, data);
+export const apiPostSubMenu1PeriodicAssessment = async (data: any) => {
+    const result = await axios.put(`${base_url}Document1PeriodicAssessment/UpdateDocument1PeriodicAssessment`, data);
     if (result)
         return result;
     else
         return null;
 }
-
 
 export const apiGetTotalClassByGradeId = async (data: any) => {
     const result = await axios.get(`${base_url}Document1/GetTotalClassByGradeId?gradeId=${data}`);
@@ -150,7 +157,7 @@ export const apiGetTeachingEquipmentByDoc1Id = async (docId: any) => {
 }
 
 export const apiGetPeriodicAssessmentByDoc1Id = async (docId: any) => {
-    const result = await axios.get(`${base_url}Document1PeriodicAssessment/${docId}`);
+    const result = await axios.get(`${base_url}Document1PeriodicAssessment/GetDocument1PeriodicAssessmentByDocument1ID/${docId}`);
     if (result)
         return result;
     else
@@ -159,6 +166,14 @@ export const apiGetPeriodicAssessmentByDoc1Id = async (docId: any) => {
 
 export const apiGetSelectedTopicByDoc1Id = async (docId: any) => {
     const result = await axios.get(`${base_url}Document1SelectedTopic/${docId}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiDeleteDocument1ForeignTableByDocument1ID = async (docId: any) => {
+    const result = await axios.delete(`${base_url}Document1/DeleteDocument1ForeignTableByDocument1ID?id=${docId}`);
     if (result)
         return result;
     else

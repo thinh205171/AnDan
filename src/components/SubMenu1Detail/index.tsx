@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, MenuItem, Paper, Radio, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, MenuItem, Paper, Radio, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material";
 import './style.scss'
 import { Add, Remove } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import generatePDF, { Options } from "react-to-pdf";
 import { useAppSelector } from '../../hook/useTypedSelector';
-import { apiDeleteSubMenu1, apiGetAllFormCategory, apiGetAllTestingCategory, apiGetCurriculumDistributionByDoc1Id, apiGetPeriodicAssessmentByDoc1Id, apiGetSelectedTopicByDoc1Id, apiGetSubMenu1ById, apiGetSubjectsRoomByDoc1Id, apiGetTeacherInformation, apiGetTeachingEquipmentByDoc1Id, apiGetTotalClassByGradeId, apiPostSubMenu1, apiPostSubMenu1CuriculumDistribution, apiPostSubMenu1PeriodicAssessment, apiPostSubMenu1SelectedTopic, apiPostSubMenu1SubjectRooms, apiPostSubMenu1TeachingEquipment, apiUpdateSubMenu1 } from '../../api/subMenu1';
+import { apiDeleteDocument1ForeignTableByDocument1ID, apiDeleteSubMenu1, apiGetAllFormCategory, apiGetAllTestingCategory, apiGetCurriculumDistributionByDoc1Id, apiGetPeriodicAssessmentByDoc1Id, apiGetSelectedTopicByDoc1Id, apiGetSubMenu1ById, apiGetSubjectsRoomByDoc1Id, apiGetTeacherInformation, apiGetTeachingEquipmentByDoc1Id, apiGetTotalClassByGradeId, apiPostSubMenu1, apiPostSubMenu1CuriculumDistribution, apiPostSubMenu1PeriodicAssessment, apiPostSubMenu1SelectedTopic, apiPostSubMenu1SubjectRooms, apiPostSubMenu1TeachingEquipment, apiUpdateSubMenu1 } from '../../api/subMenu1';
 import { apiGetGrade } from '../../api/grade';
 import { Grade } from '../../models/grade';
 import { apiGetSubject } from '../../api/subject';
@@ -58,7 +58,7 @@ interface Row4 {
 }
 
 interface Row5 {
-    baiKiemTra: string;
+    testingCategoryName: string;
     testingCategoryId: number,
     time: number | null;
     date: string;
@@ -67,10 +67,10 @@ interface Row5 {
 }
 
 const defaultRows: Row5[] = [
-    { baiKiemTra: 'Giữa Học kỳ 1', testingCategoryId: 1, time: null, date: '', description: '', formCategoryId: null },
-    { baiKiemTra: 'Cuối Học kỳ 1', testingCategoryId: 2, time: null, date: '', description: '', formCategoryId: null },
-    { baiKiemTra: 'Giữa Học kỳ 2', testingCategoryId: 3, time: null, date: '', description: '', formCategoryId: null },
-    { baiKiemTra: 'Cuối Học kỳ 2', testingCategoryId: 14, time: null, date: '', description: '', formCategoryId: null },
+    { testingCategoryName: 'Giữa Học kỳ 1', testingCategoryId: 1, time: null, date: '', description: '', formCategoryId: null },
+    { testingCategoryName: 'Cuối Học kỳ 1', testingCategoryId: 2, time: null, date: '', description: '', formCategoryId: null },
+    { testingCategoryName: 'Giữa Học kỳ 2', testingCategoryId: 3, time: null, date: '', description: '', formCategoryId: null },
+    { testingCategoryName: 'Cuối Học kỳ 2', testingCategoryId: 14, time: null, date: '', description: '', formCategoryId: null },
 ];
 
 const SubMenu1Detail = () => {
@@ -103,10 +103,11 @@ const SubMenu1Detail = () => {
     const [userInfoLogin, setUserInfoLogin] = useState<User>();
     const [userInfoDocument, setUserInfoDocument] = useState<User[]>([]);
 
+    const [count, setCount] = useState(0);
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
-    const [hoadDong, setHoatDong] = useState('');
-    const [khoiLop, setKhoiLop] = useState('');
+    const [hoadDong, setHoatDong] = useState<number | null>(null);
+    const [khoiLop, setKhoiLop] = useState<number | null>(null);
     const [startYear, setStartYear] = useState('');
     const [endYear, setEndYear] = useState('');
     const [soLop, setSoLop] = useState('');
@@ -119,11 +120,10 @@ const SubMenu1Detail = () => {
     const [tot, setTot] = useState('');
     const [kha, setKha] = useState('');
     const [chuaDat, setChuaDat] = useState('');
-    const [documentId, setDocumentId] = useState(null);
+    const [documentId, setDocumentId] = useState<number | null>(null);
     const [document1Info, setDocument1Info] = useState<Document1>();
 
     const getTargetElement = () => document.getElementById("main-content");
-    // const downloadPdf = () => generatePDF(getTargetElement, options);
 
     const downloadPdf = async () => {
         try {
@@ -134,8 +134,11 @@ const SubMenu1Detail = () => {
             const response = await axios.post('https://localhost:7241/api/S3FileUpload/upload?prefix=doc1%2F', formData);
             if (response?.status === 200) {
                 const res = await apiUpdateSubMenu1({ id: documentId, linkFile: response?.data, subjectId: hoadDong, gradeId: khoiLop, userId: user?.userId })
-                if (res && documentId)
+                if (res && documentId) {
+                    setDisplayAddRow(!displayAddRow)
+                    alert('Thành công! Hãy chờ đợi trong giây lát để chuyển trang')
                     navigate(`/sub-menu-1/detail-view/${documentId}`)
+                }
             }
 
         } catch (error) {
@@ -260,6 +263,7 @@ const SubMenu1Detail = () => {
         fetchFormCategory();
         fetchSpecializedDepartmentById()
     }, [location.pathname, userInfoLogin]);
+
     useEffect(() => {
         if (location.pathname.split('/')[3]) {
             const fetchTeachingEquipmentByDocId = async () => {
@@ -313,8 +317,12 @@ const SubMenu1Detail = () => {
         let gradeIdInit;
         if (khoiLop)
             gradeIdInit = khoiLop
-        if (document1Info?.gradeId)
-            gradeIdInit = document1Info?.gradeId
+        if (document1Info?.gradeId) {
+            if (count === 0) {
+                gradeIdInit = document1Info?.gradeId
+                setCount(count + 1)
+            }
+        }
         if (gradeIdInit) {
             const fecthTotalClass = async () => {
                 const res = await apiGetTotalClassByGradeId(gradeIdInit)
@@ -325,7 +333,7 @@ const SubMenu1Detail = () => {
             }
             fecthTotalClass();
         }
-    }, [document1Info?.gradeId, khoiLop])
+    }, [count, document1Info?.gradeId, khoiLop])
 
     useEffect(() => {
         if (specializedDepartment) {
@@ -340,26 +348,48 @@ const SubMenu1Detail = () => {
         }
     }, [specializedDepartment])
 
-    const handleClickOpen = async () => {
-        setDisplayAddRow(!displayAddRow)
-        if (khoiLop && user && hoadDong) {
-            setOpen(true);
-            const post = await apiPostSubMenu1({
-                name: "KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC",
-                subjectId: hoadDong,
-                gradeId: khoiLop,
-                userId: user.userId,
-                note: "",
-                status: true,
-                approveByName: "",
-                isApprove: 1
-            })
-            if (post) {
-                setDocumentId(post?.data?.id)
+    useEffect(() => {
+        if (location.pathname.includes('edit')) {
+            if (document1Info?.id) {
+                setDocumentId(document1Info.id);
+                setHoatDong(document1Info.subjectId)
+                setKhoiLop(document1Info.gradeId)
+            } else {
+                setDocumentId(null);
             }
         }
-        else
-            alert("Nhập đầy đủ thông tin!")
+    }, [location.pathname, document1Info]);
+
+
+    const handleClickOpen = async () => {
+        setDisplayAddRow(!displayAddRow)
+        if (location.pathname.includes('create')) {
+            if (khoiLop && user && hoadDong) {
+                setOpen(true);
+                const post = await apiPostSubMenu1({
+                    name: "KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC",
+                    subjectId: hoadDong,
+                    gradeId: khoiLop,
+                    userId: user.userId,
+                    note: "",
+                    status: true,
+                    approveByName: "",
+                    isApprove: 1
+                })
+                if (post) {
+                    setDocumentId(post?.data?.id)
+                }
+            }
+            else
+                alert("Nhập đầy đủ thông tin!")
+        }
+        else {
+            if (khoiLop && user && hoadDong) {
+                setOpen(true);
+            }
+            else
+                alert("Nhập đầy đủ thông tin!")
+        }
     };
 
     const handleClickOpen1 = async () => {
@@ -505,7 +535,9 @@ const SubMenu1Detail = () => {
         }
     };
 
-    const handleAddDoc1 = async () => {
+    const handleAddDoc1 = async (documentId: any) => {
+        if (location.pathname.includes('edit'))
+            await apiDeleteDocument1ForeignTableByDocument1ID(documentId)
         if (rows1 && rows2 && rows3 && rows4 && rows5) {
             const rows1WithDocumentId = rows1.map(row => ({ ...row, document1Id: documentId }));
             const res1 = await apiPostSubMenu1TeachingEquipment(rows1WithDocumentId, documentId);
@@ -516,7 +548,7 @@ const SubMenu1Detail = () => {
             const rows4WithDocumentId = rows4.map(row => ({ ...row, document1Id: documentId }));
             const res4 = await apiPostSubMenu1SelectedTopic(rows4WithDocumentId, documentId);
             const rows5WithDocumentId = rows5.map(row => ({ ...row, document1Id: documentId }));
-            const res5 = await apiPostSubMenu1PeriodicAssessment(rows5WithDocumentId, documentId);
+            const res5 = await apiPostSubMenu1PeriodicAssessment(rows5WithDocumentId);
             if (res1 && res2 && res3 && res4 && res5) {
                 downloadPdf()
             }
@@ -558,8 +590,11 @@ const SubMenu1Detail = () => {
                                     <div style={{ display: "flex", justifyContent: "center" }}>
                                         <div><strong>MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC</strong>
                                             <select id="grades" style={{ width: "120px", marginLeft: "4px" }}
-                                                onChange={(e) => setHoatDong(e.target.value)}
-                                                defaultValue={document1Info?.subjectId}
+                                                onChange={(e) => {
+                                                    if (location.pathname.includes('create'))
+                                                        setHoatDong(parseInt(e.target.value))
+                                                }}
+                                                value={document1Info?.subjectId}
                                             >
                                                 <option value="" disabled>Chọn môn học</option>
                                                 {
@@ -573,8 +608,10 @@ const SubMenu1Detail = () => {
                                         </div>
                                         <div><strong>, KHỐI LỚP</strong>
                                             <select id="grades" style={{ width: "70px", marginLeft: "4px" }}
-                                                onChange={(e) => setKhoiLop(e.target.value)}
-                                                defaultValue={document1Info?.gradeId}
+                                                onChange={(e) => {
+                                                    if (location.pathname.includes('create'))
+                                                        setKhoiLop(parseInt(e.target.value))
+                                                }} value={document1Info?.gradeId}
                                             >
                                                 <option value="" disabled>Chọn lớp</option>
                                                 {
@@ -632,59 +669,68 @@ const SubMenu1Detail = () => {
                                                     </TableHead>
                                                     <TableBody>
                                                         {rows1.map((row, index) => (
-                                                            <TableRow key={index} sx={{ 'td': { border: 1 } }}>
-                                                                <TableCell align="center">{index + 1}</TableCell>
-                                                                <TableCell align="center">
-                                                                    <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
-                                                                        value={row.teachingEquipmentId ?? ''}
-                                                                        onChange={(e) => {
-                                                                            const newValue = parseInt(e.target.value);
-                                                                            const updatedRows = [...rows1];
-                                                                            updatedRows[index].teachingEquipmentId = newValue;
-                                                                            setRows1(updatedRows);
-                                                                        }}>
-                                                                        <option value="" disabled>Chọn lớp</option>
-                                                                        {
-                                                                            teachingEquipment?.map((item) => (
-                                                                                <option value={item?.id}>{item?.name}</option>
-                                                                            ))
-                                                                        }
-                                                                    </select>
-                                                                </TableCell>
-                                                                <TableCell align="center">
-                                                                    <textarea
-                                                                        value={row.quantity ?? ''}
-                                                                        onChange={(e) => {
-                                                                            const newValue = parseInt(e.target.value);
-                                                                            const updatedRows = [...rows1];
-                                                                            updatedRows[index].quantity = newValue;
-                                                                            setRows1(updatedRows);
-                                                                        }}
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell align="center">
-                                                                    <textarea
-                                                                        value={row.description}
-                                                                        onChange={(e) => {
-                                                                            const newValue = e.target.value;
-                                                                            const updatedRows = [...rows1];
-                                                                            updatedRows[index].description = newValue;
-                                                                            setRows1(updatedRows);
-                                                                        }}
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell align="center">
-                                                                    <textarea
-                                                                        value={row.note}
-                                                                        onChange={(e) => {
-                                                                            const newValue = e.target.value;
-                                                                            const updatedRows = [...rows1];
-                                                                            updatedRows[index].note = newValue;
-                                                                            setRows1(updatedRows);
-                                                                        }}
-                                                                    />
-                                                                </TableCell>
-                                                            </TableRow>
+                                                            <Tooltip key={index} disableFocusListener placement="right"
+                                                                title={<h2 onClick={() => {
+                                                                    const updatedRows = [...rows1];
+                                                                    updatedRows.splice(index, 1);
+                                                                    setRows1(updatedRows);
+                                                                }}
+                                                                    style={{ cursor: "pointer" }}>Xóa hàng</h2>}
+                                                            >
+                                                                <TableRow key={index} sx={{ 'td': { border: 1 } }}>
+                                                                    <TableCell align="center">{index + 1}</TableCell>
+                                                                    <TableCell align="center">
+                                                                        <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                            value={row.teachingEquipmentId ?? ''}
+                                                                            onChange={(e) => {
+                                                                                const newValue = parseInt(e.target.value);
+                                                                                const updatedRows = [...rows1];
+                                                                                updatedRows[index].teachingEquipmentId = newValue;
+                                                                                setRows1(updatedRows);
+                                                                            }}>
+                                                                            <option value="" disabled>Chọn lớp</option>
+                                                                            {
+                                                                                teachingEquipment?.map((item) => (
+                                                                                    <option value={item?.id}>{item?.name}</option>
+                                                                                ))
+                                                                            }
+                                                                        </select>
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        <textarea
+                                                                            value={row.quantity ?? ''}
+                                                                            onChange={(e) => {
+                                                                                const newValue = parseInt(e.target.value);
+                                                                                const updatedRows = [...rows1];
+                                                                                updatedRows[index].quantity = newValue;
+                                                                                setRows1(updatedRows);
+                                                                            }}
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        <textarea
+                                                                            value={row.description}
+                                                                            onChange={(e) => {
+                                                                                const newValue = e.target.value;
+                                                                                const updatedRows = [...rows1];
+                                                                                updatedRows[index].description = newValue;
+                                                                                setRows1(updatedRows);
+                                                                            }}
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        <textarea
+                                                                            value={row.note}
+                                                                            onChange={(e) => {
+                                                                                const newValue = e.target.value;
+                                                                                const updatedRows = [...rows1];
+                                                                                updatedRows[index].note = newValue;
+                                                                                setRows1(updatedRows);
+                                                                            }}
+                                                                        />
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </Tooltip>
                                                         ))}
                                                     </TableBody>
                                                 </Table>
@@ -708,59 +754,68 @@ const SubMenu1Detail = () => {
                                                     </TableHead>
                                                     <TableBody>
                                                         {rows2.map((row, index) => (
-                                                            <TableRow key={index} sx={{ 'td': { border: 1 } }}>
-                                                                <TableCell align="center">{index + 1}</TableCell>
-                                                                <TableCell align="center">
-                                                                    <select id="subjectRoomId" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
-                                                                        value={row.subjectRoomId ?? ''}
-                                                                        onChange={(e) => {
-                                                                            const newValue = parseInt(e.target.value);
-                                                                            const updatedRows = [...rows2];
-                                                                            updatedRows[index].subjectRoomId = newValue;
-                                                                            setRows2(updatedRows);
-                                                                        }}>
-                                                                        <option value="" disabled>Chọn phòng học</option>
-                                                                        {
-                                                                            subjectRoom?.map((item) => (
-                                                                                <option value={item?.id}>{item?.name}</option>
-                                                                            ))
-                                                                        }
-                                                                    </select>
-                                                                </TableCell>
-                                                                <TableCell align="center">
-                                                                    <textarea
-                                                                        value={row.quantity ?? ''}
-                                                                        onChange={(e) => {
-                                                                            const newValue = parseInt(e.target.value);
-                                                                            const updatedRows = [...rows2];
-                                                                            updatedRows[index].quantity = newValue;
-                                                                            setRows2(updatedRows);
-                                                                        }}
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell align="center">
-                                                                    <textarea
-                                                                        value={row.description}
-                                                                        onChange={(e) => {
-                                                                            const newValue = e.target.value;
-                                                                            const updatedRows = [...rows2];
-                                                                            updatedRows[index].description = newValue;
-                                                                            setRows2(updatedRows);
-                                                                        }}
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell align="center">
-                                                                    <textarea
-                                                                        value={row.note}
-                                                                        onChange={(e) => {
-                                                                            const newValue = e.target.value;
-                                                                            const updatedRows = [...rows2];
-                                                                            updatedRows[index].note = newValue;
-                                                                            setRows2(updatedRows);
-                                                                        }}
-                                                                    />
-                                                                </TableCell>
-                                                            </TableRow>
+                                                            <Tooltip key={index} disableFocusListener placement="right"
+                                                                title={<h2 onClick={() => {
+                                                                    const updatedRows = [...rows2];
+                                                                    updatedRows.splice(index, 1);
+                                                                    setRows2(updatedRows);
+                                                                }}
+                                                                    style={{ cursor: "pointer" }}>Xóa hàng</h2>}
+                                                            >
+                                                                <TableRow key={index} sx={{ 'td': { border: 1 } }}>
+                                                                    <TableCell align="center">{index + 1}</TableCell>
+                                                                    <TableCell align="center">
+                                                                        <select id="subjectRoomId" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                            value={row.subjectRoomId ?? ''}
+                                                                            onChange={(e) => {
+                                                                                const newValue = parseInt(e.target.value);
+                                                                                const updatedRows = [...rows2];
+                                                                                updatedRows[index].subjectRoomId = newValue;
+                                                                                setRows2(updatedRows);
+                                                                            }}>
+                                                                            <option value="" disabled>Chọn phòng học</option>
+                                                                            {
+                                                                                subjectRoom?.map((item) => (
+                                                                                    <option value={item?.id}>{item?.name}</option>
+                                                                                ))
+                                                                            }
+                                                                        </select>
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        <textarea
+                                                                            value={row.quantity ?? ''}
+                                                                            onChange={(e) => {
+                                                                                const newValue = parseInt(e.target.value);
+                                                                                const updatedRows = [...rows2];
+                                                                                updatedRows[index].quantity = newValue;
+                                                                                setRows2(updatedRows);
+                                                                            }}
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        <textarea
+                                                                            value={row.description}
+                                                                            onChange={(e) => {
+                                                                                const newValue = e.target.value;
+                                                                                const updatedRows = [...rows2];
+                                                                                updatedRows[index].description = newValue;
+                                                                                setRows2(updatedRows);
+                                                                            }}
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        <textarea
+                                                                            value={row.note}
+                                                                            onChange={(e) => {
+                                                                                const newValue = e.target.value;
+                                                                                const updatedRows = [...rows2];
+                                                                                updatedRows[index].note = newValue;
+                                                                                setRows2(updatedRows);
+                                                                            }}
+                                                                        />
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </Tooltip>
                                                         ))}
                                                     </TableBody>
                                                 </Table>
@@ -790,48 +845,57 @@ const SubMenu1Detail = () => {
                                                     </TableHead>
                                                     <TableBody>
                                                         {rows3.map((row, index) => (
-                                                            <TableRow key={index} sx={{ 'td': { border: 1 } }}>
-                                                                <TableCell align="center">{index + 1}</TableCell>
-                                                                <TableCell align="center">
-                                                                    <select id="curriculumDistribution" style={{ width: "210px", height: "40px", marginLeft: "4px" }}
-                                                                        value={row.curriculumId ?? ''}
-                                                                        onChange={(e) => {
-                                                                            const newValue = parseInt(e.target.value);
-                                                                            const updatedRows = [...rows3];
-                                                                            updatedRows[index].curriculumId = newValue;
-                                                                            setRows3(updatedRows);
-                                                                        }}>
-                                                                        <option value="" disabled>Chọn phân phối chương trình</option>
-                                                                        {
-                                                                            curriculumDistribution?.map((item) => (
-                                                                                <option value={item?.id}>{item?.name}</option>
-                                                                            ))
-                                                                        }
-                                                                    </select>
-                                                                </TableCell>
-                                                                <TableCell align="center">
-                                                                    <textarea
-                                                                        value={row.slot ?? ''}
-                                                                        onChange={(e) => {
-                                                                            const newValue = parseInt(e.target.value);
-                                                                            const updatedRows = [...rows3];
-                                                                            updatedRows[index].slot = newValue;
-                                                                            setRows3(updatedRows);
-                                                                        }}
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell align="center">
-                                                                    <textarea
-                                                                        value={row.description}
-                                                                        onChange={(e) => {
-                                                                            const newValue = e.target.value;
-                                                                            const updatedRows = [...rows3];
-                                                                            updatedRows[index].description = newValue;
-                                                                            setRows3(updatedRows);
-                                                                        }}
-                                                                    />
-                                                                </TableCell>
-                                                            </TableRow>
+                                                            <Tooltip key={index} disableFocusListener placement="right"
+                                                                title={<h2 onClick={() => {
+                                                                    const updatedRows = [...rows3];
+                                                                    updatedRows.splice(index, 1);
+                                                                    setRows3(updatedRows);
+                                                                }}
+                                                                    style={{ cursor: "pointer" }}>Xóa hàng</h2>}
+                                                            >
+                                                                <TableRow key={index} sx={{ 'td': { border: 1 } }}>
+                                                                    <TableCell align="center">{index + 1}</TableCell>
+                                                                    <TableCell align="center">
+                                                                        <select id="curriculumDistribution" style={{ width: "210px", height: "40px", marginLeft: "4px" }}
+                                                                            value={row.curriculumId ?? ''}
+                                                                            onChange={(e) => {
+                                                                                const newValue = parseInt(e.target.value);
+                                                                                const updatedRows = [...rows3];
+                                                                                updatedRows[index].curriculumId = newValue;
+                                                                                setRows3(updatedRows);
+                                                                            }}>
+                                                                            <option value="" disabled>Chọn phân phối chương trình</option>
+                                                                            {
+                                                                                curriculumDistribution?.map((item) => (
+                                                                                    <option value={item?.id}>{item?.name}</option>
+                                                                                ))
+                                                                            }
+                                                                        </select>
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        <textarea
+                                                                            value={row.slot ?? ''}
+                                                                            onChange={(e) => {
+                                                                                const newValue = parseInt(e.target.value);
+                                                                                const updatedRows = [...rows3];
+                                                                                updatedRows[index].slot = newValue;
+                                                                                setRows3(updatedRows);
+                                                                            }}
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        <textarea
+                                                                            value={row.description}
+                                                                            onChange={(e) => {
+                                                                                const newValue = e.target.value;
+                                                                                const updatedRows = [...rows3];
+                                                                                updatedRows[index].description = newValue;
+                                                                                setRows3(updatedRows);
+                                                                            }}
+                                                                        />
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </Tooltip>
                                                         ))}
                                                     </TableBody>
                                                 </Table>
@@ -855,48 +919,57 @@ const SubMenu1Detail = () => {
                                                     </TableHead>
                                                     <TableBody>
                                                         {rows4.map((row, index) => (
-                                                            <TableRow key={index} sx={{ 'td': { border: 1 } }}>
-                                                                <TableCell align="center">{index + 1}</TableCell>
-                                                                <TableCell align="center">
-                                                                    <select id="selectedTopic" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
-                                                                        value={row.selectedTopicsId ?? ''}
-                                                                        onChange={(e) => {
-                                                                            const newValue = parseInt(e.target.value);
-                                                                            const updatedRows = [...rows4];
-                                                                            updatedRows[index].selectedTopicsId = newValue;
-                                                                            setRows4(updatedRows);
-                                                                        }}>
-                                                                        <option value="" disabled>Chọn chuyên đề</option>
-                                                                        {
-                                                                            selectedTopic?.map((item) => (
-                                                                                <option value={item?.id}>{item?.name}</option>
-                                                                            ))
-                                                                        }
-                                                                    </select>
-                                                                </TableCell>
-                                                                <TableCell align="center">
-                                                                    <textarea
-                                                                        value={row.slot ?? ''}
-                                                                        onChange={(e) => {
-                                                                            const newValue = parseInt(e.target.value);
-                                                                            const updatedRows = [...rows4];
-                                                                            updatedRows[index].slot = newValue;
-                                                                            setRows4(updatedRows);
-                                                                        }}
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell align="center">
-                                                                    <textarea
-                                                                        value={row.description}
-                                                                        onChange={(e) => {
-                                                                            const newValue = e.target.value;
-                                                                            const updatedRows = [...rows4];
-                                                                            updatedRows[index].description = newValue;
-                                                                            setRows4(updatedRows);
-                                                                        }}
-                                                                    />
-                                                                </TableCell>
-                                                            </TableRow>
+                                                            <Tooltip key={index} disableFocusListener placement="right"
+                                                                title={<h2 onClick={() => {
+                                                                    const updatedRows = [...rows4];
+                                                                    updatedRows.splice(index, 1);
+                                                                    setRows4(updatedRows);
+                                                                }}
+                                                                    style={{ cursor: "pointer" }}>Xóa hàng</h2>}
+                                                            >
+                                                                <TableRow key={index} sx={{ 'td': { border: 1 } }}>
+                                                                    <TableCell align="center">{index + 1}</TableCell>
+                                                                    <TableCell align="center">
+                                                                        <select id="selectedTopic" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                            value={row.selectedTopicsId ?? ''}
+                                                                            onChange={(e) => {
+                                                                                const newValue = parseInt(e.target.value);
+                                                                                const updatedRows = [...rows4];
+                                                                                updatedRows[index].selectedTopicsId = newValue;
+                                                                                setRows4(updatedRows);
+                                                                            }}>
+                                                                            <option value="" disabled>Chọn chuyên đề</option>
+                                                                            {
+                                                                                selectedTopic?.map((item) => (
+                                                                                    <option value={item?.id}>{item?.name}</option>
+                                                                                ))
+                                                                            }
+                                                                        </select>
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        <textarea
+                                                                            value={row.slot ?? ''}
+                                                                            onChange={(e) => {
+                                                                                const newValue = parseInt(e.target.value);
+                                                                                const updatedRows = [...rows4];
+                                                                                updatedRows[index].slot = newValue;
+                                                                                setRows4(updatedRows);
+                                                                            }}
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        <textarea
+                                                                            value={row.description}
+                                                                            onChange={(e) => {
+                                                                                const newValue = e.target.value;
+                                                                                const updatedRows = [...rows4];
+                                                                                updatedRows[index].description = newValue;
+                                                                                setRows4(updatedRows);
+                                                                            }}
+                                                                        />
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </Tooltip>
                                                         ))}
                                                     </TableBody>
                                                 </Table>
@@ -922,7 +995,7 @@ const SubMenu1Detail = () => {
                                                     <TableBody>
                                                         {rows5.map((row, index) => (
                                                             <TableRow key={index} sx={{ 'td': { border: 1 } }}>
-                                                                <TableCell align="center">{row.baiKiemTra}</TableCell>
+                                                                <TableCell align="center">{row.testingCategoryName}</TableCell>
                                                                 <TableCell align="center">
                                                                     <textarea
                                                                         value={row.time ?? ''}
@@ -958,7 +1031,8 @@ const SubMenu1Detail = () => {
                                                                     />
                                                                 </TableCell>
                                                                 <TableCell align="center">
-                                                                    <select id="formCategory" style={{ width: "150px", height: "40px", marginLeft: "4px" }} defaultValue={''}
+                                                                    <select id="formCategory" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                        value={row.formCategoryId ?? ''}
                                                                         onChange={(e) => {
                                                                             const newValue = parseInt(e.target.value);
                                                                             const updatedRows = [...rows5];
@@ -1084,7 +1158,7 @@ const SubMenu1Detail = () => {
                 </DialogContent>
                 <DialogActions >
                     <Button onClick={handleClose} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
-                    <Button onClick={handleAddDoc1} className='button-mui' autoFocus>
+                    <Button onClick={() => handleAddDoc1(documentId)} className='button-mui' autoFocus>
                         Đồng ý
                     </Button>
                 </DialogActions>

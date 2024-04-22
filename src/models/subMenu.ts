@@ -10,5 +10,6 @@ export interface SubMenuData {
     teachingPlannerId: number,
     createdDate: Date,
     linkFile: string,
-    linkImage: string
+    linkImage: string,
+    documents: any
 }

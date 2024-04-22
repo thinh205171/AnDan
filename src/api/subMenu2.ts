@@ -10,6 +10,14 @@ export const apiGetSubMenu2 = async () => {
         return null;
 }
 
+export const apiGetDocument2ByUserSpecialiedDepartment = async (query: any) => {
+    const result = await axios.get(`${base_url}Document2/GetDocument2ByUserSpecialiedDepartment?${query}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
 export const apiGetSubMenu2ById = async (id: string) => {
     const result = await axios.get(`${base_url}Document2/ById/${id}`);
     if (result)
