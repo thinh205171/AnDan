@@ -10,6 +10,14 @@ export const apiGetSubMenu3 = async () => {
         return null;
 }
 
+export const apiGetDocument3ByUserSpecialiedDepartment = async (query: any) => {
+    const result = await axios.get(`${base_url}Document3/GetDocument3ByUserSpecialiedDepartment?${query}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
 export const apiGetSubMenu3ById = async (id: string) => {
     const result = await axios.get(`${base_url}Document3/ById/${id}`);
     if (result)
@@ -20,6 +28,14 @@ export const apiGetSubMenu3ById = async (id: string) => {
 
 export const apiPostSubMenu3 = async (data: any) => {
     const result = await axios.post(`${base_url}Document3`, data);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiDeleteSubMenu3 = async (docId: any) => {
+    const result = await axios.delete(`${base_url}Document3/${docId}`);
     if (result)
         return result;
     else
@@ -66,3 +82,13 @@ export const apiGetSubMenu3SelectedTopics = async (docId: any) => {
     else
         return null;
 }
+
+export const apiDeleteDocument3ForeignTableByDocument3ID = async (docId: any) => {
+    const result = await axios.delete(`${base_url}Document3/DeleteDocument3ForeignTableByDocument3Id?id=${docId}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+

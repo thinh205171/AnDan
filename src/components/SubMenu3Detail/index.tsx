@@ -19,7 +19,7 @@ import { TeachingEquipment } from '../../models/teachingEquipment';
 import { SubjectRoom } from '../../models/SubjectRoom';
 import { CurriculumDistribution } from '../../models/CurriculumDistribution';
 import { formatDate } from '../../utils/date';
-import { apiGetSubMenu3ById, apiGetSubMenu3CuriculumDistribution, apiGetSubMenu3SelectedTopics, apiPostSubMenu3, apiPostSubMenu3CuriculumDistribution, apiPostSubMenu3SelectedTopics, apiUpdateSubMenu3 } from '../../api/subMenu3';
+import { apiDeleteDocument3ForeignTableByDocument3ID, apiDeleteSubMenu3, apiGetSubMenu3ById, apiGetSubMenu3CuriculumDistribution, apiGetSubMenu3SelectedTopics, apiPostSubMenu3, apiPostSubMenu3CuriculumDistribution, apiPostSubMenu3SelectedTopics, apiUpdateSubMenu3 } from '../../api/subMenu3';
 import generatePDF from 'react-to-pdf';
 import { options } from '../UploadPhuLuc4';
 import axios from 'axios';
@@ -31,7 +31,7 @@ interface Row {
     slot: number | null;
     equipmentId: number | null;
     time: string;
-    subjectRoomName: number | null;
+    subjectRoomName: string;
 }
 
 const SubMenu3Detail = () => {
@@ -39,8 +39,8 @@ const SubMenu3Detail = () => {
     const navigate = useNavigate()
     const document1Id = location.pathname.split('/')[3];
     const user = useAppSelector(state => state.auth.user)
-    const [rows1, setRows1] = useState<Row[]>([{ curriculumId: null, selectedTopicsId: null, equipmentId: null, slot: null, time: '', subjectRoomName: null }]);
-    const [rows2, setRows2] = useState<Row[]>([{ curriculumId: null, selectedTopicsId: null, equipmentId: null, slot: null, time: '', subjectRoomName: null }]);
+    const [rows1, setRows1] = useState<Row[]>([{ curriculumId: null, selectedTopicsId: null, equipmentId: null, slot: null, time: '', subjectRoomName: '' }]);
+    const [rows2, setRows2] = useState<Row[]>([{ curriculumId: null, selectedTopicsId: null, equipmentId: null, slot: null, time: '', subjectRoomName: '' }]);
     const [login, setLogin] = useState(false);
     const [open, setOpen] = useState(false);
     const [openAccept, setOpenAccept] = useState(false);
@@ -59,6 +59,7 @@ const SubMenu3Detail = () => {
     const [documentId, setDocumentId] = useState(null);
     const [userInfoDocument, setUserInfoDocument] = useState<User[]>([]);
     const [document3Info, setDocument3Info] = useState<Document1>();
+    const [displayAddRow, setDisplayAddRow] = useState(false);
 
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
@@ -88,8 +89,11 @@ const SubMenu3Detail = () => {
             const response = await axios.post('https://localhost:7241/api/S3FileUpload/upload?prefix=doc3%2F', formData);
             if (response?.status === 200) {
                 const res = await apiUpdateSubMenu3({ id: documentId, document1Id: parseInt(document1Id), linkFile: response?.data, userId: user?.userId }, documentId)
-                if (res && documentId)
+                if (res && documentId) {
+                    setDisplayAddRow(!displayAddRow)
+                    alert('Thành công! Hãy chờ đợi trong giây lát để chuyển trang')
                     navigate(`/sub-menu-3/detail-view/${documentId}`)
+                }
             }
 
         } catch (error) {
@@ -312,7 +316,7 @@ const SubMenu3Detail = () => {
     }, [document1Info])
 
     const handleClickOpen = async () => {
-        // setDisplayAddRow(!displayAddRow)
+        setDisplayAddRow(!displayAddRow)
         if (location.pathname.includes('create')) {
             if (khoiLop && user) {
                 setOpen(true);
@@ -341,7 +345,7 @@ const SubMenu3Detail = () => {
     };
 
     const handleClickOpen1 = async () => {
-        // setDisplayAddRow(!displayAddRow)
+        setDisplayAddRow(!displayAddRow)
         if (khoiLop && user) {
             setOpen(true);
             const post = await apiPostSubMenu3({
@@ -362,11 +366,22 @@ const SubMenu3Detail = () => {
             alert("Nhập đầy đủ thông tin!")
     };
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleClose = async () => {
+        if (location.pathname.includes('create')) {
+            setDisplayAddRow(!displayAddRow)
+            setOpen(false);
+            try {
+                await apiDeleteSubMenu3(documentId);
+            } catch (error) {
+                console.error(error);
+            }
+        }
     };
 
     const handleAddDoc3 = async () => {
+        if (location.pathname.includes('edit')) {
+            await apiDeleteDocument3ForeignTableByDocument3ID(location.pathname.split('/')[3])
+        }
         if (rows1 && rows2) {
             const rows1WithDocumentId = rows1.map(row => ({ ...row, document3Id: documentId }));
             const res1 = await apiPostSubMenu3CuriculumDistribution(rows1WithDocumentId);
@@ -419,7 +434,7 @@ const SubMenu3Detail = () => {
             equipmentId: null,
             slot: null,
             time: '',
-            subjectRoomName: null
+            subjectRoomName: ''
         };
         setRows1([...rows1, newRow]);
     };
@@ -432,7 +447,7 @@ const SubMenu3Detail = () => {
             equipmentId: null,
             slot: null,
             time: '',
-            subjectRoomName: null
+            subjectRoomName: ''
         };
         setRows2([...rows2, newRow]);
     };
@@ -587,7 +602,7 @@ const SubMenu3Detail = () => {
                                                                 <select id="subjectRoom" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
                                                                     value={row.subjectRoomName ?? ''}
                                                                     onChange={(e) => {
-                                                                        const newValue = parseInt(e.target.value);
+                                                                        const newValue = e.target.value;
                                                                         const updatedRows = [...rows1];
                                                                         updatedRows[index].subjectRoomName = newValue;
                                                                         setRows1(updatedRows);
@@ -694,7 +709,7 @@ const SubMenu3Detail = () => {
                                                                 <select id="subjectRoom" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
                                                                     value={row.subjectRoomName ?? ''}
                                                                     onChange={(e) => {
-                                                                        const newValue = parseInt(e.target.value);
+                                                                        const newValue = e.target.value;
                                                                         const updatedRows = [...rows2];
                                                                         updatedRows[index].subjectRoomName = newValue;
                                                                         setRows2(updatedRows);
@@ -840,7 +855,11 @@ const SubMenu3Detail = () => {
             }
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={async (event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleClose();
+                    }
+                }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
 

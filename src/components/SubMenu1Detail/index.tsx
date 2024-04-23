@@ -415,12 +415,14 @@ const SubMenu1Detail = () => {
     };
 
     const handleClose = async () => {
-        setDisplayAddRow(!displayAddRow)
-        setOpen(false);
-        try {
-            await apiDeleteSubMenu1(documentId);
-        } catch (error) {
-            console.error(error);
+        if (location.pathname.includes('create')) {
+            setDisplayAddRow(!displayAddRow)
+            setOpen(false);
+            try {
+                await apiDeleteSubMenu1(documentId);
+            } catch (error) {
+                console.error(error);
+            }
         }
     };
 

@@ -11,7 +11,7 @@ import { apiGetAllGetUser, apiGetUser } from '../../api/user';
 import { Grade } from '../../models/grade';
 import { apiGetGrade } from '../../api/grade';
 import { useAppSelector } from '../../hook/useTypedSelector';
-import { apiDeleteSubMenu2, apiGetSubMenu2ById, apiPostSubMenu2, apiPostSubMenu2Grade, apiUpdateSubMenu2 } from '../../api/subMenu2';
+import { apiDeleteDocument2GradeByDocument2Id, apiDeleteSubMenu2, apiGetDocument2GradeById, apiGetSubMenu2ById, apiPostSubMenu2, apiPostSubMenu2Grade, apiUpdateSubMenu2 } from '../../api/subMenu2';
 import { formatDate } from '../../utils/date';
 import { Department } from '../../models/department';
 import { apiGetSpecializedDepartmentById } from '../../api/specializedDepartment';
@@ -20,6 +20,8 @@ import { Document1 } from '../../models/document1';
 import { options } from '../UploadPhuLuc4';
 import generatePDF from 'react-to-pdf';
 import axios from 'axios';
+import { TotalClass } from '../../models/totalClass';
+import { apiGetTotalClassByGradeId } from '../../api/subMenu1';
 
 interface Row {
     gradeId: number | null;
@@ -57,7 +59,9 @@ const SubMenu2Detail = () => {
     const [userInfoLogin, setUserInfoLogin] = useState<User>();
     const [userInfoDocument, setUserInfoDocument] = useState<User[]>([]);
     const [document2Info, setDocument2Info] = useState<Document1>();
-
+    const [totalClass, setTotalClass] = useState<TotalClass>();
+    const [multiTotalClass, setMultiTotalClass] = useState<TotalClass[]>([]);
+    const [displayAddRow, setDisplayAddRow] = useState(false);
 
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
@@ -87,8 +91,11 @@ const SubMenu2Detail = () => {
             const response = await axios.post('https://localhost:7241/api/S3FileUpload/upload?prefix=doc2%2F', formData);
             if (response?.status === 200) {
                 const res = await apiUpdateSubMenu2({ id: documentId, linkFile: response?.data, userId: user?.userId }, documentId)
-                if (res && documentId)
+                if (res && documentId) {
+                    setDisplayAddRow(!displayAddRow)
+                    alert('Thành công! Hãy chờ đợi trong giây lát để chuyển trang')
                     navigate(`/sub-menu-2/detail-view/${documentId}`)
+                }
             }
 
         } catch (error) {
@@ -109,9 +116,43 @@ const SubMenu2Detail = () => {
         fetchUserInfoLogin()
     }, [user])
 
-    // useEffect(() => {
-    //     iff
-    // })
+    useEffect(() => {
+        if (location.pathname.includes('edit')) {
+            const fetchDoc2GradeInfo = async () => {
+                const res = await apiGetDocument2GradeById(location.pathname.split('/')[3]);
+                if (res && res.data) {
+                    const gradeMap = new Map();
+
+                    res.data.forEach((item: any, index: any) => {
+                        if (gradeMap.has(item.gradeId)) {
+                            const existingArray = gradeMap.get(item.gradeId);
+                            existingArray.push(item);
+                            gradeMap.set(item.gradeId, existingArray);
+                        } else {
+                            gradeMap.set(item.gradeId, [item]);
+                        }
+                        fecthTotalClass(item.gradeId, index)
+                    });
+
+                    const formatRes = Array.from(gradeMap.values());
+                    setMultiRows(formatRes)
+                }
+            };
+            fetchDoc2GradeInfo();
+        }
+    }, [location.pathname]);
+
+
+    const fecthTotalClass = async (gradeId: any, index: any) => {
+        const res = await apiGetTotalClassByGradeId(gradeId)
+        if (res && res.data) {
+            const totalClassData: TotalClass = res.data;
+            setTotalClass(totalClassData);
+            const updatedMultiTotalClass = [...multiTotalClass];
+            updatedMultiTotalClass[index] = res.data
+            setMultiTotalClass(updatedMultiTotalClass)
+        }
+    }
 
     useEffect(() => {
         const fetchSpecializedDepartmentById = async () => {
@@ -167,7 +208,8 @@ const SubMenu2Detail = () => {
     }, [])
 
     const handleClickOpen = async () => {
-        if (!location.pathname.split('/')[3]) {
+        setDisplayAddRow(!displayAddRow)
+        if (location.pathname.includes('create')) {
             const today = new Date();
             const createdDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
             if (user) {
@@ -200,6 +242,7 @@ const SubMenu2Detail = () => {
     };
 
     const handleClickOpen1 = async () => {
+        setDisplayAddRow(!displayAddRow)
         const today = new Date();
         const createdDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
         if (user) {
@@ -226,11 +269,14 @@ const SubMenu2Detail = () => {
     };
 
     const handleClose = async () => {
-        setOpen(false);
-        try {
-            await apiDeleteSubMenu2(documentId);
-        } catch (error) {
-            console.error(error);
+        if (location.pathname.includes('create')) {
+            setDisplayAddRow(!displayAddRow)
+            setOpen(false);
+            try {
+                await apiDeleteSubMenu2(documentId);
+            } catch (error) {
+                console.error(error);
+            }
         }
     };
 
@@ -271,7 +317,7 @@ const SubMenu2Detail = () => {
     };
 
     const handleClickSave = () => {
-        navigate(`/sub-menu-2/detail-edit/${location.pathname.split('/')[1].split('-')[2]}`)
+        navigate(`/sub-menu-2/detail-edit/${location.pathname.split('/')[3]}`)
     };
 
     const handleClickAdd = () => {
@@ -315,6 +361,8 @@ const SubMenu2Detail = () => {
     }
 
     const handleAddDoc2 = async () => {
+        if (location.pathname.includes('edit'))
+            await apiDeleteDocument2GradeByDocument2Id(location.pathname.split('/')[3])
         const formatMultiRow = multiRows?.map((rows, index) => {
             rows?.forEach(row => {
                 row.gradeId = gradeIds[index]?.gradeId ?? null;
@@ -331,7 +379,7 @@ const SubMenu2Detail = () => {
 
         if (rowsWithDocumentId) {
             try {
-                const res = await apiPostSubMenu2Grade(rowsWithDocumentId, documentId);
+                const res = await apiPostSubMenu2Grade(rowsWithDocumentId);
                 if (res) {
                     alert("Thành công! Xin hãy đợi trong giây lát");
                     downloadPdf();
@@ -342,6 +390,8 @@ const SubMenu2Detail = () => {
         }
         setOpen(false);
     };
+
+    console.log("multiRows: ", multiRows)
 
     return (
         <div className='sub-menu-container'>
@@ -385,7 +435,8 @@ const SubMenu2Detail = () => {
                                             <div className="sub-menu-content-main-feature-item" style={{ display: "flex", alignItems: "center", columnGap: "6px" }}>
                                                 <div><strong>{indexGrade + 1}. Khối lớp: </strong>
                                                     <select id="grade" style={{ width: "40px", height: "20px", marginLeft: "4px" }}
-                                                        value={subRows[0].gradeId ?? ''}
+                                                        value={gradeIds[indexGrade]?.gradeId ?? ''}
+                                                        defaultValue={subRows[0]?.gradeId ?? ''}
                                                         onChange={(e) => {
                                                             const newValue = parseInt(e.target.value);
                                                             const updatedGradeIds = [...gradeIds];
@@ -393,7 +444,7 @@ const SubMenu2Detail = () => {
                                                                 updatedGradeIds[indexGrade].gradeId = newValue;
                                                                 setGradeIds(updatedGradeIds);
                                                             }
-                                                            console.log("gradeIds: ", gradeIds)
+                                                            fecthTotalClass(parseInt(e.target.value), indexGrade)
                                                         }}>
                                                         <option value="" disabled>Chọn khối lớp</option>
                                                         {
@@ -403,7 +454,9 @@ const SubMenu2Detail = () => {
                                                         }
                                                     </select>
                                                 </div>
-                                                <div><strong>Số học sinh: </strong><input type="number" placeholder='..............' style={{ width: "50px" }} onChange={e => setSoHocSinh1(e.target.value)} /></div>
+                                                <div><strong>Số học sinh: </strong>
+                                                    {multiTotalClass[indexGrade]?.totalStudent}
+                                                </div>
                                             </div>
                                             <div className="sub-menu-content-main-feature-table">
                                                 <TableContainer component={Paper} className="table-list-sub-menu">
@@ -588,7 +641,7 @@ const SubMenu2Detail = () => {
                             <div className="sub-menu-action">
                                 <div className="verify" style={{ justifyContent: "center" }}>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
-                                        <div className='action-button' onClick={location.pathname.includes('add') ? handleClickAdd : handleClickSave}>
+                                        <div className='action-button' onClick={location.pathname.includes('create') ? handleClickAdd : handleClickSave}>
                                             {
                                                 location.pathname.includes('create') ? "Tạo mới" : "Sửa"
                                             }

@@ -34,8 +34,16 @@ export const apiPostSubMenu2 = async (data: any) => {
         return null;
 }
 
-export const apiPostSubMenu2Grade = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document2Grade/${docId}`, data);
+export const apiPostSubMenu2Grade = async (data: any) => {
+    const result = await axios.put(`${base_url}Document2Grade`, data);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+export const apiGetDocument2GradeById = async (data: any) => {
+    const result = await axios.get(`${base_url}Document2Grade/GetDocument2GradeById/${data}`);
     if (result)
         return result;
     else
@@ -57,3 +65,13 @@ export const apiUpdateSubMenu2 = async (data: any, docId: any) => {
     else
         return null;
 }
+
+export const apiDeleteDocument2GradeByDocument2Id = async (docId: any) => {
+    const result = await axios.delete(`${base_url}Document2Grade/DeleteDocument2GradeByDocument2Id?id=${docId}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+

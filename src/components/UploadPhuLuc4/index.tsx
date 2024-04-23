@@ -6,6 +6,12 @@ import { Class } from '../../models/class';
 import { apiGetAllClass } from '../../api/class';
 import { apiGetSubject } from '../../api/subject';
 import { blob } from 'stream/consumers';
+import axios from 'axios';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { useAppSelector } from '../../hook/useTypedSelector';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { apiDeleteTeachingPlanner, apiPostTeachingPlanner } from '../../api/teachingPlanner';
+import { apiPostSubMenu4 } from '../../api/subMenu4';
 
 export const options: Options = {
     filename: "using-function.pdf",
@@ -14,6 +20,9 @@ export const options: Options = {
     }
 };
 const UploadPhuLuc4 = () => {
+    const location = useLocation()
+    const navigate = useNavigate()
+    const user = useAppSelector(state => state.auth.user)
     const [subjectId, setSubjectId] = useState<number | null>(null)
     const [classId, setClassId] = useState<number | null>(null)
     const [tieuDe, setTieuDe] = useState('')
@@ -21,27 +30,36 @@ const UploadPhuLuc4 = () => {
     const [avatar, setAvatar] = useState<File | null>(null)
     const [subjects, setSubjects] = useState<Subject[]>([])
     const [classes, setClasses] = useState<Class[]>([])
-    const getTargetElement = () => document.getElementById("main-content");
-    // const downloadPdf = () => generatePDF(getTargetElement, options);
+    const [avatarUrl, setAvatarUrl] = useState('')
+    const [file, setFile] = useState<File | null>(null)
+    const [fileUrl, setFileUrl] = useState('')
+    const [open, setOpen] = useState(false);
+    const [teachingPlannerId, setTeachingPlannerId] = useState(null);
 
-    const downloadPdf = () => {
-        generatePDF(getTargetElement, options).then((pdf) => {
-            // Chuyển file PDF thành Blob
-            // Tạo một FormData object và thêm file PDF vào đó
+    const handleAvatarChange = async (e: any) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+            setAvatar(file);
+            const blob = new Blob([file], { type: file.type });
             const formData = new FormData();
-            formData.append('files', pdf.output("blob"), 'document.pdf');
+            formData.append('files', blob, file.name);
+            const response = await axios.post('https://localhost:7241/api/S3FileUpload/upload?prefix=images%2F', formData);
+            if (response?.status === 200)
+                setAvatarUrl(response.data)
+        }
+    };
 
-            // Gọi API để lưu file PDF vào cơ sở dữ liệu
-            fetch('https://localhost:7241/api/S3FileUpload/upload?prefix=images%2F', {
-                method: 'POST',
-                body: formData
-            }).then((response) => {
-                // Xử lý kết quả sau khi gửi file lên máy chủ
-                console.log('Các file PDF đã được lưu vào cơ sở dữ liệu.');
-            }).catch((error) => {
-                console.error('Lỗi khi gửi các file PDF lên máy chủ:', error);
-            });
-        });
+    const handleFileChange = async (e: any) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+            setAvatar(file);
+            const blob = new Blob([file], { type: file.type });
+            const formData = new FormData();
+            formData.append('files', blob, file.name);
+            const response = await axios.post('https://localhost:7241/api/S3FileUpload/upload?prefix=doc4%2F', formData);
+            if (response?.status === 200)
+                setFileUrl(response.data)
+        }
     };
 
     useEffect(() => {
@@ -69,21 +87,35 @@ const UploadPhuLuc4 = () => {
     const handleTieuDeChange = (e: any) => {
         setTieuDe(e.target.value);
     };
-    const handleFileDocChange = (e: any) => {
-        const file = e.target.files && e.target.files[0];
-        if (file) {
-            const url = URL.createObjectURL(file);
-            setFileDoc(file);
+
+    const handleUpload = async () => {
+        setOpen(true)
+        if (subjectId && classId && user) {
+            const post = await apiPostTeachingPlanner(null, { userId: user?.userId, subjectId: subjectId, classId: classId })
+            if (post) {
+                setTeachingPlannerId(post?.data.id)
+            }
+        }
+    }
+
+    const handleClose = async () => {
+        setOpen(false)
+        try {
+            await apiDeleteTeachingPlanner(teachingPlannerId);
+        } catch (error) {
+            console.error(error);
         }
     };
 
-    const handleAvatarChange = (e: any) => {
-        const file = e.target.files && e.target.files[0];
-        if (file) {
-            const url = URL.createObjectURL(file);
-            setAvatar(file);
+    const handleAddDoc4 = async () => {
+        if (teachingPlannerId && user && tieuDe && fileUrl && avatarUrl) {
+            const post = await apiPostSubMenu4({ teachingPlannerId: teachingPlannerId, name: tieuDe, linkFile: fileUrl, linkImage: avatarUrl })
+            if (post)
+                alert("Thành công")
         }
-    };
+        else
+            alert("Nhập đầy đủ thông tin!")
+    }
 
     return (
         <div className='scrom-upload-panel'>
@@ -143,7 +175,7 @@ const UploadPhuLuc4 = () => {
                         File dữ liệu
                     </div>
                     <div className="upload-input-file">
-                        <input type="file" onChange={handleFileDocChange} />
+                        <input type="file" onChange={handleFileChange} accept='application/pdf' />
                     </div>
                 </div>
                 <div className='upload-row'>
@@ -151,7 +183,7 @@ const UploadPhuLuc4 = () => {
                         Ảnh đại diện
                     </div>
                     <div className="upload-input-file">
-                        <input type="file" onChange={handleAvatarChange} />
+                        <input type="file" onChange={handleAvatarChange} accept='image/*' />
                     </div>
                 </div>
                 <div className='upload-tutorial'>
@@ -166,10 +198,34 @@ const UploadPhuLuc4 = () => {
                         <li>Nhấn nút <strong>Lưu lại</strong>, bài giảng sẽ....</li>
                     </ul>
                 </div>
-                <div className='upload-button'>Lưu lại</div>
+                <div className='upload-button' onClick={handleUpload}>Lưu lại</div>
             </div>
-            <button onClick={downloadPdf}>Xuất PDF</button>
+            <Dialog
+                open={open}
+                onClose={async (event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleClose();
+                    }
+                }}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
 
+            >
+                <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
+                    Bạn có chắc chắn không
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "center", fontWeight: 600 }}>
+                        Bạn có chắc muốn đưa phụ lục này vào xét duyệt
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
+                    <Button onClick={handleAddDoc4} className='button-mui' autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     )
 }

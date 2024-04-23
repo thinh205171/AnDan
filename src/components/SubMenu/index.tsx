@@ -4,12 +4,11 @@ import { Add } from '@mui/icons-material';
 import './style.scss'
 import { apiGetDocument1ByUserSpecialiedDepartment, apiGetSubMenu1 } from '../../api/subMenu1';
 import { SubMenuData } from '../../models/subMenu';
-import { apiGetSubMenu4 } from '../../api/subMenu4';
+import { apiGetDocument4ByUserSpecialiedDepartment, apiGetSubMenu4 } from '../../api/subMenu4';
 import { apiGetDocument2ByUserSpecialiedDepartment, apiGetSubMenu2 } from '../../api/subMenu2';
-import { apiGetSubMenu3 } from '../../api/subMenu3';
-import { apiGetSubMenu5 } from '../../api/subMenu5';
+import { apiGetDocument3ByUserSpecialiedDepartment, apiGetSubMenu3 } from '../../api/subMenu3';
+import { apiGetDocument5ByUserSpecialiedDepartment, apiGetSubMenu5 } from '../../api/subMenu5';
 import { apiGetSpecializedDepartment } from '../../api/specializedDepartment';
-import { Department } from '../../models/department';
 
 const SubMenu = () => {
     const location = useLocation();
@@ -18,7 +17,6 @@ const SubMenu = () => {
     const [specializedDepartmentId, setSpecializedDepartmentID] = useState<any>([]);
     const [specializedDepartment, setSpecializedDepartment] = useState<any>([]);
     const [subMenuName, setSubMenuName] = useState('');
-    const [gradeData, setGradeData] = useState<{ gradeName: any; items: SubMenuData[] }[]>([]);
     const indexSubMenu = location.pathname.split('/')[2];
     const grades = useMemo(() => ["6", "7", "8", "9"], []);
     const handleAddSubMenu = () => {
@@ -55,14 +53,14 @@ const SubMenu = () => {
                     setSubMenu1Data([])
             }
             else if (indexSubMenu === '3') {
-                const res = await apiGetSubMenu3();
+                const res = await apiGetDocument3ByUserSpecialiedDepartment(specializedDepartmentId);
                 if (res)
                     setSubMenu1Data(res.data)
                 else
                     setSubMenu1Data([])
             }
             else if (indexSubMenu === '4') {
-                const res = await apiGetSubMenu4();
+                const res = await apiGetDocument4ByUserSpecialiedDepartment(specializedDepartmentId);
                 if (res)
                     setSubMenu1Data(res.data)
                 else
