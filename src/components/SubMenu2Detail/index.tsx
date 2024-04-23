@@ -653,18 +653,17 @@ const SubMenu2Detail = () => {
                         </div>
                         <div className="sub-menu-infomation">
                             <div className="sub-menu-row">
-                                <div><i>(Tài liệu chưa được thẩm định)</i></div>
+                                <div><i>
+                                    {
+                                        document2Info?.isApprove === 4 ? "(Tài liệu chưa được thẩm định)" : "(Tài liệu đã được thẩm định)"
+                                    }
+                                </i></div>
                             </div>
                             <div className="sub-menu-row">
-                                <div><strong>Nguồn: </strong> https://baigiang.violet.vn</div>
-                                <div className='right-action' onClick={handleClickOpenReport}><strong><u className='underline-blue'>Báo tài liệu có sai sót</u></strong></div>
+                                <div><strong>Người gửi: </strong> <u className='underline-blue'>{document2Info?.userFullName}</u></div>
                             </div>
                             <div className="sub-menu-row">
-                                <div><strong>Người gửi: </strong> <u className='underline-blue'>Sam Dung</u></div>
-                                <div className='right-action'><strong><u className='underline-blue'>Nhắn tin cho tác giả</u></strong></div>
-                            </div>
-                            <div className="sub-menu-row">
-                                <div><strong>Ngày gửi: </strong> 10h:34' 14-01-2024</div>
+                                <div><strong>Ngày gửi: </strong> {document2Info?.createdDate}</div>
                                 <div className='right-action'>
                                     <div className='share-facebook'>
                                         <img src="/facebook-circle-svgrepo-com.svg" alt="SVG" />
@@ -672,17 +671,6 @@ const SubMenu2Detail = () => {
                                         <span>0</span>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="sub-menu-row">
-                                <div><strong>Dung lượng: </strong> 19/9 KB</div>
-                            </div>
-                            <div className="sub-menu-row">
-                                <div><strong>Số lượt tải: </strong>25</div>
-                                <div className='right-action'></div>
-                            </div>
-                            <div className="sub-menu-row">
-                                <div><strong>Số lượt thích: </strong> 0 người</div>
-                                <div className='right-action'></div>
                             </div>
                         </div>
                         <div>
@@ -811,7 +799,14 @@ const SubMenu2Detail = () => {
                 </DialogContent>
                 <DialogActions >
                     <Button onClick={handleCloseAccept} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
-                    <Button onClick={handleAccept} className='button-mui' autoFocus>
+                    <Button onClick={async () => {
+                        try {
+                            await apiUpdateSubMenu2({ id: document2Info?.id, userId: document2Info?.userId, isApprove: 3, approveBy: user?.userId }, document2Info?.id)
+                        } catch (error) {
+                            alert("Không thể xét duyệt")
+                        }
+                        setOpenAccept(false)
+                    }} className='button-mui' autoFocus>
                         Đồng ý
                     </Button>
                 </DialogActions>
@@ -833,8 +828,15 @@ const SubMenu2Detail = () => {
                 </DialogContent>
                 <DialogActions >
                     <Button onClick={handleCloseDeny} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
-                    <Button onClick={handleCloseDeny} className='button-mui' autoFocus>
-                        Từ chối
+                    <Button onClick={async () => {
+                        try {
+                            await apiUpdateSubMenu2({ id: document2Info?.id, userId: document2Info?.userId, isApprove: 4, approveBy: user?.userId }, document2Info?.id)
+                        } catch (error) {
+                            alert("Không thể từ chối")
+                        }
+                        setOpenDeny(false)
+                    }} className='button-mui' autoFocus>
+                        Chắc chắn
                     </Button>
                 </DialogActions>
             </Dialog>

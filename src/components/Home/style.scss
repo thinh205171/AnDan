@@ -55,7 +55,7 @@
                                 position: absolute;
                                 text-align: center;
                                 top: 270px;
-                                font-size: 20px;
+                                font-size: 18px;
                                 left: 50%;
                                 transform: translateX(-55%);
                             }
@@ -65,4 +65,23 @@
             }
         }
     }
+}
+
+.sub-menu-content-detail {
+    position: relative;
+    width: 100%;
+    height: auto;
+    /* Đảm bảo chiều cao tự động dựa trên nội dung */
+}
+
+.image-container {
+    background-size: cover;
+    /* Hiển thị ảnh đầy đủ kích thước và cắt bớt phần dư thừa */
+    background-position: center;
+    /* Căn ảnh vào giữa */
+    width: 100%;
+    /* Đảm bảo ảnh đầy đủ chiều rộng của parent */
+    padding-top: 75%;
+    /* Tỷ lệ chiều cao của ảnh (VD: 4:3) */
+    position: relative;
 }

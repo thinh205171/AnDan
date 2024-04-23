@@ -1,17 +1,29 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './style.scss'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Radio } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
+import { apiGetSubMenu4ById } from '../../api/subMenu4';
 
 const SubMenu4Detail = () => {
     const location = useLocation()
     const navigate = useNavigate()
     const [login, setLogin] = useState(false);
     const [open, setOpen] = useState(false);
+    const [document4Info, setDocument4Info] = useState<any>()
     const [openReport, setOpenReport] = useState(false);
     const [openFeedback, setOpenFeedback] = useState(false);
     const [openRemove, setOpenRemove] = useState(false);
+
+    useEffect(() => {
+        const fecthDoc4 = async () => {
+            const res = await apiGetSubMenu4ById(location.pathname.split('/')[3])
+            if (res && res.data) {
+                setDocument4Info(res.data)
+            }
+        }
+        fecthDoc4()
+    }, [location.pathname])
 
     const handleClickOpenReport = () => {
         setOpenReport(true);
@@ -37,29 +49,23 @@ const SubMenu4Detail = () => {
         setOpenRemove(false);
     };
 
-    const handleClickSave = () => {
+    const handleClickEdit = () => {
         navigate(`/sub-menu-4/detail-edit/${location.pathname.split('/')[3]}`)
     };
 
-    const docs = [{ uri: require("./phuluc4.pdf") }]
-
     return (
         <div className='sub-menu-container'>
-            <DocViewer documents={docs} pluginRenderers={DocViewerRenderers}
-                config={{
-                    header: {
-                        disableHeader: true,
-                        disableFileName: true,
-                        retainURLParams: true,
-                    },
-                    pdfVerticalScrollByDefault: true,
-                }}
+            <embed
+                src={document4Info?.linkFile}
+                width="100%"
+                height="1000px"
+                type="application/pdf"
             />
             <div>
                 <div className="sub-menu-action">
                     <div className="verify" style={{ justifyContent: "center" }}>
                         <div style={{ display: "flex", columnGap: "10px" }}>
-                            <div className='action-button' onClick={handleClickSave}>Sửa</div>
+                            <div className='action-button' onClick={handleClickEdit}>Sửa</div>
                             <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                         </div>
                     </div>
@@ -187,7 +193,7 @@ const SubMenu4Detail = () => {
                 </DialogContent>
                 <DialogActions >
                     <Button onClick={handleCloseFeedback} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
-                    <Button onClick={() => navigate('/sub-menu-5')} className='button-mui' autoFocus>
+                    <Button onClick={() => navigate(`/sub-menu-5/detail-create/${document4Info?.id}`)} className='button-mui' autoFocus>
                         Click vào đây để sang phụ lục 5
                     </Button>
                 </DialogActions>

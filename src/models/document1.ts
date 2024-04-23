@@ -16,5 +16,6 @@ export interface Document1 {
     userName: string,
     subjectName: string,
     gradeName: string,
-    claasName: string
+    claasName: string,
+    userFullName: string
 }

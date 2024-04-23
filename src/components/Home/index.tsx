@@ -44,7 +44,7 @@ const Home = () => {
         navigate("/sub-menu-3/detail-add")
     }
 
-    const arr = [1, 2, 3, 4, 5, 6]
+    const imageurl = 'https://png.pngtree.com/png-vector/20190701/ourlarge/pngtree-document-icon-for-your-project-png-image_1533118.jpg'
     return (
         <div className='home-panel'>
             <div className='home-panel-content'>
@@ -74,7 +74,8 @@ const Home = () => {
                                     subMenu1Data?.map((subMenu1, index) => (
                                         <SwiperSlide>
                                             <Tooltip title={subMenu1?.name} arrow placement="top" key={index}>
-                                                <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-1/detail-view/${subMenu1?.id}`)}>
+                                                <div className='sub-menu-content-detail image-container' onClick={() => navigate(`/sub-menu-1/detail-view/${subMenu1?.id}`)}
+                                                    style={{ backgroundImage: subMenu1?.linkImage ? `url('${subMenu1?.linkImage}')` : `url('${imageurl}')` }}                                                >
                                                     <div className='sub-menu-subject-name'>
                                                         {subMenu1.subjectName} {subMenu1.gradeName}
                                                     </div>
@@ -91,7 +92,7 @@ const Home = () => {
                     <div className="home-panel-content-sub-menu-list">
                         <div className="home-panel-content-sub-menu-item-name">
                             <span>
-                                Phụ lục 2
+                                KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN
                             </span>
                             <div className='add-row-button'>
                                 <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu2} />
@@ -113,9 +114,10 @@ const Home = () => {
                                     subMenu2Data?.map((subMenu2, index) => (
                                         <SwiperSlide>
                                             <Tooltip title={subMenu2?.name} arrow placement="top" key={index}>
-                                                <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-2/detail-view/${subMenu2?.id}`)}>
+                                                <div className='sub-menu-content-detail image-container' onClick={() => navigate(`/sub-menu-2/detail-view/${subMenu2?.id}`)}
+                                                    style={{ backgroundImage: subMenu2?.linkImage ? `url('${subMenu2?.linkImage}')` : `url('${imageurl}')` }}                                                >
                                                     <div className='sub-menu-subject-name'>
-                                                        {subMenu2.subjectName} {subMenu2.gradeName}
+                                                        TỔ {subMenu2.name.split('\n')[1].trim()}
                                                     </div>
                                                 </div>
                                             </Tooltip>
@@ -130,7 +132,7 @@ const Home = () => {
                     <div className="home-panel-content-sub-menu-list">
                         <div className="home-panel-content-sub-menu-item-name">
                             <span>
-                                Phụ lục 3
+                                KẾ HOẠCH GIÁO DỤC CỦA GIÁO VIÊN
                             </span>
                             <div className='add-row-button'>
                                 <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu3} />
@@ -152,9 +154,11 @@ const Home = () => {
                                     subMenu3Data?.map((subMenu3, index) => (
                                         <SwiperSlide>
                                             <Tooltip title={subMenu3?.name} arrow placement="top" key={index}>
-                                                <div className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-3/detail-view/${subMenu3?.id}`)}>
+                                                <div className='sub-menu-content-detail image-container' onClick={() => navigate(`/sub-menu-3/detail-view/${subMenu3?.id}`)}
+                                                    style={{ backgroundImage: subMenu3?.linkImage ? `url('${subMenu3?.linkImage}')` : `url('${imageurl}')` }}
+                                                >
                                                     <div className='sub-menu-subject-name'>
-                                                        {subMenu3.subjectName} {subMenu3.gradeName}
+                                                        {subMenu3.name.split('GIÁO DỤC')[2].trim()}
                                                     </div>
                                                 </div>
                                             </Tooltip>

@@ -34,3 +34,11 @@ export const apiPostSubMenu5 = async (data: any) => {
         return null;
 }
 
+export const apiUpdateSubMenu5 = async (data: any, docId: any) => {
+    const result = await axios.post(`${base_url}Document5/${docId}`, data);
+    if (result)
+        return result;
+    else
+        return null;
+}
+

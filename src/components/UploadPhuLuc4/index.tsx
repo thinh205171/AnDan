@@ -10,8 +10,8 @@ import axios from 'axios';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { useAppSelector } from '../../hook/useTypedSelector';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { apiDeleteTeachingPlanner, apiPostTeachingPlanner } from '../../api/teachingPlanner';
-import { apiPostSubMenu4 } from '../../api/subMenu4';
+import { apiDeleteTeachingPlanner, apiGetTeachingPlannerById, apiPostTeachingPlanner } from '../../api/teachingPlanner';
+import { apiGetSubMenu4ById, apiPostSubMenu4, apiUpdateSubMenu4 } from '../../api/subMenu4';
 
 export const options: Options = {
     filename: "using-function.pdf",
@@ -26,15 +26,40 @@ const UploadPhuLuc4 = () => {
     const [subjectId, setSubjectId] = useState<number | null>(null)
     const [classId, setClassId] = useState<number | null>(null)
     const [tieuDe, setTieuDe] = useState('')
-    const [fileDoc, setFileDoc] = useState<File | null>(null)
     const [avatar, setAvatar] = useState<File | null>(null)
     const [subjects, setSubjects] = useState<Subject[]>([])
     const [classes, setClasses] = useState<Class[]>([])
     const [avatarUrl, setAvatarUrl] = useState('')
-    const [file, setFile] = useState<File | null>(null)
     const [fileUrl, setFileUrl] = useState('')
     const [open, setOpen] = useState(false);
     const [teachingPlannerId, setTeachingPlannerId] = useState(null);
+    const [teachingPlanner, setTeachingPlanner] = useState<any>();
+    const [document4Info, setDocument4Info] = useState<any>()
+    const isEditPath = location.pathname.includes('edit');
+
+    useEffect(() => {
+        if (isEditPath) {
+            const fecthDoc4 = async () => {
+                const res = await apiGetSubMenu4ById(location.pathname.split('/')[3])
+                if (res && res.data) {
+                    setDocument4Info(res.data)
+                }
+            }
+            fecthDoc4()
+        }
+    }, [location.pathname, isEditPath])
+
+    useEffect(() => {
+        if (document4Info) {
+            const fecthTeachingPlanner = async () => {
+                const res = await apiGetTeachingPlannerById(location.pathname.split('/')[3])
+                if (res && res.data) {
+                    setTeachingPlanner(res.data)
+                }
+            }
+            fecthTeachingPlanner()
+        }
+    }, [document4Info, location.pathname])
 
     const handleAvatarChange = async (e: any) => {
         const file = e.target.files && e.target.files[0];
@@ -85,7 +110,8 @@ const UploadPhuLuc4 = () => {
     }, []);
 
     const handleTieuDeChange = (e: any) => {
-        setTieuDe(e.target.value);
+        if (!isEditPath)
+            setTieuDe(e.target.value);
     };
 
     const handleUpload = async () => {
@@ -108,13 +134,30 @@ const UploadPhuLuc4 = () => {
     };
 
     const handleAddDoc4 = async () => {
-        if (teachingPlannerId && user && tieuDe && fileUrl && avatarUrl) {
-            const post = await apiPostSubMenu4({ teachingPlannerId: teachingPlannerId, name: tieuDe, linkFile: fileUrl, linkImage: avatarUrl })
-            if (post)
-                alert("Thành công")
+        if (!isEditPath) {
+            if (teachingPlannerId && user && tieuDe && fileUrl && avatarUrl) {
+                const post = await apiPostSubMenu4({ teachingPlannerId: teachingPlannerId, name: tieuDe, linkFile: fileUrl, linkImage: avatarUrl })
+                if (post) {
+                    setOpen(false)
+                    alert("Thành công")
+                    navigate(`/sub-menu-4/detail-view/${post.data.id}`)
+                }
+            }
+            else
+                alert("Nhập đầy đủ thông tin!")
         }
-        else
-            alert("Nhập đầy đủ thông tin!")
+        else {
+            if (user && fileUrl && avatarUrl) {
+                const post = await apiUpdateSubMenu4({ teachingPlannerId: document4Info?.teachingPlannerId, name: document4Info?.name, linkFile: fileUrl, linkImage: avatarUrl, id: location.pathname.split('/')[3] }, location.pathname.split('/')[3])
+                if (post) {
+                    setOpen(false)
+                    alert("Thành công")
+                    navigate(`/sub-menu-4/detail-view/${post.data.dataMap.id}`)
+                }
+            }
+            else
+                alert("Nhập đầy đủ thông tin!")
+        }
     }
 
     return (
@@ -133,7 +176,8 @@ const UploadPhuLuc4 = () => {
                     <div className="upload-input">
                         <select id="subjects" style={{ width: "100%", height: "30px" }}
                             onChange={(e) => setSubjectId(parseInt(e.target.value))}
-                            defaultValue={''}
+                            defaultValue={teachingPlanner?.subjectId}
+                            disabled={isEditPath ? true : false}
                         >
                             <option value="" disabled>Chọn môn học</option>
                             {
@@ -151,7 +195,8 @@ const UploadPhuLuc4 = () => {
                     <div className="upload-input">
                         <select id="classes" style={{ width: "100%", height: "30px" }}
                             onChange={(e) => setClassId(parseInt(e.target.value))}
-                            defaultValue={''}
+                            defaultValue={teachingPlanner?.classId}
+                            disabled={isEditPath ? true : false}
                         >
                             <option value="" disabled>Chọn lớp</option>
                             {
@@ -167,7 +212,7 @@ const UploadPhuLuc4 = () => {
                         Tiêu đề
                     </div>
                     <div className="upload-input">
-                        <input type="text" value={tieuDe} onChange={handleTieuDeChange} />
+                        <input type="text" value={document4Info?.name} disabled={isEditPath ? true : false} onChange={handleTieuDeChange} />
                     </div>
                 </div>
                 <div className='upload-row'>

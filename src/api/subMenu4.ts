@@ -26,7 +26,16 @@ export const apiGetSubMenu4ById = async (id: string) => {
         return null;
 }
 
-export const apiPostSubMenu4 = async (data: any) => {
+export const apiGetSubMenu4infoById = async (id: string) => {
+    const result = await axios.get(`${base_url}Document4/GetDoc4InformationByDoc4Id?id=${id}`);
+    if (result)
+        return result;
+    else
+        return null;
+}
+
+
+export const apiPostSubMenu4 = async (data: any): Promise<any> => {
     const result = await axios.post(`${base_url}Document4`, data);
     if (result)
         return result;

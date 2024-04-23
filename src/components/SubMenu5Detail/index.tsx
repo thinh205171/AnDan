@@ -1,18 +1,16 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import { useLocation, useNavigate } from 'react-router-dom';
 import './style.scss'
 import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
+import { apiGetSubMenu4ById, apiGetSubMenu4infoById } from '../../api/subMenu4';
+import { useAppSelector } from '../../hook/useTypedSelector';
+import { apiPostSubMenu5 } from '../../api/subMenu5';
 
 const SubMenu5Detail = () => {
     const location = useLocation()
     const navigate = useNavigate()
-    const [baiDay, setBaiDay] = useState('');
-    const [monHoc, setMonHoc] = useState('');
-    const [lop, setLop] = useState('');
-    const [tiet, setTiet] = useState('');
-    const [ngay, setNgay] = useState('');
-    const [giaoVien, setGiaoVien] = useState('');
+    const [tiet, setTiet] = useState<number | null>(null);
     const [tieuChi1, setTieuChi1] = useState<number | null>(null);
     const [tieuChi2, setTieuChi2] = useState<number | null>(null);
     const [tieuChi3, setTieuChi3] = useState<number | null>(null);
@@ -27,6 +25,9 @@ const SubMenu5Detail = () => {
     const [tieuChi12, setTieuChi12] = useState<number | null>(null);
     const [tongDiem, setTongDiem] = useState<number | null>(null);
     const [nguoiDanhGia, setNguoiDanhGia] = useState('');
+    const [document4, setDocument4] = useState<any>()
+    const [document5Id, setDocument5Id] = useState<any>()
+    const [document4Info, setDocument4Info] = useState<any>()
 
     const [login, setLogin] = useState(false);
     const [open, setOpen] = useState(false);
@@ -35,9 +36,26 @@ const SubMenu5Detail = () => {
     const [openReport, setOpenReport] = useState(false);
     const [openRemove, setOpenRemove] = useState(false);
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
+    const user = useAppSelector(state => state.auth.user)
+
+    useEffect(() => {
+        if (location.pathname.includes('create')) {
+            const fecthDoc4 = async () => {
+                const res = await apiGetSubMenu4ById(location.pathname.split('/')[3])
+                if (res && res.data) {
+                    setDocument4(res.data)
+                }
+            }
+            const fecthDoc4Info = async () => {
+                const res = await apiGetSubMenu4infoById(location.pathname.split('/')[3])
+                if (res && res.data) {
+                    setDocument4Info(res.data)
+                }
+            }
+            fecthDoc4()
+            fecthDoc4Info()
+        }
+    }, [location.pathname])
 
     const handleClose = () => {
         setOpen(false);
@@ -79,12 +97,32 @@ const SubMenu5Detail = () => {
         navigate(`/sub-menu-5/detail-edit/${location.pathname.split('/')[3]}`)
     };
 
-    const docs = [{ uri: require("./phuluc5.pdf") }]
+    const handleClickOpen = async () => {
+        if (tiet && user) {
+            const post = await apiPostSubMenu5({
+                name: document4?.name,
+                document4Id: document4?.id,
+                userId: user?.userID,
+                slot: tiet,
+                date: document4?.createdDate,
+                total: 0,
+            })
+            if (post) {
+                setDocument5Id(post?.data?.id)
+            }
+        }
+        else
+            alert("Nhập đầy đủ thông tin!")
+    };
 
+    const handleClickOpen1 = async () => {
+    };
+
+    const docs = [{ uri: require("./phuluc5.pdf") }]
     return (
         <div className='sub-menu-container'>
             {
-                location.pathname?.includes("edit") ?
+                location.pathname?.includes("create") ?
                     <div>
                         <div className='sub-menu-content'>
                             <div className="sub-menu-content-header">
@@ -99,21 +137,28 @@ const SubMenu5Detail = () => {
                                 </div>
                             </div>
 
-                            <div className="sub-menu-content-title">
-                                <div><strong>PHIẾU ĐÁNH GIÁ BÀI DẠY</strong></div>
-                                <div style={{ display: "flex", justifyContent: "center" }}>
-                                    <div>Tên bài dạy: <input type="text" placeholder='...............................................................................' style={{ width: "310px" }} onChange={(e) => setBaiDay(e.target.value)} /></div>
+                            <div className="sub-menu-content-title" style={{ display: "flex", flexDirection: "column", width: "50%", margin: "12px auto" }}>
+                                <div ><strong>PHIẾU ĐÁNH GIÁ BÀI DẠY</strong></div>
+                                <div style={{ display: "flex" }}>
+                                    <div>Tên bài dạy:
+                                        {/* <input type="text" placeholder='...............................................................................' style={{ width: "310px" }} onChange={(e) => setBaiDay(e.target.value)} /> */}
+                                        {document4?.name}
+                                    </div>
                                 </div>
-                                <div style={{ display: "flex", justifyContent: "center" }}>
-                                    <div>Môn học/ Hoạt động giáo dục: <input type="text" placeholder='.........................................................' style={{ width: "210px" }} onChange={(e) => setMonHoc(e.target.value)} /></div>
+                                <div style={{ display: "flex" }}>
+                                    <div>Môn học/ Hoạt động giáo dục:
+                                        {document4Info?.subjectName}
+                                    </div>
                                 </div>
-                                <div style={{ display: "flex", justifyContent: "center" }}>
-                                    <div>Lớp: <input type="text" placeholder='.........................' style={{ width: "90px" }} onChange={(e) => setLop(e.target.value)} /></div>;
-                                    <div>Tiết: <input type="text" placeholder='.........................' style={{ width: "90px" }} onChange={(e) => setTiet(e.target.value)} /></div>;
-                                    <div>Ngày: <input type="text" placeholder='.........................' style={{ width: "100px" }} onChange={(e) => setNgay(e.target.value)} /></div>
+                                <div style={{ display: "flex" }}>
+                                    <div>Lớp:  {document4Info?.className}</div>;
+                                    <div>Tiết: <input type="text" placeholder='.........................' style={{ width: "90px" }} onChange={(e) => setTiet(parseInt(e.target.value))} /></div>;
+                                    <div> Ngày: {new Date().toLocaleDateString('vi-VN')}</div>
                                 </div>
-                                <div style={{ display: "flex", justifyContent: "center" }}>
-                                    <div>Họ và tên giáo viên thực hiện: <input type="text" placeholder='.........................................................' style={{ width: "200px" }} onChange={(e) => setGiaoVien(e.target.value)} /></div>
+                                <div style={{ display: "flex" }}>
+                                    <div>Họ và tên giáo viên thực hiện:
+                                        {user?.username}
+                                    </div>
                                 </div>
                             </div>
 
@@ -371,6 +416,10 @@ const SubMenu5Detail = () => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div className="sub-menu-content-action">
+                            <Button onClick={handleClickOpen1} >Lưu bản nháp</Button>
+                            <Button onClick={handleClickOpen} >Xác nhận xét duyệt</Button>
                         </div>
                     </div> : (
                         <>
