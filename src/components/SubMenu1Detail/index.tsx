@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, MenuItem, Paper, Radio, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, MenuItem, Paper, Radio, RadioGroup, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material";
 import './style.scss'
 import { Add, Remove } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -31,6 +31,8 @@ import { TotalClass } from '../../models/totalClass';
 import { TeacherInfo } from '../../models/teacherInfo';
 import { options } from '../UploadPhuLuc4';
 import axios from 'axios';
+import { apiPostReport } from '../../api/report';
+import { apiGetListIdOfTeacherAndPricipleByDepartmentId, apiPostNotification } from '../../api/notification';
 
 interface Row1 {
     teachingEquipmentId: number | null;
@@ -101,28 +103,19 @@ const SubMenu1Detail = () => {
     const [totalClass, setTotalClass] = useState<TotalClass>();
     const [teacherInfo, setTeacherInfo] = useState<TeacherInfo>();
     const [userInfoLogin, setUserInfoLogin] = useState<User>();
-    const [userInfoDocument, setUserInfoDocument] = useState<User[]>([]);
+    const [userInfoDocument, setUserInfoDocument] = useState<User>();
+    const [reasonReport, setReasonReport] = useState('')
+    const [principleAndTeacher, setPrincipleAndTeacher] = useState<any>()
 
     const [count, setCount] = useState(0);
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
     const [hoadDong, setHoatDong] = useState<number | null>(null);
     const [khoiLop, setKhoiLop] = useState<number | null>(null);
-    const [startYear, setStartYear] = useState('');
-    const [endYear, setEndYear] = useState('');
-    const [soLop, setSoLop] = useState('');
-    const [soHocSinh, setSoHocSinh] = useState('');
-    const [soHocSinhselectedTopicsId, setSoHocSinhselectedTopicsId] = useState('');
-    const [soGiaoVien, setSoGiaoVien] = useState('');
-    const [caoDang, setCaoDang] = useState('');
-    const [daiHoc, setDaiHoc] = useState('');
-    const [trenDaiHoc, setTrenDaiHoc] = useState('');
     const [tot, setTot] = useState('');
-    const [kha, setKha] = useState('');
-    const [chuaDat, setChuaDat] = useState('');
     const [documentId, setDocumentId] = useState<number | null>(null);
     const [document1Info, setDocument1Info] = useState<Document1>();
-
+    const [descriptionRp, setDescriptionRp] = useState('');
     const getTargetElement = () => document.getElementById("main-content");
 
     const downloadPdf = async () => {
@@ -156,8 +149,19 @@ const SubMenu1Detail = () => {
                 }
             }
         }
+        const fecthPrincipleAndTeacher = async () => {
+            if (specializedDepartment?.id) {
+                const res = await apiGetListIdOfTeacherAndPricipleByDepartmentId(specializedDepartment?.id)
+                if (res && res.data) {
+                    const resData: any = res.data;
+                    setPrincipleAndTeacher(resData);
+                }
+            }
+        }
         fetchUserInfoLogin()
-    }, [user])
+        fecthPrincipleAndTeacher()
+    }, [specializedDepartment?.id, user])
+
 
     useEffect(() => {
         const fetchSpecializedDepartmentById = async () => {
@@ -377,6 +381,16 @@ const SubMenu1Detail = () => {
                 })
                 if (post) {
                     setDocumentId(post?.data?.id)
+                    await apiPostNotification(
+                        principleAndTeacher?.principle
+                        , {
+                            userId: user?.userId,
+                            titleName: `${post?.data?.name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
+                            message: `${post?.data?.name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
+                            docType: 1,
+                            docId: post?.data?.id
+                        }
+                    )
                 }
             }
             else
@@ -385,10 +399,21 @@ const SubMenu1Detail = () => {
         else {
             if (khoiLop && user && hoadDong) {
                 setOpen(true);
+                await apiPostNotification(
+                    principleAndTeacher?.principle
+                    , {
+                        userId: user?.userId,
+                        titleName: `${document1Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
+                        message: `${document1Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
+                        docType: 1,
+                        docId: document1Info?.id
+                    }
+                )
             }
             else
                 alert("Nhập đầy đủ thông tin!")
         }
+
     };
 
     const handleClickOpen1 = async () => {
@@ -445,7 +470,21 @@ const SubMenu1Detail = () => {
         setOpenReport(true);
     };
 
-    const handleCloseReport = () => {
+    const handleCloseReport1 = () => {
+        setOpenReport(false);
+    };
+    const handleCloseReport3 = () => {
+        setOpenReport(false);
+    };
+    const handleCloseReport2 = async () => {
+        const rp = {
+            userId: user?.userId,
+            doctype: 1,
+            docId: document1Info?.id,
+            message: reasonReport,
+            description: descriptionRp,
+        }
+        await apiPostReport(rp);
         setOpenReport(false);
     };
 
@@ -1075,14 +1114,18 @@ const SubMenu1Detail = () => {
                                 <div className="verify" style={{ justifyContent: "center" }}>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
                                         {
-                                            !location.pathname.includes('-create') && <div className='action-button' onClick={handleClickCreate}>Tạo khung kế hoạch</div>
+                                            !location.pathname.includes('-create') && <div
+                                                style={{ display: user?.role === "Teacher" && specializedDepartment?.id === userInfoLogin?.specializedDepartmentId ? "initial" : "none" }}
+                                                className='action-button' onClick={handleClickCreate}>Tạo khung kế hoạch</div>
                                         }
-                                        <div className='action-button' onClick={location.pathname.includes('add') ? handleClickAdd : handleClickSave}>
+                                        <div
+                                            style={{ display: user?.userId === userInfoDocument?.id ? "initial" : "none" }}
+                                            className='action-button' onClick={location.pathname.includes('add') ? handleClickAdd : handleClickSave}>
                                             {
                                                 location.pathname.includes('create') ? "Tạo mới" : "Sửa"
                                             }
                                         </div>
-                                        <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
+                                        <div style={{ display: user?.userId === userInfoDocument?.id ? "initial" : "none" }} className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                                     </div>
                                 </div>
                             </div>
@@ -1099,19 +1142,16 @@ const SubMenu1Detail = () => {
                                 <div><strong>Người gửi: </strong> <u className='underline-blue'>{document1Info?.userFullName}</u></div>
                             </div>
                             <div className="sub-menu-row">
+                                <div><strong>Nguồn: </strong> https://baigiang.violet.vn</div>
+                                <div className='right-action' onClick={handleClickOpenReport}><strong><u className='underline-blue'>Báo cáo tài liệu có sai sót</u></strong></div>
+                            </div>
+                            <div className="sub-menu-row">
                                 <div><strong>Ngày gửi: </strong> {document1Info?.createdDate}</div>
-                                <div className='right-action'>
-                                    <div className='share-facebook'>
-                                        <img src="/facebook-circle-svgrepo-com.svg" alt="SVG" />
-                                        <span>Chia sẻ</span>
-                                        <span>0</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <div>
                             <div className="sub-menu-action">
-                                <div className="verify">
+                                <div className="verify" style={{ display: user?.role === "Principle" ? "flex" : "none" }}>
                                     <span>Tình trạng thẩm định:</span>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
                                         <div className='action-button' onClick={handleClickOpenAccept}>Chấp thuận</div>
@@ -1156,7 +1196,7 @@ const SubMenu1Detail = () => {
                 open={openReport}
                 onClose={(event, reason) => {
                     if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
-                        handleCloseReport();
+                        handleCloseReport1();
                     }
                 }}
                 maxWidth={"md"}
@@ -1167,61 +1207,48 @@ const SubMenu1Detail = () => {
                 <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
                     Báo cáo tài liệu
                 </DialogTitle>
-
-                {
-                    login ? (
-                        <>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
-                                    <div className="report-row">
-                                        <div className='report-title'>Tài liệu</div>
-                                        <div className='report-detail'>
-                                            Giáo án tài liệu A
-                                        </div>
-                                    </div>
-                                    <div className="report-row">
-                                        <div className='report-title'>
-                                            Lý do báo cáo
-                                        </div>
-                                        <div className='report-detail' style={{ display: "flex", flexDirection: "column" }}>
-                                            <FormControlLabel value="" control={<Radio />} label="Có lỗi kỹ thuật ..." />
-                                            <FormControlLabel value="" control={<Radio />} label="Không dùng để dạy học" />
-                                            <FormControlLabel value="" control={<Radio />} label="Vi phạm bản quyền" />
-                                            <FormControlLabel value="" control={<Radio />} label="Lý do khác" />
-                                        </div>
-                                    </div>
-                                    <div className="report-row">
-                                        <div className='report-title'>Chi tiết lỗi</div>
-                                        <div className='report-detail'>
-                                            <span style={{ whiteSpace: "nowrap" }}>Đề nghị cung cấp lý do và chỉ ra các điểm không chính xác</span>
-                                            <br />
-                                            <textarea name="" id="" rows={10} />
-                                        </div>
-                                    </div>
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions >
-                                <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
-                                <Button onClick={handleCloseReport} className='button-mui' autoFocus>
-                                    Gửi báo cáo
-                                </Button>
-                            </DialogActions></>
-                    ) : (
-                        <>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", fontWeight: 600, marginBottom: "12px" }}>
-                                    Bạn cần đăng nhập để thực hiện chức năng
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions >
-                                <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
-                                <Button onClick={() => setLogin(true)} className='button-mui' autoFocus>
-                                    Đăng nhập
-                                </Button>
-                            </DialogActions>
-                        </>
-                    )
-                }
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
+                        <div className="report-row">
+                            <div className='report-title'>Tài liệu</div>
+                            <div className='report-detail'>
+                                value={document1Info?.name}
+                            </div>
+                        </div>
+                        <div className="report-row">
+                            <div className='report-title'>
+                                Lý do báo cáo
+                            </div>
+                            <div className='report-detail' style={{ display: "flex", flexDirection: "column" }}>
+                                <RadioGroup
+                                    aria-labelledby="demo-controlled-radio-buttons-group"
+                                    name="controlled-radio-buttons-group"
+                                    value={reasonReport ?? ''}
+                                    onChange={(e) => setReasonReport(e.target.value)}
+                                >
+                                    <FormControlLabel value="Có lỗi kỹ thuật" control={<Radio />} label="Có lỗi kỹ thuật" />
+                                    <FormControlLabel value="Không dùng để dạy học" control={<Radio />} label="Không dùng để dạy học" />
+                                    <FormControlLabel value="Vi phạm bản quyền" control={<Radio />} label="Vi phạm bản quyền" />
+                                    <FormControlLabel value="Lý do khác" control={<Radio />} label="Lý do khác" />
+                                </RadioGroup>
+                            </div>
+                        </div>
+                        <div className="report-row">
+                            <div className='report-title'>Chi tiết lỗi</div>
+                            <div className='report-detail'>
+                                <span style={{ whiteSpace: "nowrap" }}>Đề nghị cung cấp lý do và chỉ ra các điểm không chính xác</span>
+                                <br />
+                                <textarea name="" id="" rows={10} onChange={e => setDescriptionRp(e.target.value)} />
+                            </div>
+                        </div>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions >
+                    <Button onClick={handleCloseReport1} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
+                    <Button onClick={handleCloseReport2} className='button-mui' autoFocus>
+                        Gửi báo cáo
+                    </Button>
+                </DialogActions>
             </Dialog>
             <Dialog
                 open={openAccept}
@@ -1247,6 +1274,26 @@ const SubMenu1Detail = () => {
                     <Button onClick={async () => {
                         try {
                             await apiUpdateSubMenu1({ id: document1Info?.id, subjectId: document1Info?.subjectId, gradeId: document1Info?.gradeId, userId: document1Info?.userId, isApprove: 3, approveBy: user?.userId })
+                            await apiPostNotification(
+                                [document1Info?.userId]
+                                , {
+                                    userId: user?.userId,
+                                    titleName: `${document1Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
+                                    message: `${document1Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
+                                    docType: 1,
+                                    docId: document1Info?.id
+                                }
+                            )
+                            await apiPostNotification(
+                                principleAndTeacher?.teacher
+                                , {
+                                    userId: user?.userId,
+                                    titleName: `${document1Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN, HÃY TẠO KHUNG KẾ HOẠCH`,
+                                    message: `${document1Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN, HÃY TẠO KHUNG KẾ HOẠCH`,
+                                    docType: 1,
+                                    docId: document1Info?.id
+                                }
+                            )
                         } catch (error) {
                             alert("Không thể xét duyệt")
                         }
@@ -1280,6 +1327,16 @@ const SubMenu1Detail = () => {
                     <Button onClick={async () => {
                         try {
                             await apiUpdateSubMenu1({ id: document1Info?.id, subjectId: document1Info?.subjectId, gradeId: document1Info?.gradeId, userId: document1Info?.userId, isApprove: 4, approveBy: user?.userId })
+                            await apiPostNotification(
+                                [document1Info?.userId]
+                                , {
+                                    userId: user?.userId,
+                                    titleName: `${document1Info?.name} ĐÃ BỊ TỪ CHỐI HÃY ĐĂNG TẢI LẠI`,
+                                    message: `${document1Info?.name} ĐÃ BỊ TỪ CHỐI HÃY ĐĂNG TẢI LẠI`,
+                                    docType: 1,
+                                    docId: document1Info?.id
+                                }
+                            )
                         } catch (error) {
                             alert("Không thể từ chối")
                         }
@@ -1310,7 +1367,11 @@ const SubMenu1Detail = () => {
                 </DialogContent>
                 <DialogActions >
                     <Button onClick={handleCloseRemove} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
-                    <Button onClick={handleCloseRemove} className='button-mui' autoFocus>
+                    <Button onClick={async () => {
+                        await apiDeleteSubMenu1(location.pathname.split('/')[3]);
+                        navigate('/sub-menu/1')
+                    }}
+                        className='button-mui' autoFocus>
                         Xóa
                     </Button>
                 </DialogActions>

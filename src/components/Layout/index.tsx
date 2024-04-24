@@ -6,6 +6,7 @@ import LeftSubNavBar from './SubNavBar/LeftSubNavBar';
 import RightSubNavBar from './SubNavBar/RightSubNavbar';
 import { SearchOutlined } from '@mui/icons-material';
 import './style.scss'
+import { useAppSelector } from '../../hook/useTypedSelector';
 
 const Layout = ({ children }: { children: ReactNode }) => {
     return (

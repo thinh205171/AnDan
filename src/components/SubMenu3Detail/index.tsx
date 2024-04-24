@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Paper, Radio, RadioGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material";
 import './style.scss'
 import { Add, Remove } from '@mui/icons-material';
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
@@ -24,6 +24,8 @@ import generatePDF from 'react-to-pdf';
 import { options } from '../UploadPhuLuc4';
 import axios from 'axios';
 import { SelectedTopic } from '../../models/SelectedTopic';
+import { apiPostReport } from '../../api/report';
+import { apiGetListIdOfTeacherAndPricipleByDepartmentId, apiPostNotification } from '../../api/notification';
 
 interface Row {
     curriculumId: number | null;
@@ -57,15 +59,18 @@ const SubMenu3Detail = () => {
     const [document1Info, setDocument1Info] = useState<Document1>();
     const [userInfoLogin, setUserInfoLogin] = useState<User>();
     const [documentId, setDocumentId] = useState(null);
-    const [userInfoDocument, setUserInfoDocument] = useState<User[]>([]);
+    const [userInfoDocument, setUserInfoDocument] = useState<User>();
     const [document3Info, setDocument3Info] = useState<Document1>();
     const [displayAddRow, setDisplayAddRow] = useState(false);
+    const [reasonReport, setReasonReport] = useState('')
+    const [descriptionRp, setDescriptionRp] = useState('');
+    const [principleAndTeacher, setPrincipleAndTeacher] = useState<any>()
 
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
     const [giaoVien, setGiaoVien] = useState('');
     const [hoadDong, setHoatDong] = useState<number | null>(null);
-    const [khoiLop, setKhoiLop] = useState<number | null>(null);
+    const [khoiLop, setKhoiLop] = useState('');
     const [startYear, setStartYear] = useState('');
     const [endYear, setEndYear] = useState('');
     const [toTruong, setToTruong] = useState('');
@@ -75,8 +80,6 @@ const SubMenu3Detail = () => {
     const [month, setMonth] = useState('');
     const [year, setYear] = useState('');
     const [nhiemVuKhac, setNhiemVuKhac] = useState('');
-
-    console.log("row1: ", rows1)
 
     const getTargetElement = () => document.getElementById("main-content");
 
@@ -111,8 +114,19 @@ const SubMenu3Detail = () => {
                 }
             }
         }
+
+        const fecthPrincipleAndTeacher = async () => {
+            if (specializedDepartment?.id) {
+                const res = await apiGetListIdOfTeacherAndPricipleByDepartmentId(specializedDepartment?.id)
+                if (res && res.data) {
+                    const resData: any = res.data;
+                    setPrincipleAndTeacher(resData);
+                }
+            }
+        }
         fetchUserInfoLogin()
-    }, [user])
+        fecthPrincipleAndTeacher()
+    }, [specializedDepartment?.id, user])
 
     useEffect(() => {
         if (!location.pathname.includes('create')) {
@@ -321,7 +335,7 @@ const SubMenu3Detail = () => {
             if (khoiLop && user) {
                 setOpen(true);
                 const post = await apiPostSubMenu3({
-                    name: `KẾ HOẠCH DẠY HỌC CỦA GIÁO VIÊN MÔN ${subjects?.find(item => item.id === hoadDong)?.name}, Lớp ${classes?.find(item => item.id === khoiLop)?.name} `,
+                    name: "KẾ HOẠCH DẠY HỌC CỦA GIÁO VIÊN",
                     document1Id: document1Id,
                     claasName: khoiLop,
                     userId: parseInt(user.userId),
@@ -332,6 +346,16 @@ const SubMenu3Detail = () => {
                 })
                 if (post) {
                     setDocumentId(post?.data?.id)
+                    await apiPostNotification(
+                        principleAndTeacher?.principle
+                        , {
+                            userId: user?.userId,
+                            titleName: `${post?.data?.name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
+                            message: `${post?.data?.name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
+                            docType: 3,
+                            docId: post.data.id
+                        }
+                    )
                 }
             }
             else
@@ -340,6 +364,16 @@ const SubMenu3Detail = () => {
         else {
             if (user) {
                 setOpen(true);
+                await apiPostNotification(
+                    principleAndTeacher?.principle
+                    , {
+                        userId: user?.userId,
+                        titleName: `${document3Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
+                        message: `${document3Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
+                        docType: 3,
+                        docId: document3Info?.id
+                    }
+                )
             }
         }
     };
@@ -349,7 +383,7 @@ const SubMenu3Detail = () => {
         if (khoiLop && user) {
             setOpen(true);
             const post = await apiPostSubMenu3({
-                name: `KẾ HOẠCH DẠY HỌC CỦA GIÁO VIÊN MÔN ${subjects?.find(item => item.id === hoadDong)?.name}, Lớp ${classes?.find(item => item.id === khoiLop)?.name} `,
+                name: "KẾ HOẠCH DẠY HỌC CỦA GIÁO VIÊN",
                 document1Id: document1Id,
                 claasName: khoiLop,
                 userId: user.userId,
@@ -467,6 +501,18 @@ const SubMenu3Detail = () => {
             setRows2(updatedRows);
         }
     };
+
+    const handleSubmitReport = async () => {
+        const rp = {
+            userId: user?.userId,
+            doctype: 3,
+            docId: document3Info?.id,
+            message: reasonReport,
+            description: descriptionRp,
+        }
+        await apiPostReport(rp);
+        setOpenReport(false);
+    };
     return (
         <div className='sub-menu-container'>
             {
@@ -504,7 +550,7 @@ const SubMenu3Detail = () => {
                                         <span style={{ marginLeft: "4px" }}>{document1Info?.subjectName}</span>
                                         <strong>, LỚP</strong>
                                         <select id="classes" style={{ width: "70px", marginLeft: "4px" }}
-                                            onChange={(e) => setKhoiLop(parseInt(e.target.value))}
+                                            onChange={(e) => setKhoiLop(e.target.value)}
                                             defaultValue={document3Info?.claasName}
                                         >
                                             <option value="" disabled>Chọn lớp</option>
@@ -539,83 +585,92 @@ const SubMenu3Detail = () => {
                                                 </TableHead>
                                                 <TableBody>
                                                     {rows1?.map((row, index) => (
-                                                        <TableRow key={index} sx={{ 'td': { border: 1 } }}>
-                                                            <TableCell align="center">{index + 1}</TableCell>
-                                                            <TableCell align="center">
-                                                                <select id="curriculumDistribution" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
-                                                                    value={row?.curriculumId ?? ''}
-                                                                    onChange={(e) => {
-                                                                        const newValue = parseInt(e.target.value);
-                                                                        const updatedRows = [...rows1];
-                                                                        updatedRows[index].curriculumId = newValue;
-                                                                        setRows1(updatedRows);
-                                                                    }}>
-                                                                    <option value="" disabled>Chọn bài học</option>
-                                                                    {
-                                                                        curriculumDistribution?.map((item) => (
-                                                                            <option value={item?.curriculumId}>{item?.curriculumName}</option>
-                                                                        ))
-                                                                    }
-                                                                </select>
-                                                            </TableCell>
-                                                            <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.slot ?? ''}
-                                                                    onChange={(e) => {
-                                                                        const newValue = parseInt(e.target.value);
-                                                                        const updatedRows = [...rows1];
-                                                                        updatedRows[index].slot = newValue;
-                                                                        setRows1(updatedRows);
-                                                                    }}
-                                                                />
-                                                            </TableCell>
-                                                            <TableCell align="center">
-                                                                <input
-                                                                    type="date"
-                                                                    value={row.time ? formatDate(row.time) : ''}
-                                                                    onChange={(e) => {
-                                                                        const newValue = e.target.value;
-                                                                        const updatedRows = [...rows1];
-                                                                        updatedRows[index].time = newValue;
-                                                                        setRows1(updatedRows);
-                                                                    }}
-                                                                />
-                                                            </TableCell>
-                                                            <TableCell align="center">
-                                                                <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
-                                                                    value={row.equipmentId ?? ''}
-                                                                    onChange={(e) => {
-                                                                        const newValue = parseInt(e.target.value);
-                                                                        const updatedRows = [...rows1];
-                                                                        updatedRows[index].equipmentId = newValue;
-                                                                        setRows1(updatedRows);
-                                                                    }}>
-                                                                    <option value="" disabled>Chọn thiết bị dạy học</option>
-                                                                    {
-                                                                        teachingEquipment?.map((item) => (
-                                                                            <option value={item?.teachingEquipmentId}>{item?.teachingEquipmentName}</option>
-                                                                        ))
-                                                                    }
-                                                                </select>
-                                                            </TableCell>
-                                                            <TableCell align="center">
-                                                                <select id="subjectRoom" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
-                                                                    value={row.subjectRoomName ?? ''}
-                                                                    onChange={(e) => {
-                                                                        const newValue = e.target.value;
-                                                                        const updatedRows = [...rows1];
-                                                                        updatedRows[index].subjectRoomName = newValue;
-                                                                        setRows1(updatedRows);
-                                                                    }}>
-                                                                    <option value="" disabled>Chọn địa điểm</option>
-                                                                    {
-                                                                        subjectRoom?.map((item) => (
-                                                                            <option value={item?.subjectRoomName}>{item?.subjectRoomName}</option>
-                                                                        ))
-                                                                    }
-                                                                </select>
-                                                            </TableCell>
-                                                        </TableRow>
+                                                        <Tooltip key={index} disableFocusListener placement="right"
+                                                            title={<h2 onClick={() => {
+                                                                const updatedRows = [...rows1];
+                                                                updatedRows.splice(index, 1);
+                                                                setRows1(updatedRows);
+                                                            }}
+                                                                style={{ cursor: "pointer" }}>Xóa hàng</h2>}
+                                                        >
+                                                            <TableRow key={index} sx={{ 'td': { border: 1 } }}>
+                                                                <TableCell align="center">{index + 1}</TableCell>
+                                                                <TableCell align="center">
+                                                                    <select id="curriculumDistribution" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                        value={row?.curriculumId ?? ''}
+                                                                        onChange={(e) => {
+                                                                            const newValue = parseInt(e.target.value);
+                                                                            const updatedRows = [...rows1];
+                                                                            updatedRows[index].curriculumId = newValue;
+                                                                            setRows1(updatedRows);
+                                                                        }}>
+                                                                        <option value="" disabled>Chọn bài học</option>
+                                                                        {
+                                                                            curriculumDistribution?.map((item) => (
+                                                                                <option value={item?.curriculumId}>{item?.curriculumName}</option>
+                                                                            ))
+                                                                        }
+                                                                    </select>
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <textarea
+                                                                        value={row.slot ?? ''}
+                                                                        onChange={(e) => {
+                                                                            const newValue = parseInt(e.target.value);
+                                                                            const updatedRows = [...rows1];
+                                                                            updatedRows[index].slot = newValue;
+                                                                            setRows1(updatedRows);
+                                                                        }}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <input
+                                                                        type="date"
+                                                                        value={row.time ? formatDate(row.time) : ''}
+                                                                        onChange={(e) => {
+                                                                            const newValue = e.target.value;
+                                                                            const updatedRows = [...rows1];
+                                                                            updatedRows[index].time = newValue;
+                                                                            setRows1(updatedRows);
+                                                                        }}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                        value={row.equipmentId ?? ''}
+                                                                        onChange={(e) => {
+                                                                            const newValue = parseInt(e.target.value);
+                                                                            const updatedRows = [...rows1];
+                                                                            updatedRows[index].equipmentId = newValue;
+                                                                            setRows1(updatedRows);
+                                                                        }}>
+                                                                        <option value="" disabled>Chọn thiết bị dạy học</option>
+                                                                        {
+                                                                            teachingEquipment?.map((item) => (
+                                                                                <option value={item?.teachingEquipmentId}>{item?.teachingEquipmentName}</option>
+                                                                            ))
+                                                                        }
+                                                                    </select>
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <select id="subjectRoom" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                        value={row.subjectRoomName ?? ''}
+                                                                        onChange={(e) => {
+                                                                            const newValue = e.target.value;
+                                                                            const updatedRows = [...rows1];
+                                                                            updatedRows[index].subjectRoomName = newValue;
+                                                                            setRows1(updatedRows);
+                                                                        }}>
+                                                                        <option value="" disabled>Chọn địa điểm</option>
+                                                                        {
+                                                                            subjectRoom?.map((item) => (
+                                                                                <option value={item?.subjectRoomName}>{item?.subjectRoomName}</option>
+                                                                            ))
+                                                                        }
+                                                                    </select>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        </Tooltip>
                                                     ))}
                                                 </TableBody>
                                             </Table>
@@ -646,83 +701,93 @@ const SubMenu3Detail = () => {
                                                 </TableHead>
                                                 <TableBody>
                                                     {rows2?.map((row, index) => (
-                                                        <TableRow key={index} sx={{ 'td': { border: 1 } }}>
-                                                            <TableCell align="center">{index + 1}</TableCell>
-                                                            <TableCell align="center">
-                                                                <select id="curriculumDistribution" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
-                                                                    value={row?.selectedTopicsId ?? ''}
-                                                                    onChange={(e) => {
-                                                                        const newValue = parseInt(e.target.value);
-                                                                        const updatedRows = [...rows2];
-                                                                        updatedRows[index].selectedTopicsId = newValue;
-                                                                        setRows2(updatedRows);
-                                                                    }}>
-                                                                    <option value="" disabled>Chọn bài học</option>
-                                                                    {
-                                                                        selectedTopics?.map((item) => (
-                                                                            <option value={item?.selectedTopicsId}>{item?.selectedTopicsName}</option>
-                                                                        ))
-                                                                    }
-                                                                </select>
-                                                            </TableCell>
-                                                            <TableCell align="center">
-                                                                <textarea
-                                                                    value={row.slot ?? ''}
-                                                                    onChange={(e) => {
-                                                                        const newValue = parseInt(e.target.value);
-                                                                        const updatedRows = [...rows2];
-                                                                        updatedRows[index].slot = newValue;
-                                                                        setRows2(updatedRows);
-                                                                    }}
-                                                                />
-                                                            </TableCell>
-                                                            <TableCell align="center">
-                                                                <input
-                                                                    type="date"
-                                                                    value={row.time ? formatDate(row.time) : ''}
-                                                                    onChange={(e) => {
-                                                                        const newValue = e.target.value;
-                                                                        const updatedRows = [...rows2];
-                                                                        updatedRows[index].time = newValue;
-                                                                        setRows2(updatedRows);
-                                                                    }}
-                                                                />
-                                                            </TableCell>
-                                                            <TableCell align="center">
-                                                                <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
-                                                                    value={row.equipmentId ?? ''}
-                                                                    onChange={(e) => {
-                                                                        const newValue = parseInt(e.target.value);
-                                                                        const updatedRows = [...rows2];
-                                                                        updatedRows[index].equipmentId = newValue;
-                                                                        setRows2(updatedRows);
-                                                                    }}>
-                                                                    <option value="" disabled>Chọn thiết bị dạy học</option>
-                                                                    {
-                                                                        teachingEquipment?.map((item) => (
-                                                                            <option value={item?.teachingEquipmentId}>{item?.teachingEquipmentName}</option>
-                                                                        ))
-                                                                    }
-                                                                </select>
-                                                            </TableCell>
-                                                            <TableCell align="center">
-                                                                <select id="subjectRoom" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
-                                                                    value={row.subjectRoomName ?? ''}
-                                                                    onChange={(e) => {
-                                                                        const newValue = e.target.value;
-                                                                        const updatedRows = [...rows2];
-                                                                        updatedRows[index].subjectRoomName = newValue;
-                                                                        setRows2(updatedRows);
-                                                                    }}>
-                                                                    <option value="" disabled>Chọn địa điểm</option>
-                                                                    {
-                                                                        subjectRoom?.map((item) => (
-                                                                            <option value={item?.subjectRoomName}>{item?.subjectRoomName}</option>
-                                                                        ))
-                                                                    }
-                                                                </select>
-                                                            </TableCell>
-                                                        </TableRow>
+                                                        <Tooltip key={index} disableFocusListener placement="right"
+                                                            title={<h2 onClick={() => {
+                                                                const updatedRows = [...rows2];
+                                                                updatedRows.splice(index, 1);
+                                                                setRows2(updatedRows);
+                                                            }}
+                                                                style={{ cursor: "pointer" }}>Xóa hàng</h2>}
+                                                        >
+                                                            <TableRow key={index} sx={{ 'td': { border: 1 } }}>
+                                                                <TableCell align="center">{index + 1}</TableCell>
+                                                                <TableCell align="center">
+                                                                    <select id="curriculumDistribution" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                        value={row?.selectedTopicsId ?? ''}
+                                                                        onChange={(e) => {
+                                                                            const newValue = parseInt(e.target.value);
+                                                                            const updatedRows = [...rows2];
+                                                                            updatedRows[index].selectedTopicsId = newValue;
+                                                                            setRows2(updatedRows);
+                                                                        }}>
+                                                                        <option value="" disabled>Chọn bài học</option>
+                                                                        {
+                                                                            selectedTopics?.map((item) => (
+                                                                                <option value={item?.selectedTopicsId}>{item?.selectedTopicsName}</option>
+                                                                            ))
+                                                                        }
+                                                                    </select>
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <textarea
+                                                                        value={row.slot ?? ''}
+                                                                        onChange={(e) => {
+                                                                            const newValue = parseInt(e.target.value);
+                                                                            const updatedRows = [...rows2];
+                                                                            updatedRows[index].slot = newValue;
+                                                                            setRows2(updatedRows);
+                                                                        }}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <input
+                                                                        type="date"
+                                                                        value={row.time ? formatDate(row.time) : ''}
+                                                                        onChange={(e) => {
+                                                                            const newValue = e.target.value;
+                                                                            const updatedRows = [...rows2];
+                                                                            updatedRows[index].time = newValue;
+                                                                            setRows2(updatedRows);
+                                                                        }}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <select id="teachingEquipment" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                        value={row.equipmentId ?? ''}
+                                                                        onChange={(e) => {
+                                                                            const newValue = parseInt(e.target.value);
+                                                                            const updatedRows = [...rows2];
+                                                                            updatedRows[index].equipmentId = newValue;
+                                                                            setRows2(updatedRows);
+                                                                        }}>
+                                                                        <option value="" disabled>Chọn thiết bị dạy học</option>
+                                                                        {
+                                                                            teachingEquipment?.map((item) => (
+                                                                                <option value={item?.teachingEquipmentId}>{item?.teachingEquipmentName}</option>
+                                                                            ))
+                                                                        }
+                                                                    </select>
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <select id="subjectRoom" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                        value={row.subjectRoomName ?? ''}
+                                                                        onChange={(e) => {
+                                                                            const newValue = e.target.value;
+                                                                            const updatedRows = [...rows2];
+                                                                            updatedRows[index].subjectRoomName = newValue;
+                                                                            setRows2(updatedRows);
+                                                                        }}>
+                                                                        <option value="" disabled>Chọn địa điểm</option>
+                                                                        {
+                                                                            subjectRoom?.map((item) => (
+                                                                                <option value={item?.subjectRoomName}>{item?.subjectRoomName}</option>
+                                                                            ))
+                                                                        }
+                                                                    </select>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        </Tooltip>
+
                                                     ))}
                                                 </TableBody>
                                             </Table>
@@ -795,7 +860,7 @@ const SubMenu3Detail = () => {
                         <div>
                             <div className="sub-menu-action">
                                 <div className="verify" style={{ justifyContent: "center" }}>
-                                    <div style={{ display: "flex", columnGap: "10px" }}>
+                                    <div style={{ display: user?.userId === userInfoDocument?.id ? "flex" : "none", columnGap: "10px" }}>
                                         <div className='action-button' onClick={() => navigate(`/sub-menu-3/detail-edit/${location.pathname.split('/')[3]}`)}>Sửa</div>
                                         <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                                     </div>
@@ -814,21 +879,18 @@ const SubMenu3Detail = () => {
                                 <div><strong>Người gửi: </strong> <u className='underline-blue'>{document3Info?.userFullName}</u></div>
                             </div>
                             <div className="sub-menu-row">
+                                <div><strong>Nguồn: </strong> https://baigiang.violet.vn</div>
+                                <div className='right-action' onClick={handleClickOpenReport}><strong><u className='underline-blue'>Báo cáo tài liệu có sai sót</u></strong></div>
+                            </div>
+                            <div className="sub-menu-row">
                                 <div><strong>Ngày gửi: </strong> {document3Info?.createdDate}</div>
-                                <div className='right-action'>
-                                    <div className='share-facebook'>
-                                        <img src="/facebook-circle-svgrepo-com.svg" alt="SVG" />
-                                        <span>Chia sẻ</span>
-                                        <span>0</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <div>
                             <div className="sub-menu-action">
                                 <div className="verify">
                                     <span>Tình trạng thẩm định:</span>
-                                    <div style={{ display: "flex", columnGap: "10px" }}>
+                                    <div style={{ display: user?.userId === document1Info?.userId ? "flex" : "none", columnGap: "10px" }}>
                                         <div className='action-button' onClick={handleClickOpenAccept}>Chấp thuận</div>
                                         <div className='action-button' onClick={handleClickOpenDeny}>Từ chối</div>
                                     </div>
@@ -878,61 +940,48 @@ const SubMenu3Detail = () => {
                 <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
                     Báo cáo tài liệu
                 </DialogTitle>
-
-                {
-                    login ? (
-                        <>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
-                                    <div className="report-row">
-                                        <div className='report-title'>Tài liệu</div>
-                                        <div className='report-detail'>
-                                            Giáo án tài liệu A
-                                        </div>
-                                    </div>
-                                    <div className="report-row">
-                                        <div className='report-title'>
-                                            Lý do báo cáo
-                                        </div>
-                                        <div className='report-detail' style={{ display: "flex", flexDirection: "column" }}>
-                                            <FormControlLabel value="" control={<Radio />} label="Có lỗi kỹ thuật ..." />
-                                            <FormControlLabel value="" control={<Radio />} label="Không dùng để dạy học" />
-                                            <FormControlLabel value="" control={<Radio />} label="Vi phạm bản quyền" />
-                                            <FormControlLabel value="" control={<Radio />} label="Lý do khác" />
-                                        </div>
-                                    </div>
-                                    <div className="report-row">
-                                        <div className='report-title'>Chi tiết lỗi</div>
-                                        <div className='report-detail'>
-                                            <span style={{ whiteSpace: "nowrap" }}>Đề nghị cung cấp lý do và chỉ ra các điểm không chính xác</span>
-                                            <br />
-                                            <textarea name="" id="" rows={10} />
-                                        </div>
-                                    </div>
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions >
-                                <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
-                                <Button onClick={handleCloseReport} className='button-mui' autoFocus>
-                                    Gửi báo cáo
-                                </Button>
-                            </DialogActions></>
-                    ) : (
-                        <>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", fontWeight: 600, marginBottom: "12px" }}>
-                                    Bạn cần đăng nhập để thực hiện chức năng
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions >
-                                <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
-                                <Button onClick={() => setLogin(true)} className='button-mui' autoFocus>
-                                    Đăng nhập
-                                </Button>
-                            </DialogActions>
-                        </>
-                    )
-                }
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
+                        <div className="report-row">
+                            <div className='report-title'>Tài liệu</div>
+                            <div className='report-detail'>
+                                Giáo án tài liệu A
+                            </div>
+                        </div>
+                        <div className="report-row">
+                            <div className='report-title'>
+                                Lý do báo cáo
+                            </div>
+                            <div className='report-detail' style={{ display: "flex", flexDirection: "column" }}>
+                                <RadioGroup
+                                    aria-labelledby="demo-controlled-radio-buttons-group"
+                                    name="controlled-radio-buttons-group"
+                                    value={reasonReport ?? ''}
+                                    onChange={(e) => setReasonReport(e.target.value)}
+                                >
+                                    <FormControlLabel value="Có lỗi kỹ thuật" control={<Radio />} label="Có lỗi kỹ thuật" />
+                                    <FormControlLabel value="Không dùng để dạy học" control={<Radio />} label="Không dùng để dạy học" />
+                                    <FormControlLabel value="Vi phạm bản quyền" control={<Radio />} label="Vi phạm bản quyền" />
+                                    <FormControlLabel value="Lý do khác" control={<Radio />} label="Lý do khác" />
+                                </RadioGroup>
+                            </div>
+                        </div>
+                        <div className="report-row">
+                            <div className='report-title'>Chi tiết lỗi</div>
+                            <div className='report-detail'>
+                                <span style={{ whiteSpace: "nowrap" }}>Đề nghị cung cấp lý do và chỉ ra các điểm không chính xác</span>
+                                <br />
+                                <textarea name="" id="" rows={10} onChange={e => setDescriptionRp(e.target.value)} />
+                            </div>
+                        </div>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions >
+                    <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
+                    <Button onClick={handleSubmitReport} className='button-mui' autoFocus>
+                        Gửi báo cáo
+                    </Button>
+                </DialogActions>
             </Dialog>
             <Dialog
                 open={openAccept}
@@ -955,6 +1004,16 @@ const SubMenu3Detail = () => {
                         try {
 
                             await apiUpdateSubMenu3({ id: document3Info?.id, document1Id: document3Info?.document1Id, userId: document3Info?.userId, isApprove: 3, approveBy: user?.userId }, document3Info?.id)
+                            await apiPostNotification(
+                                [document3Info?.userId]
+                                , {
+                                    userId: user?.userId,
+                                    titleName: `${document3Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
+                                    message: `${document3Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
+                                    docType: 3,
+                                    docId: document3Info?.id
+                                }
+                            )
                         } catch (error) {
                             alert("Không thể xét duyệt")
                         }
@@ -985,6 +1044,16 @@ const SubMenu3Detail = () => {
                         try {
 
                             await apiUpdateSubMenu3({ id: document3Info?.id, document1Id: document3Info?.document1Id, userId: document3Info?.userId, isApprove: 4, approveBy: user?.userId }, document3Info?.id)
+                            await apiPostNotification(
+                                [document3Info?.userId]
+                                , {
+                                    userId: user?.userId,
+                                    titleName: `${document3Info?.name} ĐÃ BỊ TỪ CHỐI, HÃY ĐĂNG TẢI LẠI`,
+                                    message: `${document3Info?.name} ĐÃ BỊ TỪ CHỐI, HÃY ĐĂNG TẢI LẠI`,
+                                    docType: 3,
+                                    docId: document3Info?.id
+                                }
+                            )
                         } catch (error) {
                             alert("Không thể từ chối")
                         }
@@ -1011,7 +1080,10 @@ const SubMenu3Detail = () => {
                 </DialogContent>
                 <DialogActions >
                     <Button onClick={handleCloseRemove} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
-                    <Button onClick={handleCloseRemove} className='button-mui' autoFocus>
+                    <Button onClick={async () => {
+                        await apiDeleteSubMenu3(location.pathname.split('/')[3]);
+                        navigate('/sub-menu/3')
+                    }} className='button-mui' autoFocus>
                         Xóa
                     </Button>
                 </DialogActions>

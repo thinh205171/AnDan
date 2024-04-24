@@ -9,15 +9,18 @@ import { apiGetDocument2ByUserSpecialiedDepartment, apiGetSubMenu2 } from '../..
 import { apiGetDocument3ByUserSpecialiedDepartment, apiGetSubMenu3 } from '../../api/subMenu3';
 import { apiGetDocument5ByUserSpecialiedDepartment, apiGetSubMenu5 } from '../../api/subMenu5';
 import { apiGetSpecializedDepartment } from '../../api/specializedDepartment';
+import { useAppSelector } from '../../hook/useTypedSelector';
 
 const SubMenu = () => {
     const location = useLocation();
     const navigate = useNavigate()
     const [subMenu1Data, setSubMenu1Data] = useState<SubMenuData[]>([]);
+    const [subMenu5Data, setSubMenu5Data] = useState<SubMenuData[]>([]);
     const [specializedDepartmentId, setSpecializedDepartmentID] = useState<any>([]);
     const [specializedDepartment, setSpecializedDepartment] = useState<any>([]);
     const [subMenuName, setSubMenuName] = useState('');
     const indexSubMenu = location.pathname.split('/')[2];
+    const user = useAppSelector(state => state.auth.user)
     const grades = useMemo(() => ["6", "7", "8", "9"], []);
     const handleAddSubMenu = () => {
         navigate(`/sub-menu-${indexSubMenu}/detail-create`)
@@ -69,28 +72,32 @@ const SubMenu = () => {
             else if (indexSubMenu === '5') {
                 const res = await apiGetSubMenu5();
                 if (res)
-                    setSubMenu1Data(res.data)
+                    setSubMenu5Data(res.data)
                 else
-                    setSubMenu1Data([])
+                    setSubMenu5Data([])
             }
         }
         fetchList();
     }, [indexSubMenu, specializedDepartmentId])
 
-    useEffect(() => {
-        const fetchSpecializedDepartment = async () => {
-            const res = await apiGetSpecializedDepartment();
-            if (res && res.data) {
-                setSpecializedDepartment(res.data)
-                const idArray = res.data.map((item: any) => item.id);
-                const queryString = idArray.map((id: any) => `listId=${id}`).join('&');
-                setSpecializedDepartmentID(queryString)
-            }
-        }
-        fetchSpecializedDepartment()
-    }, [])
+    console.log("subMenu1Data: ", subMenu1Data)
 
-    const displayStyle = indexSubMenu === '3' ? 'none' : 'initial';
+    useEffect(() => {
+        if (indexSubMenu !== '5') {
+            const fetchSpecializedDepartment = async () => {
+                const res = await apiGetSpecializedDepartment();
+                if (res && res.data) {
+                    setSpecializedDepartment(res.data)
+                    const idArray = res.data.map((item: any) => item.id);
+                    const queryString = idArray.map((id: any) => `listId=${id}`).join('&');
+                    setSpecializedDepartmentID(queryString)
+                }
+            }
+            fetchSpecializedDepartment()
+        }
+    }, [indexSubMenu])
+
+    const displayStyle = indexSubMenu === '3' || user?.role !== "Leader" ? 'none' : 'initial';
 
     return (
         <div className='home-panel1'>
@@ -104,14 +111,15 @@ const SubMenu = () => {
                             <div className='add-row-button'>
                                 {
                                     indexSubMenu !== "4" ?
-                                        <Add style={{ color: "black", display: `${displayStyle}` }} className='add-row-icon' onClick={handleAddSubMenu} />
+                                        <Add style={{ color: "black", display: `${displayStyle}` }}
+                                            className='add-row-icon' onClick={handleAddSubMenu} />
                                         :
-                                        <Add style={{ color: "black" }} className='add-row-icon' onClick={() => navigate('/upload-sub-menu-4')} />
+                                        <Add style={{ color: "black", display: user?.role !== "Teacher" ? "none" : "initial" }} className='add-row-icon' onClick={() => navigate('/upload-sub-menu-4')} />
                                 }
                             </div>
                         </div>
                         {
-                            subMenu1Data?.map((doc, index) => (
+                            indexSubMenu !== '5' && subMenu1Data?.map((doc, index) => (
                                 <div key={index}>
                                     <div className="grade-name" style={{ fontSize: "24px" }}>Tổ {specializedDepartment[index]?.name}</div>
                                     <div className="home-panel1-content-sub-menu-item-content-grid"
@@ -122,6 +130,20 @@ const SubMenu = () => {
                                                 <div key={index} className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-${indexSubMenu}/detail-view/${item?.id}`)}>
                                                 </div>
                                             ))
+                                        }
+                                    </div>
+                                </div>
+                            ))
+                        }
+                        {
+                            indexSubMenu === '5' && subMenu5Data?.map((doc: any, index) => (
+                                <div key={index}>
+                                    <div className="home-panel1-content-sub-menu-item-content-grid"
+                                        style={{ borderBottom: index === grades.length - 1 ? 'none' : '1px solid black' }}
+                                    >
+                                        {
+                                            <div key={index} className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-${indexSubMenu}/detail-view/${doc?.id}`)}>
+                                            </div>
                                         }
                                     </div>
                                 </div>

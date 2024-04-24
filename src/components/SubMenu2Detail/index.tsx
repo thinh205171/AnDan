@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Paper, Radio, RadioGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material";
 import './style.scss'
 import { Add, Remove } from '@mui/icons-material';
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
@@ -22,6 +22,8 @@ import generatePDF from 'react-to-pdf';
 import axios from 'axios';
 import { TotalClass } from '../../models/totalClass';
 import { apiGetTotalClassByGradeId } from '../../api/subMenu1';
+import { apiPostReport } from '../../api/report';
+import { apiGetListHostbyByIdOfUserByDoc2Id, apiGetListIdOfTeacherAndPricipleByDepartmentId, apiPostNotification } from '../../api/notification';
 
 interface Row {
     gradeId: number | null;
@@ -57,11 +59,15 @@ const SubMenu2Detail = () => {
     const [grades, setGrades] = useState<Grade[]>([]);
     const [documentId, setDocumentId] = useState(null);
     const [userInfoLogin, setUserInfoLogin] = useState<User>();
-    const [userInfoDocument, setUserInfoDocument] = useState<User[]>([]);
+    const [userInfoDocument, setUserInfoDocument] = useState<User>();
     const [document2Info, setDocument2Info] = useState<Document1>();
     const [totalClass, setTotalClass] = useState<TotalClass>();
     const [multiTotalClass, setMultiTotalClass] = useState<TotalClass[]>([]);
     const [displayAddRow, setDisplayAddRow] = useState(false);
+    const [reasonReport, setReasonReport] = useState('')
+    const [descriptionRp, setDescriptionRp] = useState('');
+    const [principleAndTeacher, setPrincipleAndTeacher] = useState<any>()
+    const [hostByList, setHostByList] = useState<any>()
 
     const [truong, setTruong] = useState('');
     const [to, setTo] = useState('');
@@ -113,8 +119,28 @@ const SubMenu2Detail = () => {
                 }
             }
         }
+        const fecthPrincipleAndTeacher = async () => {
+            if (specializedDepartment?.id) {
+                const res = await apiGetListIdOfTeacherAndPricipleByDepartmentId(specializedDepartment?.id)
+                if (res && res.data) {
+                    const resData: any = res.data;
+                    setPrincipleAndTeacher(resData);
+                }
+            }
+        }
+        const fecthHostByList = async () => {
+            if (document2Info) {
+                const res = await apiGetListHostbyByIdOfUserByDoc2Id(document2Info?.id)
+                if (res && res.data) {
+                    const resData: any = res.data;
+                    setHostByList(resData);
+                }
+            }
+        }
         fetchUserInfoLogin()
-    }, [user])
+        fecthPrincipleAndTeacher()
+        fecthHostByList()
+    }, [specializedDepartment?.id, user])
 
     useEffect(() => {
         if (location.pathname.includes('edit')) {
@@ -122,6 +148,7 @@ const SubMenu2Detail = () => {
                 const res = await apiGetDocument2GradeById(location.pathname.split('/')[3]);
                 if (res && res.data) {
                     const gradeMap = new Map();
+
                     res.data.forEach((item: any, index: any) => {
                         if (gradeMap.has(item.gradeId)) {
                             const existingArray = gradeMap.get(item.gradeId);
@@ -136,7 +163,6 @@ const SubMenu2Detail = () => {
                     const formatRes = Array.from(gradeMap.values());
                     setMultiRows(formatRes)
                 }
-                console.log(res?.data)
                 if (res?.data.length === 0) {
                     setMultiRows([[{ gradeId: null, titleName: '', description: '', slot: null, time: '', place: '', hostBy: null, collaborateWith: '', condition: '' }]])
                 }
@@ -218,17 +244,29 @@ const SubMenu2Detail = () => {
             if (user) {
                 setOpen(true);
                 try {
-                    const post = await apiPostSubMenu2({
-                        name: `KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN ${specializedDepartment?.name}`,
-                        userId: user.userId,
-                        userName: user.username,
-                        createdDate: createdDate,
-                        status: true,
-                        approveByName: "",
-                        isApprove: 1
-                    })
+                    const post = await apiPostSubMenu2([
+                        {
+                            name: "KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN",
+                            userId: user.userId,
+                            userName: user.username,
+                            createdDate: createdDate,
+                            status: true,
+                            approveByName: "",
+                            isApprove: 1
+                        }
+                    ])
                     if (post) {
-                        setDocumentId(post?.data?.id)
+                        setDocumentId(post?.data[0]?.id)
+                        await apiPostNotification(
+                            principleAndTeacher?.principle
+                            , {
+                                userId: user?.userId,
+                                titleName: `${post?.data[0].name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
+                                message: `${post?.data[0].name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
+                                docType: 2,
+                                docId: post?.data?.id
+                            }
+                        )
                     }
                 } catch (error) {
                     alert("Something went wrong")
@@ -240,6 +278,16 @@ const SubMenu2Detail = () => {
         else {
             if (user) {
                 setOpen(true);
+                await apiPostNotification(
+                    principleAndTeacher?.principle
+                    , {
+                        userId: user?.userId,
+                        titleName: `${document2Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
+                        message: `${document2Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
+                        docType: 2,
+                        docId: document2Info?.id
+                    }
+                )
             }
         }
     };
@@ -251,17 +299,17 @@ const SubMenu2Detail = () => {
         if (user) {
             setOpen(true);
             try {
-                const post = await apiPostSubMenu2({
-                    name: `KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN ${specializedDepartment?.name}`,
+                const post = await apiPostSubMenu2([{
+                    name: "KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN",
                     userId: user.userId,
                     userName: user.username,
                     createdDate: createdDate,
                     status: true,
                     approveByName: "",
                     isApprove: 2
-                })
+                }])
                 if (post) {
-                    setDocumentId(post?.data?.id)
+                    setDocumentId(post?.data[0]?.id)
                 }
             } catch (error) {
                 alert("Something went wrong")
@@ -308,6 +356,18 @@ const SubMenu2Detail = () => {
     };
 
     const handleCloseReport = () => {
+        setOpenReport(false);
+    };
+
+    const handleSubmitReport = async () => {
+        const rp = {
+            userId: user?.userId,
+            doctype: 2,
+            docId: document2Info?.id,
+            message: reasonReport,
+            description: descriptionRp,
+        }
+        await apiPostReport(rp);
         setOpenReport(false);
     };
 
@@ -376,9 +436,11 @@ const SubMenu2Detail = () => {
             accumulator.push(...currentValue);
             return accumulator;
         }, []);
+        console.log("flattenedRows: ", flattenedRows)
         const rowsWithDocumentId = flattenedRows.map(row => {
             return { ...row, document2Id: documentId };
         });
+        console.log("rowsWithDocumentId: ", rowsWithDocumentId)
 
         if (rowsWithDocumentId) {
             try {
@@ -429,7 +491,7 @@ const SubMenu2Detail = () => {
 
                             <div className='sub-menu-content-main'>
                                 {multiRows.map((subRows, indexGrade) => (
-                                    <Tooltip key={indexGrade} disableFocusListener placement="right"
+                                    <Tooltip key={indexGrade} disableFocusListener placement="left"
                                         title={<h2 onClick={() => handleAddGrade(indexGrade)} style={{ cursor: "pointer" }}>Add</h2>}
                                     >
                                         <div className="sub-menu-content-main-feature">
@@ -477,104 +539,120 @@ const SubMenu2Detail = () => {
                                                         </TableHead>
                                                         <TableBody>
                                                             {subRows.map((row, index) => (
-                                                                <TableRow key={index} sx={{ 'td': { border: 1 } }}>
-                                                                    <TableCell align="center">{index + 1}</TableCell>
-                                                                    <TableCell align="center">
-                                                                        <textarea
-                                                                            value={row.titleName ?? null}
-                                                                            onChange={(e) => {
-                                                                                const newValue = e.target.value;
-                                                                                const updatedRows = [...multiRows];
-                                                                                updatedRows[indexGrade][index].titleName = newValue;
-                                                                                setMultiRows(updatedRows);
-                                                                            }}
-                                                                        />
-                                                                    </TableCell>
-                                                                    <TableCell align="center">
-                                                                        <textarea
-                                                                            value={row.description ?? null}
-                                                                            onChange={(e) => {
-                                                                                const newValue = e.target.value;
-                                                                                const updatedRows = [...multiRows];
-                                                                                updatedRows[indexGrade][index].description = newValue;
-                                                                                setMultiRows(updatedRows);
-                                                                            }}
-                                                                        />
-                                                                    </TableCell>
-                                                                    <TableCell align="center">
-                                                                        <textarea
-                                                                            value={row.slot ?? ''}
-                                                                            onChange={(e) => {
-                                                                                const newValue = parseInt(e.target.value);
-                                                                                const updatedRows = [...multiRows];
-                                                                                updatedRows[indexGrade][index].slot = newValue;
-                                                                                setMultiRows(updatedRows);
-                                                                            }}
-                                                                        />
-                                                                    </TableCell>
-                                                                    <TableCell align="center">
-                                                                        <input
-                                                                            type="date"
-                                                                            value={row.time ? formatDate(row.time) : ''}
-                                                                            onChange={(e) => {
-                                                                                const newValue = e.target.value;
-                                                                                const updatedRows = [...multiRows];
-                                                                                updatedRows[indexGrade][index].time = newValue;
-                                                                                setMultiRows(updatedRows);
-                                                                            }}
-                                                                        />
-                                                                    </TableCell>
-                                                                    <TableCell align="center">
-                                                                        <textarea
-                                                                            value={row.place ?? null}
-                                                                            onChange={(e) => {
-                                                                                const newValue = e.target.value;
-                                                                                const updatedRows = [...multiRows];
-                                                                                updatedRows[indexGrade][index].place = newValue;
-                                                                                setMultiRows(updatedRows);
-                                                                            }}
-                                                                        />
-                                                                    </TableCell>
-                                                                    <TableCell align="center">
-                                                                        <select id="selectedTopic" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
-                                                                            value={row.hostBy ?? ''}
-                                                                            onChange={(e) => {
-                                                                                const newValue = parseInt(e.target.value);
-                                                                                const updatedRows = [...multiRows];
-                                                                                updatedRows[indexGrade][index].hostBy = newValue;
-                                                                                setMultiRows(updatedRows);
-                                                                            }}>
-                                                                            <option value="" disabled>Chọn chủ trì</option>
-                                                                            {
-                                                                                users?.map((item) => (
-                                                                                    <option value={item?.id}>{item?.fullName}</option>
-                                                                                ))
-                                                                            }
-                                                                        </select>
-                                                                    </TableCell>
-                                                                    <TableCell align="center">
-                                                                        <textarea
-                                                                            value={row.collaborateWith ?? null}
-                                                                            onChange={(e) => {
-                                                                                const newValue = e.target.value;
-                                                                                const updatedRows = [...multiRows];
-                                                                                updatedRows[indexGrade][index].collaborateWith = newValue;
-                                                                                setMultiRows(updatedRows);
-                                                                            }}
-                                                                        />
-                                                                    </TableCell>
-                                                                    <TableCell align="center">
-                                                                        <textarea
-                                                                            value={row.condition ?? null}
-                                                                            onChange={(e) => {
-                                                                                const newValue = e.target.value;
-                                                                                const updatedRows = [...multiRows];
-                                                                                updatedRows[indexGrade][index].condition = newValue;
-                                                                                setMultiRows(updatedRows);
-                                                                            }}
-                                                                        />
-                                                                    </TableCell>
-                                                                </TableRow>
+                                                                <Tooltip key={index} disableFocusListener placement="right"
+                                                                    title={<h2 onClick={() => {
+                                                                        const updatedRows = [...subRows];
+                                                                        updatedRows.splice(index, 1);
+                                                                        setMultiRows((prevRows) => {
+                                                                            const updatedRows = [...subRows];
+                                                                            updatedRows.splice(index, 1);
+                                                                            const newMultiRows = [...prevRows]; // Tạo một bản sao của mảng multiRows
+                                                                            newMultiRows[indexGrade] = updatedRows; // Cập nhật phần của mảng cần thay đổi
+                                                                            return newMultiRows; // Trả về mảng mới đã được cập nhật
+                                                                        });
+                                                                    }}
+                                                                        style={{ cursor: "pointer" }}>Xóa hàng</h2>}
+                                                                >
+                                                                    <TableRow key={index} sx={{ 'td': { border: 1 } }}>
+                                                                        <TableCell align="center">{index + 1}</TableCell>
+                                                                        <TableCell align="center">
+                                                                            <textarea
+                                                                                value={row.titleName ?? null}
+                                                                                onChange={(e) => {
+                                                                                    const newValue = e.target.value;
+                                                                                    const updatedRows = [...multiRows];
+                                                                                    updatedRows[indexGrade][index].titleName = newValue;
+                                                                                    setMultiRows(updatedRows);
+                                                                                }}
+                                                                            />
+                                                                        </TableCell>
+                                                                        <TableCell align="center">
+                                                                            <textarea
+                                                                                value={row.description ?? null}
+                                                                                onChange={(e) => {
+                                                                                    const newValue = e.target.value;
+                                                                                    const updatedRows = [...multiRows];
+                                                                                    updatedRows[indexGrade][index].description = newValue;
+                                                                                    setMultiRows(updatedRows);
+                                                                                }}
+                                                                            />
+                                                                        </TableCell>
+                                                                        <TableCell align="center">
+                                                                            <textarea
+                                                                                value={row.slot ?? ''}
+                                                                                onChange={(e) => {
+                                                                                    const newValue = parseInt(e.target.value);
+                                                                                    const updatedRows = [...multiRows];
+                                                                                    updatedRows[indexGrade][index].slot = newValue;
+                                                                                    setMultiRows(updatedRows);
+                                                                                }}
+                                                                            />
+                                                                        </TableCell>
+                                                                        <TableCell align="center">
+                                                                            <input
+                                                                                type="date"
+                                                                                value={row.time ? formatDate(row.time) : ''}
+                                                                                onChange={(e) => {
+                                                                                    const newValue = e.target.value;
+                                                                                    const updatedRows = [...multiRows];
+                                                                                    updatedRows[indexGrade][index].time = newValue;
+                                                                                    setMultiRows(updatedRows);
+                                                                                }}
+                                                                            />
+                                                                        </TableCell>
+                                                                        <TableCell align="center">
+                                                                            <textarea
+                                                                                value={row.place ?? null}
+                                                                                onChange={(e) => {
+                                                                                    const newValue = e.target.value;
+                                                                                    const updatedRows = [...multiRows];
+                                                                                    updatedRows[indexGrade][index].place = newValue;
+                                                                                    setMultiRows(updatedRows);
+                                                                                }}
+                                                                            />
+                                                                        </TableCell>
+                                                                        <TableCell align="center">
+                                                                            <select id="selectedTopic" style={{ width: "150px", height: "40px", marginLeft: "4px" }}
+                                                                                value={row.hostBy ?? ''}
+                                                                                onChange={(e) => {
+                                                                                    const newValue = parseInt(e.target.value);
+                                                                                    const updatedRows = [...multiRows];
+                                                                                    updatedRows[indexGrade][index].hostBy = newValue;
+                                                                                    setMultiRows(updatedRows);
+                                                                                }}>
+                                                                                <option value="" disabled>Chọn chủ trì</option>
+                                                                                {
+                                                                                    users?.map((item) => (
+                                                                                        <option value={item?.id}>{item?.fullName}</option>
+                                                                                    ))
+                                                                                }
+                                                                            </select>
+                                                                        </TableCell>
+                                                                        <TableCell align="center">
+                                                                            <textarea
+                                                                                value={row.collaborateWith ?? null}
+                                                                                onChange={(e) => {
+                                                                                    const newValue = e.target.value;
+                                                                                    const updatedRows = [...multiRows];
+                                                                                    updatedRows[indexGrade][index].collaborateWith = newValue;
+                                                                                    setMultiRows(updatedRows);
+                                                                                }}
+                                                                            />
+                                                                        </TableCell>
+                                                                        <TableCell align="center">
+                                                                            <textarea
+                                                                                value={row.condition ?? null}
+                                                                                onChange={(e) => {
+                                                                                    const newValue = e.target.value;
+                                                                                    const updatedRows = [...multiRows];
+                                                                                    updatedRows[indexGrade][index].condition = newValue;
+                                                                                    setMultiRows(updatedRows);
+                                                                                }}
+                                                                            />
+                                                                        </TableCell>
+                                                                    </TableRow>
+                                                                </Tooltip>
+
                                                             ))}
                                                         </TableBody>
                                                     </Table>
@@ -642,12 +720,16 @@ const SubMenu2Detail = () => {
                             <div className="sub-menu-action">
                                 <div className="verify" style={{ justifyContent: "center" }}>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
-                                        <div className='action-button' onClick={location.pathname.includes('create') ? handleClickAdd : handleClickSave}>
+                                        <div
+                                            style={{ display: user?.userId === userInfoDocument?.id ? "initial" : "none" }}
+                                            className='action-button' onClick={location.pathname.includes('create') ? handleClickAdd : handleClickSave}>
                                             {
                                                 location.pathname.includes('create') ? "Tạo mới" : "Sửa"
                                             }
                                         </div>
-                                        <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
+                                        <div
+                                            style={{ display: user?.userId === userInfoDocument?.id ? "initial" : "none" }}
+                                            className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                                     </div>
                                 </div>
                             </div>
@@ -664,19 +746,16 @@ const SubMenu2Detail = () => {
                                 <div><strong>Người gửi: </strong> <u className='underline-blue'>{document2Info?.userFullName}</u></div>
                             </div>
                             <div className="sub-menu-row">
+                                <div><strong>Nguồn: </strong> https://baigiang.violet.vn</div>
+                                <div className='right-action' onClick={handleClickOpenReport}><strong><u className='underline-blue'>Báo cáo tài liệu có sai sót</u></strong></div>
+                            </div>
+                            <div className="sub-menu-row">
                                 <div><strong>Ngày gửi: </strong> {document2Info?.createdDate}</div>
-                                <div className='right-action'>
-                                    <div className='share-facebook'>
-                                        <img src="/facebook-circle-svgrepo-com.svg" alt="SVG" />
-                                        <span>Chia sẻ</span>
-                                        <span>0</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <div>
                             <div className="sub-menu-action">
-                                <div className="verify">
+                                <div className="verify" style={{ display: user?.role === "Principle" ? "flex" : "none" }}>
                                     <span>Tình trạng thẩm định:</span>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
                                         <div className='action-button' onClick={handleClickOpenAccept}>Chấp thuận</div>
@@ -727,61 +806,48 @@ const SubMenu2Detail = () => {
                 <DialogTitle id="alert-dialog-title" style={{ textAlign: "center", fontWeight: 600 }}>
                     Báo cáo tài liệu
                 </DialogTitle>
-
-                {
-                    login ? (
-                        <>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
-                                    <div className="report-row">
-                                        <div className='report-title'>Tài liệu</div>
-                                        <div className='report-detail'>
-                                            Giáo án tài liệu A
-                                        </div>
-                                    </div>
-                                    <div className="report-row">
-                                        <div className='report-title'>
-                                            Lý do báo cáo
-                                        </div>
-                                        <div className='report-detail' style={{ display: "flex", flexDirection: "column" }}>
-                                            <FormControlLabel value="" control={<Radio />} label="Có lỗi kỹ thuật ..." />
-                                            <FormControlLabel value="" control={<Radio />} label="Không dùng để dạy học" />
-                                            <FormControlLabel value="" control={<Radio />} label="Vi phạm bản quyền" />
-                                            <FormControlLabel value="" control={<Radio />} label="Lý do khác" />
-                                        </div>
-                                    </div>
-                                    <div className="report-row">
-                                        <div className='report-title'>Chi tiết lỗi</div>
-                                        <div className='report-detail'>
-                                            <span style={{ whiteSpace: "nowrap" }}>Đề nghị cung cấp lý do và chỉ ra các điểm không chính xác</span>
-                                            <br />
-                                            <textarea name="" id="" rows={10} />
-                                        </div>
-                                    </div>
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions >
-                                <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
-                                <Button onClick={handleCloseReport} className='button-mui' autoFocus>
-                                    Gửi báo cáo
-                                </Button>
-                            </DialogActions></>
-                    ) : (
-                        <>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", fontWeight: 600, marginBottom: "12px" }}>
-                                    Bạn cần đăng nhập để thực hiện chức năng
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions >
-                                <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
-                                <Button onClick={() => setLogin(true)} className='button-mui' autoFocus>
-                                    Đăng nhập
-                                </Button>
-                            </DialogActions>
-                        </>
-                    )
-                }
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" style={{ textAlign: "left", backgroundColor: "#D9D9D9", borderRadius: "20px", padding: "20px" }}>
+                        <div className="report-row">
+                            <div className='report-title'>Tài liệu</div>
+                            <div className='report-detail'>
+                                Giáo án tài liệu A
+                            </div>
+                        </div>
+                        <div className="report-row">
+                            <div className='report-title'>
+                                Lý do báo cáo
+                            </div>
+                            <div className='report-detail' style={{ display: "flex", flexDirection: "column" }}>
+                                <RadioGroup
+                                    aria-labelledby="demo-controlled-radio-buttons-group"
+                                    name="controlled-radio-buttons-group"
+                                    value={reasonReport ?? ''}
+                                    onChange={(e) => setReasonReport(e.target.value)}
+                                >
+                                    <FormControlLabel value="Có lỗi kỹ thuật" control={<Radio />} label="Có lỗi kỹ thuật" />
+                                    <FormControlLabel value="Không dùng để dạy học" control={<Radio />} label="Không dùng để dạy học" />
+                                    <FormControlLabel value="Vi phạm bản quyền" control={<Radio />} label="Vi phạm bản quyền" />
+                                    <FormControlLabel value="Lý do khác" control={<Radio />} label="Lý do khác" />
+                                </RadioGroup>
+                            </div>
+                        </div>
+                        <div className="report-row">
+                            <div className='report-title'>Chi tiết lỗi</div>
+                            <div className='report-detail'>
+                                <span style={{ whiteSpace: "nowrap" }}>Đề nghị cung cấp lý do và chỉ ra các điểm không chính xác</span>
+                                <br />
+                                <textarea name="" id="" rows={10} onChange={e => setDescriptionRp(e.target.value)} />
+                            </div>
+                        </div>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions >
+                    <Button onClick={handleCloseReport} style={{ color: "#000", fontWeight: 600 }} > Quay lại trang</Button>
+                    <Button onClick={handleSubmitReport} className='button-mui' autoFocus>
+                        Gửi báo cáo
+                    </Button>
+                </DialogActions>
             </Dialog>
             <Dialog
                 open={openAccept}
@@ -803,6 +869,26 @@ const SubMenu2Detail = () => {
                     <Button onClick={async () => {
                         try {
                             await apiUpdateSubMenu2({ id: document2Info?.id, userId: document2Info?.userId, isApprove: 3, approveBy: user?.userId }, document2Info?.id)
+                            await apiPostNotification(
+                                [document2Info?.userId]
+                                , {
+                                    userId: user?.userId,
+                                    titleName: `${document2Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
+                                    message: `${document2Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
+                                    docType: 2,
+                                    docId: document2Info?.id
+                                }
+                            )
+                            await apiPostNotification(
+                                hostByList
+                                , {
+                                    userId: user?.userId,
+                                    titleName: `${document2Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN, HÃY TẠO KHUNG KẾ HOẠCH`,
+                                    message: `${document2Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN, HÃY TẠO KHUNG KẾ HOẠCH`,
+                                    docType: 2,
+                                    docId: document2Info?.id
+                                }
+                            )
                         } catch (error) {
                             alert("Không thể xét duyệt")
                         }
@@ -832,6 +918,16 @@ const SubMenu2Detail = () => {
                     <Button onClick={async () => {
                         try {
                             await apiUpdateSubMenu2({ id: document2Info?.id, userId: document2Info?.userId, isApprove: 4, approveBy: user?.userId }, document2Info?.id)
+                            await apiPostNotification(
+                                [document2Info?.userId]
+                                , {
+                                    userId: user?.userId,
+                                    titleName: `${document2Info?.name} ĐÃ BỊ TỪ CHỐI HÃY ĐĂNG TẢI LẠI`,
+                                    message: `${document2Info?.name} ĐÃ BỊ TỪ CHỐI HÃY ĐĂNG TẢI LẠI`,
+                                    docType: 2,
+                                    docId: document2Info?.id
+                                }
+                            )
                         } catch (error) {
                             alert("Không thể từ chối")
                         }
@@ -858,7 +954,10 @@ const SubMenu2Detail = () => {
                 </DialogContent>
                 <DialogActions >
                     <Button onClick={handleCloseRemove} style={{ color: "#000", fontWeight: 600 }} >Hủy bỏ</Button>
-                    <Button onClick={handleCloseRemove} className='button-mui' autoFocus>
+                    <Button onClick={async () => {
+                        await apiDeleteSubMenu2(location.pathname.split('/')[3]);
+                        navigate('/sub-menu/2')
+                    }} className='button-mui' autoFocus>
                         Xóa
                     </Button>
                 </DialogActions>

@@ -59,6 +59,10 @@
                     margin-top: 8px;
                     border-radius: 0;
                     box-shadow: none;
+
+                    input[type='number'] {
+                        width: 50px;
+                    }
                 }
 
                 .add-row-button {

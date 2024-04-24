@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './style.scss'
 import { useEffect, useState } from 'react';
 import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Tooltip } from '@mui/material';
@@ -9,6 +9,8 @@ import { apiCheckVerifyPassword, apiPostSendEmail } from '../../../api/auth';
 
 const Header = () => {
     const dispatch = useAppDispatch();
+    const location = useLocation()
+    const navigate = useNavigate()
     const [isScrolling, setIsScrolling] = useState(false);
     const [openLogin, setOpenlogin] = useState(false);
     const [openRegister, setOpenRegister] = useState(false);
@@ -16,8 +18,23 @@ const Header = () => {
     const [isLogin, setIsLogin] = useState(false)
     const loginStatus = useAppSelector(state => state.auth.loginStatus)
     // const [user, setUser] = useState<string | null>('');
-
     const user = useAppSelector(state => state.auth.user)
+    console.log("user: ", user)
+    useEffect(() => {
+        if (localStorage.getItem("token")) {
+            setIsLogin(true)
+        }
+    }, [])
+
+    // useEffect(() => {
+    //     if (!isLogin) {
+    //         alert("Bạn phải đăng nhập trước")
+    //         if (location.pathname !== '/')
+    //             navigate('/')
+    //         setOpenlogin(true)
+    //     }
+    // }, [isLogin, location.pathname, navigate])
+
 
     useEffect(() => {
         const verifyToken = async () => {
@@ -52,7 +69,10 @@ const Header = () => {
     };
 
     const handleLoginClose = () => {
-        setOpenlogin(false);
+        if (!isLogin)
+            alert("Bạn chưa đăng nhập")
+        else
+            setOpenlogin(false);
     };
 
     const handleRegisterClose = () => {
@@ -65,7 +85,7 @@ const Header = () => {
 
     const handleLogout = () => {
         localStorage.removeItem("token");
-        window.location.reload();
+        // window.location.reload();
         setIsLogin(false)
     }
 
@@ -138,7 +158,7 @@ const Header = () => {
                         </div>
                         <div className="item-header">
                             {
-                                !user ? (
+                                !isLogin ? (
                                     <div className="action-header">
                                         <button className="login" onClick={handleLoginClickOpen}>
                                             ĐĂNG NHẬP
@@ -165,7 +185,7 @@ const Header = () => {
                                                 <Container>
                                                     <ul>
                                                         <div style={{ borderBottom: "1px solid  #ccc", paddingTop: "12px" }}>
-                                                            <span style={{ fontSize: "16px", color: "#000" }}>{user.username}</span>
+                                                            <span style={{ fontSize: "16px", color: "#000" }}>{user?.username}</span>
                                                         </div>
                                                         <div style={{ borderBottom: "1px solid  #ccc", paddingTop: "12px" }}>
                                                             <Link to="/profile" style={{ fontSize: "16px" }}>Thông tin tài khoản</Link>
@@ -223,7 +243,11 @@ const Header = () => {
                 fullWidth={true}
                 maxWidth="md"
                 open={openLogin}
-                onClose={handleLoginClose}
+                onClose={async (event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleLoginClose();
+                    }
+                }}
                 PaperProps={{
                     component: 'form',
                     onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
@@ -356,9 +380,13 @@ const Header = () => {
                         try {
                             if (password !== cfPassword)
                                 alert("Confirm password not match")
-                            if (password && cfPassword && username && curPass) {
-                                const res = await apiCheckVerifyPassword(null, { username: username, currentPassword: curPass, newPassword: password })
-                                setOpenCode(false)
+                            else {
+                                if (password && cfPassword && username && curPass) {
+                                    const res = await apiCheckVerifyPassword(null, { username: username, currentPassword: curPass, newPassword: password })
+                                    setOpenCode(false)
+                                    alert("Thay đổi mật khẩu thành công")
+                                    setOpenlogin(true)
+                                }
                             }
                             handleRegisterClose();
                         } catch (e) {

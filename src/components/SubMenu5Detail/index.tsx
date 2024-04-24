@@ -5,7 +5,7 @@ import './style.scss'
 import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
 import { apiGetSubMenu4ById, apiGetSubMenu4infoById } from '../../api/subMenu4';
 import { useAppSelector } from '../../hook/useTypedSelector';
-import { apiPostSubMenu5, apiUpdateSubMenu5 } from '../../api/subMenu5';
+import { apiGetSubMenu5ByDoc4Id, apiGetSubMenu5ById, apiPostSubMenu5, apiUpdateSubMenu5 } from '../../api/subMenu5';
 import generatePDF from 'react-to-pdf';
 import { options } from '../UploadPhuLuc4';
 import axios from 'axios';
@@ -32,6 +32,7 @@ const SubMenu5Detail = () => {
     const [document4, setDocument4] = useState<any>()
     const [document5Id, setDocument5Id] = useState<any>()
     const [document4Info, setDocument4Info] = useState<any>()
+    const [document5Info, setDocument5Info] = useState<any>()
 
     const [login, setLogin] = useState(false);
     const [open, setOpen] = useState(false);
@@ -61,13 +62,25 @@ const SubMenu5Detail = () => {
                 const res = await apiUpdateSubMenu5({ id: document5Id, document4Id: location.pathname.split('/')[3], linkFile: response?.data, userId: user?.userId }, document5Id)
                 if (res && document5Id) {
                     alert('Thành công! Hãy chờ đợi trong giây lát để chuyển trang')
-                    navigate(`/sub-menu-5/detail-view/${document5Id}`)
+                    navigate(`/sub-menu-5/detail-view/${location.pathname.split('/')[3]}`)
                 }
             }
         } catch (error) {
             console.error(error);
         }
     };
+
+    useEffect(() => {
+        if (location.pathname.includes('view')) {
+            const fecthDoc5Info = async () => {
+                const res = await apiGetSubMenu5ByDoc4Id(location.pathname.split('/')[3])
+                if (res && res.data) {
+                    setDocument5Info(res.data)
+                }
+            }
+            fecthDoc5Info()
+        }
+    }, [location.pathname])
 
     useEffect(() => {
         if (location.pathname.includes('create')) {
@@ -146,27 +159,28 @@ const SubMenu5Detail = () => {
         else
             alert("Nhập đầy đủ thông tin!")
     };
-
     const handleClickOpen1 = async () => {
     };
 
     const handleAddDoc5 = async () => {
         if (tiet && user && tieuChi1 && tieuChi2 && tieuChi3 && tieuChi4 && tieuChi5 && tieuChi6 && tieuChi7 && tieuChi8 && tieuChi9 && tieuChi10 && tieuChi11 && tieuChi12) {
-            const post = await apiPostEvaluate({
-                document5Id: document5Id,
-                evaluate11: tieuChi1,
-                evaluate12: tieuChi2,
-                evaluate13: tieuChi3,
-                evaluate14: tieuChi4,
-                evaluate21: tieuChi5,
-                evaluate22: tieuChi6,
-                evaluate23: tieuChi7,
-                evaluate24: tieuChi8,
-                evaluate31: tieuChi9,
-                evaluate32: tieuChi10,
-                evaluate33: tieuChi11,
-                evaluate34: tieuChi12
-            })
+            const post = await apiPostEvaluate([
+                {
+                    document5Id: document5Id,
+                    evaluate11: tieuChi1,
+                    evaluate12: tieuChi2,
+                    evaluate13: tieuChi3,
+                    evaluate14: tieuChi4,
+                    evaluate21: tieuChi5,
+                    evaluate22: tieuChi6,
+                    evaluate23: tieuChi7,
+                    evaluate24: tieuChi8,
+                    evaluate31: tieuChi9,
+                    evaluate32: tieuChi10,
+                    evaluate33: tieuChi11,
+                    evaluate34: tieuChi12
+                }
+            ])
             if (post && post.data) {
                 setOpen(false)
                 downloadPdf()
@@ -228,7 +242,7 @@ const SubMenu5Detail = () => {
                                                         <TableCell align="center">Nội dung</TableCell>
                                                         <TableCell align="center">Tiêu chí</TableCell>
                                                         <TableCell align="center">Điểm tối đa</TableCell>
-                                                        <TableCell align="center">Điểm đánh giá</TableCell>
+                                                        <TableCell align="center" sx={{ width: "60px" }}>Điểm đánh giá</TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
@@ -241,11 +255,14 @@ const SubMenu5Detail = () => {
                                                             1,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi1 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi1(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 1) {
+                                                                        setTieuChi1(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -258,11 +275,14 @@ const SubMenu5Detail = () => {
                                                             2,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi2 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi2(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 2) {
+                                                                        setTieuChi2(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -274,11 +294,14 @@ const SubMenu5Detail = () => {
                                                             1,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi3 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi3(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 1) {
+                                                                        setTieuChi3(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -291,11 +314,14 @@ const SubMenu5Detail = () => {
                                                             2,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi4 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi4(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 2) {
+                                                                        setTieuChi4(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -309,11 +335,14 @@ const SubMenu5Detail = () => {
                                                             2,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi5 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi5(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 2) {
+                                                                        setTieuChi5(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -322,14 +351,17 @@ const SubMenu5Detail = () => {
                                                         <TableCell align="center">
                                                             Khả năng theo dõi, quan sát, phát hiện kịp thời những khó khăn của học sinh.                                            </TableCell>
                                                         <TableCell align="center">
-                                                            1,00
+                                                            2,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi6 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi6(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 2) {
+                                                                        setTieuChi6(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -342,11 +374,14 @@ const SubMenu5Detail = () => {
                                                             2,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi7 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi7(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 2) {
+                                                                        setTieuChi7(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -359,11 +394,14 @@ const SubMenu5Detail = () => {
                                                             2,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi8 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi8(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 2) {
+                                                                        setTieuChi8(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -378,11 +416,14 @@ const SubMenu5Detail = () => {
                                                             2,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi9 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi9(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 2) {
+                                                                        setTieuChi9(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -395,11 +436,14 @@ const SubMenu5Detail = () => {
                                                             2,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi10 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi10(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 2) {
+                                                                        setTieuChi10(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -411,11 +455,14 @@ const SubMenu5Detail = () => {
                                                             2,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi11 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi11(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 2) {
+                                                                        setTieuChi11(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -428,11 +475,14 @@ const SubMenu5Detail = () => {
                                                             1,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
                                                                 value={tieuChi12 ?? ''}
                                                                 onChange={(e) => {
-                                                                    const newValue = parseInt(e.target.value);
-                                                                    setTieuChi12(newValue);
+                                                                    const newValue = parseFloat(e.target.value);
+                                                                    if (!isNaN(newValue) && newValue >= 0 && newValue <= 2) {
+                                                                        setTieuChi12(newValue);
+                                                                    }
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -445,7 +495,9 @@ const SubMenu5Detail = () => {
                                                             20,00
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                            <textarea
+                                                            <input
+                                                                type='number'
+                                                                disabled
                                                                 value={tongDiem ?? ''}
                                                             />
                                                         </TableCell>
@@ -475,15 +527,11 @@ const SubMenu5Detail = () => {
                         </div>
                     </div> : (
                         <>
-                            <DocViewer documents={docs} pluginRenderers={DocViewerRenderers}
-                                config={{
-                                    header: {
-                                        disableHeader: true,
-                                        disableFileName: true,
-                                        retainURLParams: true,
-                                    },
-                                    pdfVerticalScrollByDefault: true,
-                                }}
+                            <embed
+                                src={document5Info?.linkFile}
+                                width="100%"
+                                height="1000px"
+                                type="application/pdf"
                             />
                             <div>
                                 <div className="sub-menu-action">
@@ -501,7 +549,7 @@ const SubMenu5Detail = () => {
                                 </div>
                                 <div className="sub-menu-row">
                                     <div><strong>Nguồn: </strong> https://baigiang.violet.vn</div>
-                                    <div className='right-action' onClick={handleClickOpenReport}><strong><u className='underline-blue'>Báo tài liệu có sai sót</u></strong></div>
+                                    <div className='right-action' onClick={handleClickOpenReport}><strong><u className='underline-blue'>Báo cáo tài liệu có sai sót</u></strong></div>
                                 </div>
                                 <div className="sub-menu-row">
                                     <div><strong>Người gửi: </strong> <u className='underline-blue'>Sam Dung</u></div>
@@ -541,7 +589,7 @@ const SubMenu5Detail = () => {
                                 </div>
                                 <div className="sub-menu-note">
                                     Ghi chú <br />
-                                    <textarea name="" id="" rows={8} ></textarea>
+                                    <textarea name="" id="" rows={8} />
                                 </div>
                             </div>
                         </>

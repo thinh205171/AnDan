@@ -36,7 +36,7 @@ export const checkAuthenticationUser = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const res = await authService.checkAuthentication();
-      if (res.trim() !== "") {
+      if (res?.trim() !== "") {
         const words = res.split(' ');
         const email = words.find((word: string) => word.includes('@'));
         const userId = words.pop();
@@ -117,7 +117,7 @@ export const authSlice = createSlice({
         state.user = action.payload.res;
         state.loginStatus = 1;
         localStorage.setItem('token', action.payload.res);
-        window.location.reload();
+        // window.location.reload();
         toast.success("User login successfully", { autoClose: 1500 });
       })
       .addCase(checkAuthenticationUser.pending, (state) => {
