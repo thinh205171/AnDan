@@ -366,7 +366,7 @@ const SubMenu1Detail = () => {
             if (khoiLop && user && hoadDong) {
                 setOpen(true);
                 const post = await apiPostSubMenu1({
-                    name: "KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC",
+                    name: `KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC ${subjects?.find(item => item.id === hoadDong)?.name}, Khối lớp ${grades?.find(item => item.id === khoiLop)?.name}`,
                     subjectId: hoadDong,
                     gradeId: khoiLop,
                     userId: user.userId,

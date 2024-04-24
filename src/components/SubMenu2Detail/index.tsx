@@ -122,7 +122,6 @@ const SubMenu2Detail = () => {
                 const res = await apiGetDocument2GradeById(location.pathname.split('/')[3]);
                 if (res && res.data) {
                     const gradeMap = new Map();
-
                     res.data.forEach((item: any, index: any) => {
                         if (gradeMap.has(item.gradeId)) {
                             const existingArray = gradeMap.get(item.gradeId);
@@ -136,6 +135,10 @@ const SubMenu2Detail = () => {
 
                     const formatRes = Array.from(gradeMap.values());
                     setMultiRows(formatRes)
+                }
+                console.log(res?.data)
+                if (res?.data.length === 0) {
+                    setMultiRows([[{ gradeId: null, titleName: '', description: '', slot: null, time: '', place: '', hostBy: null, collaborateWith: '', condition: '' }]])
                 }
             };
             fetchDoc2GradeInfo();
@@ -216,7 +219,7 @@ const SubMenu2Detail = () => {
                 setOpen(true);
                 try {
                     const post = await apiPostSubMenu2({
-                        name: "KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN",
+                        name: `KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN ${specializedDepartment?.name}`,
                         userId: user.userId,
                         userName: user.username,
                         createdDate: createdDate,
@@ -249,7 +252,7 @@ const SubMenu2Detail = () => {
             setOpen(true);
             try {
                 const post = await apiPostSubMenu2({
-                    name: "KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN",
+                    name: `KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN ${specializedDepartment?.name}`,
                     userId: user.userId,
                     userName: user.username,
                     createdDate: createdDate,
@@ -390,8 +393,6 @@ const SubMenu2Detail = () => {
         }
         setOpen(false);
     };
-
-    console.log("multiRows: ", multiRows)
 
     return (
         <div className='sub-menu-container'>

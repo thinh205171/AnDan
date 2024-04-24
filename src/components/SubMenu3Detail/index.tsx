@@ -65,7 +65,7 @@ const SubMenu3Detail = () => {
     const [to, setTo] = useState('');
     const [giaoVien, setGiaoVien] = useState('');
     const [hoadDong, setHoatDong] = useState<number | null>(null);
-    const [khoiLop, setKhoiLop] = useState('');
+    const [khoiLop, setKhoiLop] = useState<number | null>(null);
     const [startYear, setStartYear] = useState('');
     const [endYear, setEndYear] = useState('');
     const [toTruong, setToTruong] = useState('');
@@ -321,7 +321,7 @@ const SubMenu3Detail = () => {
             if (khoiLop && user) {
                 setOpen(true);
                 const post = await apiPostSubMenu3({
-                    name: "KẾ HOẠCH DẠY HỌC CỦA GIÁO VIÊN",
+                    name: `KẾ HOẠCH DẠY HỌC CỦA GIÁO VIÊN MÔN ${subjects?.find(item => item.id === hoadDong)?.name}, Lớp ${classes?.find(item => item.id === khoiLop)?.name} `,
                     document1Id: document1Id,
                     claasName: khoiLop,
                     userId: parseInt(user.userId),
@@ -349,7 +349,7 @@ const SubMenu3Detail = () => {
         if (khoiLop && user) {
             setOpen(true);
             const post = await apiPostSubMenu3({
-                name: "KẾ HOẠCH DẠY HỌC CỦA GIÁO VIÊN",
+                name: `KẾ HOẠCH DẠY HỌC CỦA GIÁO VIÊN MÔN ${subjects?.find(item => item.id === hoadDong)?.name}, Lớp ${classes?.find(item => item.id === khoiLop)?.name} `,
                 document1Id: document1Id,
                 claasName: khoiLop,
                 userId: user.userId,
@@ -504,7 +504,7 @@ const SubMenu3Detail = () => {
                                         <span style={{ marginLeft: "4px" }}>{document1Info?.subjectName}</span>
                                         <strong>, LỚP</strong>
                                         <select id="classes" style={{ width: "70px", marginLeft: "4px" }}
-                                            onChange={(e) => setKhoiLop(e.target.value)}
+                                            onChange={(e) => setKhoiLop(parseInt(e.target.value))}
                                             defaultValue={document3Info?.claasName}
                                         >
                                             <option value="" disabled>Chọn lớp</option>

@@ -35,7 +35,7 @@ export const apiPostSubMenu5 = async (data: any) => {
 }
 
 export const apiUpdateSubMenu5 = async (data: any, docId: any) => {
-    const result = await axios.post(`${base_url}Document5/${docId}`, data);
+    const result = await axios.put(`${base_url}Document5/${docId}`, data);
     if (result)
         return result;
     else

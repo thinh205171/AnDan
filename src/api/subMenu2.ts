@@ -35,7 +35,7 @@ export const apiPostSubMenu2 = async (data: any) => {
 }
 
 export const apiPostSubMenu2Grade = async (data: any) => {
-    const result = await axios.put(`${base_url}Document2Grade`, data);
+    const result = await axios.post(`${base_url}Document2Grade`, data);
     if (result)
         return result;
     else

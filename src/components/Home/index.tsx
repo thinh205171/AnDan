@@ -117,7 +117,6 @@ const Home = () => {
                                                 <div className='sub-menu-content-detail image-container' onClick={() => navigate(`/sub-menu-2/detail-view/${subMenu2?.id}`)}
                                                     style={{ backgroundImage: subMenu2?.linkImage ? `url('${subMenu2?.linkImage}')` : `url('${imageurl}')` }}                                                >
                                                     <div className='sub-menu-subject-name'>
-                                                        TỔ {subMenu2.name.split('\n')[1].trim()}
                                                     </div>
                                                 </div>
                                             </Tooltip>
@@ -158,7 +157,6 @@ const Home = () => {
                                                     style={{ backgroundImage: subMenu3?.linkImage ? `url('${subMenu3?.linkImage}')` : `url('${imageurl}')` }}
                                                 >
                                                     <div className='sub-menu-subject-name'>
-                                                        {subMenu3.name.split('GIÁO DỤC')[2].trim()}
                                                     </div>
                                                 </div>
                                             </Tooltip>
