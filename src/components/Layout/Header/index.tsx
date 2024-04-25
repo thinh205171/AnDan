@@ -224,7 +224,7 @@ const Header = () => {
                         try {
                             await dispatch(loginUser({ username, password }));
                             setIsLogin(true)
-                            setOpenlogin(false)
+                            // setOpenlogin(false)
                         } catch (e) {
                             console.log(e);
                         }

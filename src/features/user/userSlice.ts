@@ -160,9 +160,13 @@ export const authSlice = createSlice({
             state.loginStatus = 4
           }
           else if (
-            action.payload.response?.data.status === LOGIN_STATUS.WRONG_PASSWORD
+            action.payload.response?.data === "Incorrect password."
           )
             alert("Sai mật khẩu")
+          else if (
+            action.payload.response?.data === "Account not found."
+          )
+            alert("Không có tài khoản")
         },
       );
   },
