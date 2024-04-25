@@ -15,6 +15,7 @@ const LOGIN_STATUS = {
 };
 
 const AUTHENTICATION_STATUS = {
+  NOT_LOGIN: 0,
   SUCCESS: 1,
   FAIL: 2,
 };
@@ -117,8 +118,8 @@ export const authSlice = createSlice({
         state.user = action.payload.res;
         state.loginStatus = 1;
         localStorage.setItem('token', action.payload.res);
-        // window.location.reload();
-        toast.success("User login successfully", { autoClose: 1500 });
+        window.location.reload();
+        alert("Đăng nhập thành công")
       })
       .addCase(checkAuthenticationUser.pending, (state) => {
         state.isLoading = true;
@@ -128,8 +129,11 @@ export const authSlice = createSlice({
         state.isError = false;
         state.isSuccess = true;
         state.user = action.payload.result;
-        state.loginStatus = 1;
-        toast.success("User login successfully", { autoClose: 1500 });
+        console.log("action.payload.result: ", action.payload.result)
+        if (action.payload.result) {
+          state.loginStatus = 1;
+          state.authStatus = 1;
+        }
       })
       .addCase(logoutUser.pending, (state) => {
         state.isLoading = true;
@@ -140,9 +144,6 @@ export const authSlice = createSlice({
         state.isSuccess = true;
         state.user = null;
         state.loginStatus = 0;
-        if (state.isSuccess === true) {
-          toast.success("User logout successfully", { autoClose: 1500 });
-        }
       })
       .addMatcher(
         (action) => action.type.endsWith("/rejected"),
@@ -161,7 +162,7 @@ export const authSlice = createSlice({
           else if (
             action.payload.response?.data.status === LOGIN_STATUS.WRONG_PASSWORD
           )
-            toast.error("Wrong password", { autoClose: 1500 });
+            alert("Sai mật khẩu")
         },
       );
   },

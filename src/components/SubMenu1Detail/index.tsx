@@ -1091,7 +1091,7 @@ const SubMenu1Detail = () => {
                                                         ))}
                                                     </TableBody>
                                                 </Table>
-                                            </TableContainer>
+                                            </TableContainer>chấp
                                         </div>
                                     </div>
                                 </div>
@@ -1119,13 +1119,13 @@ const SubMenu1Detail = () => {
                                                 className='action-button' onClick={handleClickCreate}>Tạo khung kế hoạch</div>
                                         }
                                         <div
-                                            style={{ display: user?.userId === userInfoDocument?.id ? "initial" : "none" }}
+                                            style={{ display: parseInt(user?.userId) === userInfoDocument?.id ? "initial" : "none" }}
                                             className='action-button' onClick={location.pathname.includes('add') ? handleClickAdd : handleClickSave}>
                                             {
                                                 location.pathname.includes('create') ? "Tạo mới" : "Sửa"
                                             }
                                         </div>
-                                        <div style={{ display: user?.userId === userInfoDocument?.id ? "initial" : "none" }} className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
+                                        <div style={{ display: parseInt(user?.userId) === userInfoDocument?.id ? "initial" : "none" }} className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                                     </div>
                                 </div>
                             </div>
@@ -1140,10 +1140,10 @@ const SubMenu1Detail = () => {
                             </div>
                             <div className="sub-menu-row">
                                 <div><strong>Người gửi: </strong> <u className='underline-blue'>{document1Info?.userFullName}</u></div>
+                                <div className='right-action' onClick={handleClickOpenReport}><strong><u className='underline-blue'>Báo cáo tài liệu có sai sót</u></strong></div>
+
                             </div>
                             <div className="sub-menu-row">
-                                <div><strong>Nguồn: </strong> https://baigiang.violet.vn</div>
-                                <div className='right-action' onClick={handleClickOpenReport}><strong><u className='underline-blue'>Báo cáo tài liệu có sai sót</u></strong></div>
                             </div>
                             <div className="sub-menu-row">
                                 <div><strong>Ngày gửi: </strong> {document1Info?.createdDate}</div>
@@ -1151,7 +1151,7 @@ const SubMenu1Detail = () => {
                         </div>
                         <div>
                             <div className="sub-menu-action">
-                                <div className="verify" style={{ display: user?.role === "Principle" ? "flex" : "none" }}>
+                                <div className="verify" style={{ display: (user?.role === "Principle" && document1Info?.isApprove === 2) ? "flex" : "none" }}>
                                     <span>Tình trạng thẩm định:</span>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
                                         <div className='action-button' onClick={handleClickOpenAccept}>Chấp thuận</div>

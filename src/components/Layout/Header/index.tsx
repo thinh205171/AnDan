@@ -8,33 +8,19 @@ import { checkAuthenticationUser, loginUser } from '../../../features/user/userS
 import { apiCheckVerifyPassword, apiPostSendEmail } from '../../../api/auth';
 
 const Header = () => {
-    const dispatch = useAppDispatch();
     const location = useLocation()
     const navigate = useNavigate()
+    const dispatch = useAppDispatch();
     const [isScrolling, setIsScrolling] = useState(false);
     const [openLogin, setOpenlogin] = useState(false);
     const [openRegister, setOpenRegister] = useState(false);
     const [openCode, setOpenCode] = useState(false);
     const [isLogin, setIsLogin] = useState(false)
     const loginStatus = useAppSelector(state => state.auth.loginStatus)
+    const authStatus = useAppSelector(state => state.auth.authStatus)
     // const [user, setUser] = useState<string | null>('');
+
     const user = useAppSelector(state => state.auth.user)
-    console.log("user: ", user)
-    useEffect(() => {
-        if (localStorage.getItem("token")) {
-            setIsLogin(true)
-        }
-    }, [])
-
-    // useEffect(() => {
-    //     if (!isLogin) {
-    //         alert("Bạn phải đăng nhập trước")
-    //         if (location.pathname !== '/')
-    //             navigate('/')
-    //         setOpenlogin(true)
-    //     }
-    // }, [isLogin, location.pathname, navigate])
-
 
     useEffect(() => {
         const verifyToken = async () => {
@@ -42,6 +28,19 @@ const Header = () => {
         }
         verifyToken()
     }, [dispatch, isLogin])
+
+    console.log(location.pathname.split('/'))
+
+    useEffect(() => {
+        if (authStatus === 1) {
+            setOpenlogin(false)
+        }
+        if (authStatus === 0) {
+            if (location.pathname !== '/')
+                navigate('/')
+            setOpenlogin(true)
+        }
+    }, [authStatus, location.pathname, navigate])
 
     useEffect(() => {
         if (loginStatus === 4) {
@@ -69,10 +68,7 @@ const Header = () => {
     };
 
     const handleLoginClose = () => {
-        if (!isLogin)
-            alert("Bạn chưa đăng nhập")
-        else
-            setOpenlogin(false);
+        setOpenlogin(false);
     };
 
     const handleRegisterClose = () => {
@@ -85,18 +81,12 @@ const Header = () => {
 
     const handleLogout = () => {
         localStorage.removeItem("token");
-        // window.location.reload();
+        window.location.reload();
         setIsLogin(false)
     }
 
     return (
         <div className={`header  ${isScrolling ? "scroll" : ""}`}>
-            {/* <NavLink to="/profile" className='user-profile'>
-                <span>Chào mừng User1</span> <ArrowDropDownOutlined style={{ color: "#B6B1B1", textDecoration: "none" }} />
-            </NavLink>
-            <div className='header-image'>
-                <img src="/banner.jpg" alt="banner" />
-            </div> */}
             <div className="container">
                 <div className="left-header">
                     <div className="logo-header">
@@ -158,7 +148,7 @@ const Header = () => {
                         </div>
                         <div className="item-header">
                             {
-                                !isLogin ? (
+                                !user ? (
                                     <div className="action-header">
                                         <button className="login" onClick={handleLoginClickOpen}>
                                             ĐĂNG NHẬP
@@ -185,7 +175,7 @@ const Header = () => {
                                                 <Container>
                                                     <ul>
                                                         <div style={{ borderBottom: "1px solid  #ccc", paddingTop: "12px" }}>
-                                                            <span style={{ fontSize: "16px", color: "#000" }}>{user?.username}</span>
+                                                            <span style={{ fontSize: "16px", color: "#000" }}>{user.username}</span>
                                                         </div>
                                                         <div style={{ borderBottom: "1px solid  #ccc", paddingTop: "12px" }}>
                                                             <Link to="/profile" style={{ fontSize: "16px" }}>Thông tin tài khoản</Link>
@@ -213,31 +203,6 @@ const Header = () => {
                         </div>
                     </div>
                 </div>
-                {/* <div className="hide-header">
-                    <div className="hide-header-button">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="32"
-                            height="32"
-                            fillRule="red"
-                            className="bi bi-list"
-                            viewBox="0 0 16 16"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
-                            />
-                        </svg>
-                    </div>
-                    <div className="hide-header-action">
-                        <button className="login-button hide-button-action">
-                            <Link to="/">Đăng nhập</Link>
-                        </button>
-                        <button className="hide-button-action">
-                            <Link to="/">Đăng ký</Link>
-                        </button>
-                    </div>
-                </div> */}
             </div>
             <Dialog
                 fullWidth={true}
@@ -305,7 +270,6 @@ const Header = () => {
                     </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleLoginClose}>Cancel</Button>
                     <Button type="submit">Login</Button>
                 </DialogActions>
             </Dialog>
@@ -380,13 +344,9 @@ const Header = () => {
                         try {
                             if (password !== cfPassword)
                                 alert("Confirm password not match")
-                            else {
-                                if (password && cfPassword && username && curPass) {
-                                    const res = await apiCheckVerifyPassword(null, { username: username, currentPassword: curPass, newPassword: password })
-                                    setOpenCode(false)
-                                    alert("Thay đổi mật khẩu thành công")
-                                    setOpenlogin(true)
-                                }
+                            if (password && cfPassword && username && curPass) {
+                                const res = await apiCheckVerifyPassword(null, { username: username, currentPassword: curPass, newPassword: password })
+                                setOpenCode(false)
                             }
                             handleRegisterClose();
                         } catch (e) {

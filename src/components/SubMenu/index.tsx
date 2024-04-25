@@ -96,6 +96,7 @@ const SubMenu = () => {
             fetchSpecializedDepartment()
         }
     }, [indexSubMenu])
+    const imageurl = 'https://png.pngtree.com/png-vector/20190701/ourlarge/pngtree-document-icon-for-your-project-png-image_1533118.jpg'
 
     const displayStyle = indexSubMenu === '3' || user?.role !== "Leader" ? 'none' : 'initial';
 
@@ -127,7 +128,11 @@ const SubMenu = () => {
                                     >
                                         {
                                             doc?.documents?.map((item: any, index: number) => (
-                                                <div key={index} className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-${indexSubMenu}/detail-view/${item?.id}`)}>
+                                                <div key={index} className='sub-menu-content-detail' onClick={() => navigate(`/sub-menu-${indexSubMenu}/detail-view/${item?.id}`)}
+                                                style={{ backgroundImage: item?.linkImage ? `url('${item?.linkImage}')` : `url('${imageurl}')` }}>
+                                                    <div className='sub-menu-subject-name'>
+                                                        {item.name}
+                                                    </div>
                                                 </div>
                                             ))
                                         }

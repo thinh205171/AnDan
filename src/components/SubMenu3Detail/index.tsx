@@ -347,7 +347,7 @@ const SubMenu3Detail = () => {
                 if (post) {
                     setDocumentId(post?.data?.id)
                     await apiPostNotification(
-                        principleAndTeacher?.principle
+                        [document1Info?.userId]
                         , {
                             userId: user?.userId,
                             titleName: `${post?.data?.name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
@@ -365,7 +365,7 @@ const SubMenu3Detail = () => {
             if (user) {
                 setOpen(true);
                 await apiPostNotification(
-                    principleAndTeacher?.principle
+                    [document1Info?.userId]
                     , {
                         userId: user?.userId,
                         titleName: `${document3Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
@@ -860,7 +860,7 @@ const SubMenu3Detail = () => {
                         <div>
                             <div className="sub-menu-action">
                                 <div className="verify" style={{ justifyContent: "center" }}>
-                                    <div style={{ display: user?.userId === userInfoDocument?.id ? "flex" : "none", columnGap: "10px" }}>
+                                    <div style={{ display: parseInt(user?.userId) === document3Info?.userId ? "flex" : "none", columnGap: "10px" }}>
                                         <div className='action-button' onClick={() => navigate(`/sub-menu-3/detail-edit/${location.pathname.split('/')[3]}`)}>Sửa</div>
                                         <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                                     </div>
@@ -890,7 +890,7 @@ const SubMenu3Detail = () => {
                             <div className="sub-menu-action">
                                 <div className="verify">
                                     <span>Tình trạng thẩm định:</span>
-                                    <div style={{ display: user?.userId === document1Info?.userId ? "flex" : "none", columnGap: "10px" }}>
+                                    <div style={{ display: parseInt(user?.userId) === document1Info?.userId ? "flex" : "none", columnGap: "10px" }}>
                                         <div className='action-button' onClick={handleClickOpenAccept}>Chấp thuận</div>
                                         <div className='action-button' onClick={handleClickOpenDeny}>Từ chối</div>
                                     </div>

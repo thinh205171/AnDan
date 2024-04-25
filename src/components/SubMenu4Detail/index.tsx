@@ -81,7 +81,7 @@ const SubMenu4Detail = () => {
             <div>
                 <div className="sub-menu-action">
                     <div className="verify" style={{ justifyContent: "center" }}>
-                        <div style={{ display: user?.userId === document4Info?.userId ? "flex" : "none", columnGap: "10px" }}>
+                        <div style={{ display: parseInt(user?.userId) === document4Info?.userId ? "flex" : "none", columnGap: "10px" }}>
                             <div className='action-button' onClick={handleClickEdit}>Sửa</div>
                             <div className='action-button' onClick={handleClickOpenRemove}>Xóa</div>
                         </div>

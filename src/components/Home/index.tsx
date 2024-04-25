@@ -54,9 +54,7 @@ const Home = () => {
                             <span>
                                 KẾ HOẠCH DẠY HỌC CỦA TỔ CHUYÊN MÔN MÔN HỌC/HOẠT ĐỘNG GIÁO DỤC
                             </span>
-                            <div className='add-row-button'>
-                                <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu1} />
-                            </div>
+                            
                         </div>
                         <div className="home-panel-content-sub-menu-item-content">
                             <Swiper
@@ -94,9 +92,7 @@ const Home = () => {
                             <span>
                                 KẾ HOẠCH TỔ CHỨC CÁC HOẠT ĐỘNG GIÁO DỤC CỦA TỔ CHUYÊN MÔN
                             </span>
-                            <div className='add-row-button'>
-                                <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu2} />
-                            </div>
+                            
                         </div>
                         <div className="home-panel-content-sub-menu-item-content">
                             <Swiper
@@ -134,9 +130,7 @@ const Home = () => {
                             <span>
                                 KẾ HOẠCH GIÁO DỤC CỦA GIÁO VIÊN
                             </span>
-                            <div className='add-row-button'>
-                                <Add style={{ color: "black" }} className='add-row-icon' onClick={handleAddSubMenu3} />
-                            </div>
+                            
                         </div>
                         <div className="home-panel-content-sub-menu-item-content">
                             <Swiper

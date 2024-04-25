@@ -755,7 +755,7 @@ const SubMenu2Detail = () => {
                         </div>
                         <div>
                             <div className="sub-menu-action">
-                                <div className="verify" style={{ display: user?.role === "Principle" ? "flex" : "none" }}>
+                                <div className="verify" style={{ display: (user?.role === "Principle" && document2Info?.isApprove===2)  ? "flex" : "none" }}>
                                     <span>Tình trạng thẩm định:</span>
                                     <div style={{ display: "flex", columnGap: "10px" }}>
                                         <div className='action-button' onClick={handleClickOpenAccept}>Chấp thuận</div>
