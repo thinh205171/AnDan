@@ -1,11 +1,15 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './style.scss'
 import { useEffect, useState } from 'react';
-import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Tooltip } from '@mui/material';
+import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Tooltip, List, ListItem, IconButton, Drawer, Collapse } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../hook/useTypedSelector';
 import { checkAuthenticationUser, loginUser } from '../../../features/user/userSlice';
 import { apiCheckVerifyPassword, apiPostSendEmail } from '../../../api/auth';
+import MenuIcon from '@mui/icons-material/Menu';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { ExpandLess, ExpandMore, Home, Book, Newspaper , Help } from '@mui/icons-material';
 
 const Header = () => {
     const location = useLocation()
@@ -19,6 +23,109 @@ const Header = () => {
     const loginStatus = useAppSelector(state => state.auth.loginStatus)
     const authStatus = useAppSelector(state => state.auth.authStatus)
     // const [user, setUser] = useState<string | null>('');
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
+        if (event.type === 'keydown' && (event as React.KeyboardEvent).key === 'Tab' || (event as React.KeyboardEvent).key === 'Shift') {
+            return;
+        }
+        setDrawerOpen(open);
+    };
+
+    const [open, setOpen] = useState(false);
+
+    const handleClick = () => {
+        setOpen(!open);
+    };
+
+    const handleAppendixClick = (event: React.KeyboardEvent | React.MouseEvent) => {
+        event.stopPropagation();
+        setOpenAppendix(!openAppendix);
+    };
+    
+    const handleNewsClick = (event: React.KeyboardEvent | React.MouseEvent) => {
+        event.stopPropagation();
+        setOpenNews(!openNews);
+    };
+
+    const [openAppendix, setOpenAppendix] = useState(false);
+    const [openNews, setOpenNews] = useState(false);
+    
+    const list = () => (
+        <div
+            role="presentation"
+            onClick={toggleDrawer(false)}
+            onKeyDown={toggleDrawer(false)}
+        >
+            <List >
+                {/* Add your menu items here */}
+                <ListItem button>
+                <Home />
+                    <Link to="/" style={{ color: 'black' }}>TRANG CHỦ</Link>
+                </ListItem>
+                <ListItem button onClick={() => setOpenAppendix(!openAppendix)}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                            <Book />
+                            <Link to="/" onClick={handleAppendixClick} style={{ color: 'black' }}>PHỤ LỤC</Link>
+                            {openAppendix ? <ExpandLessIcon onClick={handleAppendixClick} /> : <ExpandMoreIcon onClick={handleAppendixClick} />}
+                        </div>
+                        <Collapse in={openAppendix} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <ListItem button style={{ listStyleType: 'none', paddingLeft: '20px' }}>
+                                    <Link to="/sub-menu/1" style={{ color: 'black' }}>PHỤ LỤC 1</Link>
+                                </ListItem>
+                                <ListItem button style={{ listStyleType: 'none', paddingLeft: '20px' }}>
+                                    <Link to="/sub-menu/2" style={{ color: 'black' }}>PHỤ LỤC 2</Link>
+                                </ListItem>
+                                <ListItem button style={{ listStyleType: 'none', paddingLeft: '20px' }}>
+                                    <Link to="/sub-menu/3" style={{ color: 'black' }}>PHỤ LỤC 3</Link>
+                                </ListItem>
+                                <ListItem button style={{ listStyleType: 'none', paddingLeft: '20px' }}>
+                                    <Link to="/sub-menu/4" style={{ color: 'black' }}>PHỤ LỤC 4</Link>
+                                </ListItem>
+                            </List>
+                        </Collapse>
+                    </div>
+                </ListItem>
+                <ListItem button>
+                    <Book />
+                    <Link to="/bai-giang-scrom" style={{ color: 'black' }}>BÀI GIẢNG SCROM</Link>
+                </ListItem>
+                <ListItem button onClick={() => setOpenNews(!openNews)}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                            <Newspaper />
+                            <Link to="/" onClick={handleNewsClick} style={{ color: 'black' }}>TIN TỨC</Link>
+                            {openNews  ? <ExpandLessIcon onClick={handleNewsClick} /> : <ExpandMoreIcon onClick={handleNewsClick} />}
+                        </div>
+                        <Collapse in={openNews} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <ListItem button style={{ listStyleType: 'none', paddingLeft: '20px' }}>
+                                    <Link to="/" style={{ color: 'black' }}>TIN TỨC 1</Link>
+                                </ListItem>
+                                <ListItem button style={{ listStyleType: 'none', paddingLeft: '20px' }}>
+                                    <Link to="/" style={{ color: 'black' }}>TIN TỨC 2</Link>
+                                </ListItem>
+                                <ListItem button style={{ listStyleType: 'none', paddingLeft: '20px' }}>
+                                    <Link to="/" style={{ color: 'black' }}>TIN TỨC 3</Link>
+                                </ListItem>
+                                <ListItem button style={{ listStyleType: 'none', paddingLeft: '20px' }}>
+                                    <Link to="/" style={{ color: 'black' }}>TIN TỨC 4</Link>
+                                </ListItem>
+                            </List>
+                        </Collapse>
+                    </div>
+                </ListItem>
+
+                <ListItem button>
+                    <Help />
+                    <Link to="/" style={{ color: 'black' }}>HỖ TRỢ</Link>
+                </ListItem>
+                {/* ... */}
+            </List>
+        </div>
+    );
+
 
     const user = useAppSelector(state => state.auth.user)
 
@@ -101,6 +208,12 @@ const Header = () => {
                         <p>E-LESSON MANAGEMENT</p>
                     </div>
                 </div>
+                <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer(true)} className="hamburger-menu">
+                    <MenuIcon />
+                </IconButton>
+                <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
+                    {list()}
+                </Drawer>
                 <div className="right-header">
                     <div className="nav-list">
                         <div className="item-header">
@@ -224,7 +337,7 @@ const Header = () => {
                         try {
                             await dispatch(loginUser({ username, password }));
                             setIsLogin(true)
-                            // setOpenlogin(false)
+                            setOpenlogin(false)
                         } catch (e) {
                             console.log(e);
                         }

@@ -3,7 +3,7 @@ import { base_url } from "../utils/baseUrl"
 import axios from "axios";
 
 export const apiPostSendEmail = async (email: string): Promise<any> => {
-    const result = await axios.post(`${base_url}Account/SendMailResetPassword?mail=${email}`);
+    const result = await axios.post(`${base_url}SendMailResetPassword?mail=${email}`);
     if (result)
         return result;
     else
@@ -11,7 +11,7 @@ export const apiPostSendEmail = async (email: string): Promise<any> => {
 }
 
 export const apiCheckVerifyPassword = async (data: any, query: any): Promise<any> => {
-    const result = await axios.post(`${base_url}Account/CheckVerifyPassword`, data, { params: query });
+    const result = await axios.post(`${base_url}CheckVerifyPassword`, data, { params: query });
     if (result)
         return result;
     else

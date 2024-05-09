@@ -2,8 +2,8 @@ import { config } from "process";
 import { base_url } from "../utils/baseUrl"
 import axios from "axios";
 
-export const apiGetSubMenu1 = async () => {
-    const result = await axios.get(`${base_url}Document1`);
+export const apiGetSubMenu1 = async (data: any) => {
+    const result = await axios.get(`${base_url}Document1/GetAllDoc1sWithCondition`, { params: data });
     if (result)
         return result;
     else
@@ -11,7 +11,7 @@ export const apiGetSubMenu1 = async () => {
 }
 
 export const apiGetDocument1ByUserSpecialiedDepartment = async (query: any) => {
-    const result = await axios.get(`${base_url}Document1/GetDocument1ByUserSpecialiedDepartment?${query}`);
+    const result = await axios.get(`${base_url}Document1/GetDoc1ByUserDepartment?${query}`);
     if (result)
         return result;
     else
@@ -19,7 +19,7 @@ export const apiGetDocument1ByUserSpecialiedDepartment = async (query: any) => {
 }
 
 export const apiUpdateSubMenu1 = async (data: any) => {
-    const result = await axios.put(`${base_url}Document1`, data);
+    const result = await axios.put(`${base_url}Document1/UpdateDoc1`, data);
     if (result)
         return result;
     else
@@ -43,7 +43,7 @@ export const apiGetAllFormCategory = async () => {
 }
 
 export const apiGetSubMenu1ById = async (id: number) => {
-    const result = await axios.get(`${base_url}Document1/ById/${id}`);
+    const result = await axios.get(`${base_url}Document1/GetDoc1ById/${id}`);
     if (result)
         return result;
     else
@@ -51,7 +51,7 @@ export const apiGetSubMenu1ById = async (id: number) => {
 }
 
 export const apiPostSubMenu1 = async (data: any): Promise<any> => {
-    const result = await axios.post(`${base_url}Document1`, data);
+    const result = await axios.post(`${base_url}Document1/AddDoc1`, data);
     if (result)
         return result;
     else
@@ -59,7 +59,7 @@ export const apiPostSubMenu1 = async (data: any): Promise<any> => {
 }
 
 export const apiDeleteSubMenu1 = async (data: any) => {
-    const result = await axios.delete(`${base_url}Document1/${data}`);
+    const result = await axios.delete(`${base_url}Document1/DeleteDoc1/${data}`);
     if (result)
         return result;
     else
@@ -68,7 +68,7 @@ export const apiDeleteSubMenu1 = async (data: any) => {
 
 
 export const apiPostSubMenu1TeachingEquipment = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document1TeachingEquipment?documentId=${docId}`, data);
+    const result = await axios.put(`${base_url}Document1TeachingEquipment/AddDoc1TeachingEquipment`, data);
     if (result)
         return result;
     else
@@ -76,7 +76,7 @@ export const apiPostSubMenu1TeachingEquipment = async (data: any, docId: any) =>
 }
 
 export const apiPostSubMenu1CuriculumDistribution = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document1CuriculumDistribution?documentId=${docId}`, data);
+    const result = await axios.put(`${base_url}Document1CuriculumDistribution/AddDoc1Curiculum`, data);
     if (result)
         return result;
     else
@@ -84,7 +84,7 @@ export const apiPostSubMenu1CuriculumDistribution = async (data: any, docId: any
 }
 
 export const apiPostSubMenu1SelectedTopic = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document1SelectedTopic?documentId=${docId}`, data);
+    const result = await axios.put(`${base_url}Document1SelectedTopic/AddDoc1SelectedTopic`, data);
     if (result)
         return result;
     else
@@ -92,7 +92,7 @@ export const apiPostSubMenu1SelectedTopic = async (data: any, docId: any) => {
 }
 
 export const apiPostSubMenu1SubjectRooms = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document1SubjectRooms`, data);
+    const result = await axios.put(`${base_url}Document1SubjectRooms/AddDoc1SubjectRoom`, data);
     if (result)
         return result;
     else
@@ -100,7 +100,7 @@ export const apiPostSubMenu1SubjectRooms = async (data: any, docId: any) => {
 }
 
 export const apiPostSubMenu1PeriodicAssessment = async (data: any) => {
-    const result = await axios.put(`${base_url}Document1PeriodicAssessment/UpdateDocument1PeriodicAssessment`, data);
+    const result = await axios.put(`${base_url}Document1PeriodicAssessment/UpdateDoc1PeriodicAssessment`, data);
     if (result)
         return result;
     else
@@ -108,7 +108,7 @@ export const apiPostSubMenu1PeriodicAssessment = async (data: any) => {
 }
 
 export const apiGetTotalClassByGradeId = async (data: any) => {
-    const result = await axios.get(`${base_url}Document1/GetTotalClassByGradeId?gradeId=${data}`);
+    const result = await axios.get(`${base_url}Document1/GetTotalClassAndStudentByGradeId/${data}`);
     if (result)
         return result;
     else
@@ -116,7 +116,7 @@ export const apiGetTotalClassByGradeId = async (data: any) => {
 }
 
 export const apiGetTeacherInformation = async (data: any) => {
-    const result = await axios.get(`${base_url}Document1/GetTeacherInformation?specializedDepartmentId=${data}`);
+    const result = await axios.get(`${base_url}Document1/GetTeacherInformation/${data}`);
     if (result)
         return result;
     else
@@ -124,7 +124,7 @@ export const apiGetTeacherInformation = async (data: any) => {
 }
 
 export const apiGetDocument1ByDepartment = async (data: any) => {
-    const result = await axios.get(`${base_url}Document1/GetDocument1ByUserSpecialiedDepartment?specialDepartmentId=${data}`);
+    const result = await axios.get(`${base_url}Document1/GetDoc1ByUserDepartment?${data}`);
     if (result)
         return result;
     else
@@ -133,7 +133,7 @@ export const apiGetDocument1ByDepartment = async (data: any) => {
 
 
 export const apiGetCurriculumDistributionByDoc1Id = async (docId: any) => {
-    const result = await axios.get(`${base_url}Document1CuriculumDistribution/${docId}`);
+    const result = await axios.get(`${base_url}Document1CuriculumDistribution/GetDoc1CuriculumByDoc1ID/${docId}`);
     if (result)
         return result;
     else
@@ -141,7 +141,7 @@ export const apiGetCurriculumDistributionByDoc1Id = async (docId: any) => {
 }
 
 export const apiGetSubjectsRoomByDoc1Id = async (docId: any) => {
-    const result = await axios.get(`${base_url}Document1SubjectRooms?id=${docId}`);
+    const result = await axios.get(`${base_url}Document1SubjectRooms/GetDoc1SubjectRoomByDoc1ID?id=${docId}`);
     if (result)
         return result;
     else
@@ -149,7 +149,7 @@ export const apiGetSubjectsRoomByDoc1Id = async (docId: any) => {
 }
 
 export const apiGetTeachingEquipmentByDoc1Id = async (docId: any) => {
-    const result = await axios.get(`${base_url}Document1TeachingEquipment?id=${docId}`);
+    const result = await axios.get(`${base_url}Document1TeachingEquipment/GetDoc1TeachingEquipmentByDoc1ID?id=${docId}`);
     if (result)
         return result;
     else
@@ -157,7 +157,7 @@ export const apiGetTeachingEquipmentByDoc1Id = async (docId: any) => {
 }
 
 export const apiGetPeriodicAssessmentByDoc1Id = async (docId: any) => {
-    const result = await axios.get(`${base_url}Document1PeriodicAssessment/GetDocument1PeriodicAssessmentByDocument1ID/${docId}`);
+    const result = await axios.get(`${base_url}Document1PeriodicAssessment/GetDoc1PeriodicAssessmentByDocument1ID/${docId}`);
     if (result)
         return result;
     else
@@ -165,7 +165,7 @@ export const apiGetPeriodicAssessmentByDoc1Id = async (docId: any) => {
 }
 
 export const apiGetSelectedTopicByDoc1Id = async (docId: any) => {
-    const result = await axios.get(`${base_url}Document1SelectedTopic/${docId}`);
+    const result = await axios.get(`${base_url}Document1SelectedTopic/GetDoc1SelectedTopicByDoc1ID/${docId}`);
     if (result)
         return result;
     else
@@ -173,7 +173,7 @@ export const apiGetSelectedTopicByDoc1Id = async (docId: any) => {
 }
 
 export const apiDeleteDocument1ForeignTableByDocument1ID = async (docId: any) => {
-    const result = await axios.delete(`${base_url}Document1/DeleteDocument1ForeignTableByDocument1ID?id=${docId}`);
+    const result = await axios.delete(`${base_url}Document1/DeleteDoc1ForeignTableByDoc1ID?id=${docId}`);
     if (result)
         return result;
     else

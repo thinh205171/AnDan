@@ -2,8 +2,8 @@ import { config } from "process";
 import { base_url } from "../utils/baseUrl"
 import axios from "axios";
 
-export const apiGetSubMenu3 = async () => {
-    const result = await axios.get(`${base_url}Document3`);
+export const apiGetSubMenu3 = async (data: any) => {
+    const result = await axios.get(`${base_url}Document3/GetAllDoc3sWithCondition`, { params: data });
     if (result)
         return result;
     else
@@ -11,7 +11,7 @@ export const apiGetSubMenu3 = async () => {
 }
 
 export const apiGetDocument3ByUserSpecialiedDepartment = async (query: any) => {
-    const result = await axios.get(`${base_url}Document3/GetDocument3ByUserSpecialiedDepartment?${query}`);
+    const result = await axios.get(`${base_url}Document3/GetDoc3ByUserDepartment?${query}`);
     if (result)
         return result;
     else
@@ -19,7 +19,7 @@ export const apiGetDocument3ByUserSpecialiedDepartment = async (query: any) => {
 }
 
 export const apiGetSubMenu3ById = async (id: string) => {
-    const result = await axios.get(`${base_url}Document3/ById/${id}`);
+    const result = await axios.get(`${base_url}Document3/GetDoc3ById/${id}`);
     if (result)
         return result;
     else
@@ -27,7 +27,7 @@ export const apiGetSubMenu3ById = async (id: string) => {
 }
 
 export const apiPostSubMenu3 = async (data: any) => {
-    const result = await axios.post(`${base_url}Document3`, data);
+    const result = await axios.post(`${base_url}Document3/AddDocument3`, data);
     if (result)
         return result;
     else
@@ -35,7 +35,7 @@ export const apiPostSubMenu3 = async (data: any) => {
 }
 
 export const apiDeleteSubMenu3 = async (docId: any) => {
-    const result = await axios.delete(`${base_url}Document3/${docId}`);
+    const result = await axios.delete(`${base_url}Document3/DeleteDoc3/${docId}`);
     if (result)
         return result;
     else
@@ -43,7 +43,7 @@ export const apiDeleteSubMenu3 = async (docId: any) => {
 }
 
 export const apiUpdateSubMenu3 = async (data: any, id: any) => {
-    const result = await axios.put(`${base_url}Document3/${id}`, data);
+    const result = await axios.put(`${base_url}Document3/UpdateDoc3`, data);
     if (result)
         return result;
     else
@@ -51,7 +51,7 @@ export const apiUpdateSubMenu3 = async (data: any, id: any) => {
 }
 
 export const apiPostSubMenu3CuriculumDistribution = async (data: any) => {
-    const result = await axios.put(`${base_url}Document3CuriculumDistribution`, data);
+    const result = await axios.put(`${base_url}Document3CuriculumDistribution/AddDoc3CurriculumDistribution`, data);
     if (result)
         return result;
     else
@@ -59,7 +59,7 @@ export const apiPostSubMenu3CuriculumDistribution = async (data: any) => {
 }
 
 export const apiPostSubMenu3SelectedTopics = async (data: any) => {
-    const result = await axios.put(`${base_url}Document3SelectedTopics`, data);
+    const result = await axios.put(`${base_url}Document3SelectedTopics/AddDocument3SelectedTopics`, data);
     if (result)
         return result;
     else
@@ -68,7 +68,7 @@ export const apiPostSubMenu3SelectedTopics = async (data: any) => {
 
 
 export const apiGetSubMenu3CuriculumDistribution = async (docId: any) => {
-    const result = await axios.get(`${base_url}Document3CuriculumDistribution?id=${docId}`);
+    const result = await axios.get(`${base_url}Document3CuriculumDistribution/GetAllByDoc3ID/${docId}`);
     if (result)
         return result;
     else
@@ -76,7 +76,7 @@ export const apiGetSubMenu3CuriculumDistribution = async (docId: any) => {
 }
 
 export const apiGetSubMenu3SelectedTopics = async (docId: any) => {
-    const result = await axios.get(`${base_url}Document3SelectedTopics?id=${docId}`);
+    const result = await axios.get(`${base_url}Document3SelectedTopics/GetDoc3SelectedTopicsByDoc3ID/${docId}`);
     if (result)
         return result;
     else
@@ -84,7 +84,7 @@ export const apiGetSubMenu3SelectedTopics = async (docId: any) => {
 }
 
 export const apiDeleteDocument3ForeignTableByDocument3ID = async (docId: any) => {
-    const result = await axios.delete(`${base_url}Document3/DeleteDocument3ForeignTableByDocument3Id?id=${docId}`);
+    const result = await axios.delete(`${base_url}Document3/DeleteDoc3ForeignTableByDoc3Id/${docId}`);
     if (result)
         return result;
     else

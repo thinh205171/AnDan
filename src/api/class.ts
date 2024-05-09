@@ -3,7 +3,7 @@ import { base_url } from "../utils/baseUrl"
 import axios from "axios";
 
 export const apiGetAllClass = async () => {
-    const result = await axios.get(`${base_url}Class`);
+    const result = await axios.get(`${base_url}Class/GetAllClasses`);
     if (result)
         return result;
     else

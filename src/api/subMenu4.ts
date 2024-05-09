@@ -2,8 +2,8 @@ import { config } from "process";
 import { base_url } from "../utils/baseUrl"
 import axios from "axios";
 
-export const apiGetSubMenu4 = async () => {
-    const result = await axios.get(`${base_url}Document4`);
+export const apiGetSubMenu4 = async (data: any) => {
+    const result = await axios.get(`${base_url}Document4/GetAllDoc4sWithCondition`, { params: data });
     if (result)
         return result;
     else
@@ -19,7 +19,7 @@ export const apiGetDocument4ByUserSpecialiedDepartment = async (query: any) => {
 }
 
 export const apiGetSubMenu4ById = async (id: string) => {
-    const result = await axios.get(`${base_url}Document4/ById/${id}`);
+    const result = await axios.get(`${base_url}Document4/GetDoc4ById/${id}`);
     if (result)
         return result;
     else
@@ -36,7 +36,7 @@ export const apiGetSubMenu4infoById = async (id: string) => {
 
 
 export const apiPostSubMenu4 = async (data: any): Promise<any> => {
-    const result = await axios.post(`${base_url}Document4`, data);
+    const result = await axios.post(`${base_url}Document4/AddDocument4`, data);
     if (result)
         return result;
     else
@@ -44,7 +44,7 @@ export const apiPostSubMenu4 = async (data: any): Promise<any> => {
 }
 
 export const apiDeleteSubMenu4 = async (docId: any) => {
-    const result = await axios.delete(`${base_url}Document4/${docId}`);
+    const result = await axios.delete(`${base_url}Document4/DeleteDoc4/${docId}`);
     if (result)
         return result;
     else
@@ -52,7 +52,7 @@ export const apiDeleteSubMenu4 = async (docId: any) => {
 }
 
 export const apiUpdateSubMenu4 = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document4/${docId}`, data);
+    const result = await axios.put(`${base_url}Document4`, data);
     if (result)
         return result;
     else
