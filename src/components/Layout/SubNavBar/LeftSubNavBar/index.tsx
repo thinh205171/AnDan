@@ -28,7 +28,6 @@ const LeftSubNavBar = () => {
     const getDepartmentHandler = async () => {
       await apiGetSpecializedDepartment().then((res) => {
         setDepts(res.data);
-        console.log(res.data);
       });
     };
 

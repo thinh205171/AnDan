@@ -214,7 +214,6 @@ const ApproveList = () => {
 
     const user = useAppSelector(state => state.auth.user)
     const [userRole, setuserRole] = React.useState();
-    console.log("userRole: ", userRole)
     React.useEffect(() => {
         const fetchuserRole = async () => {
             if (user) {
@@ -233,7 +232,6 @@ const ApproveList = () => {
     }, [user])
 
     const [userInfo, setUserInfo] = useState<Document1[]>([]);
-    console.log("userInfo: ", userInfo)
     useEffect(() => {
         const fetchAllUser = async () => {
             const res = await apiGetDoc();

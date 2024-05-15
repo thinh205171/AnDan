@@ -271,9 +271,10 @@ const SubMenu3Detail = () => {
             const fecthUserResult = await apiGetUser(doc1Data?.userId);
             if (fecthUserResult && fecthUserResult.data) {
               const userData: any = fecthUserResult.data;
+              console.log("userData: ", userData)
               setUserInfoDocument(userData);
               const res = await apiGetSpecializedDepartmentById(
-                userData?.specializedDepartmentId
+                userData?.departmentId
               );
               if (res && res.data) {
                 const departmentData: any = res.data;

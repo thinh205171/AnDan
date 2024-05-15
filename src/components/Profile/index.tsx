@@ -113,7 +113,6 @@ const Profile = () => {
                             window.location.reload()
                             setOpenEdit(!openEdit)
                         } catch (e) {
-                            console.log(e);
                         }
                     },
                 }}
@@ -184,7 +183,6 @@ const Profile = () => {
                                 setOpenCode(false)
                             }
                         } catch (e) {
-                            console.log(e);
                             alert("Something went wrong")
                         }
                     },

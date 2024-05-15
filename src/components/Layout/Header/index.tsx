@@ -9,7 +9,7 @@ import { apiCheckVerifyPassword, apiPostSendEmail } from '../../../api/auth';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { ExpandLess, ExpandMore, Home, Book, Newspaper , Help } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, Home, Book, Newspaper, Help } from '@mui/icons-material';
 
 const Header = () => {
     const location = useLocation()
@@ -41,7 +41,7 @@ const Header = () => {
         event.stopPropagation();
         setOpenAppendix(!openAppendix);
     };
-    
+
     const handleNewsClick = (event: React.KeyboardEvent | React.MouseEvent) => {
         event.stopPropagation();
         setOpenNews(!openNews);
@@ -49,7 +49,7 @@ const Header = () => {
 
     const [openAppendix, setOpenAppendix] = useState(false);
     const [openNews, setOpenNews] = useState(false);
-    
+
     const list = () => (
         <div
             role="presentation"
@@ -59,7 +59,7 @@ const Header = () => {
             <List >
                 {/* Add your menu items here */}
                 <ListItem button>
-                <Home />
+                    <Home />
                     <Link to="/" style={{ color: 'black' }}>TRANG CHỦ</Link>
                 </ListItem>
                 <ListItem button onClick={() => setOpenAppendix(!openAppendix)}>
@@ -96,7 +96,7 @@ const Header = () => {
                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                             <Newspaper />
                             <Link to="/" onClick={handleNewsClick} style={{ color: 'black' }}>TIN TỨC</Link>
-                            {openNews  ? <ExpandLessIcon onClick={handleNewsClick} /> : <ExpandMoreIcon onClick={handleNewsClick} />}
+                            {openNews ? <ExpandLessIcon onClick={handleNewsClick} /> : <ExpandMoreIcon onClick={handleNewsClick} />}
                         </div>
                         <Collapse in={openNews} timeout="auto" unmountOnExit>
                             <List component="div" disablePadding>
@@ -135,8 +135,6 @@ const Header = () => {
         }
         verifyToken()
     }, [dispatch, isLogin])
-
-    console.log(location.pathname.split('/'))
 
     useEffect(() => {
         if (authStatus === 1) {

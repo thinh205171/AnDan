@@ -129,7 +129,6 @@ export const authSlice = createSlice({
         state.isError = false;
         state.isSuccess = true;
         state.user = action.payload.result;
-        console.log("action.payload.result: ", action.payload.result)
         if (action.payload.result) {
           state.loginStatus = 1;
           state.authStatus = 1;
@@ -152,7 +151,6 @@ export const authSlice = createSlice({
           state.isError = true;
           state.isSuccess = false;
           state.message = action.error;
-          console.log(action.payload.response);
           if (
             action.payload.response.data === "Please change your password on first login."
           ) {

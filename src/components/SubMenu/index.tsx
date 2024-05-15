@@ -34,7 +34,7 @@ const SubMenu = () => {
   const handleAddSubMenu = () => {
     navigate(`/sub-menu-${indexSubMenu}/detail-create`)
   }
-
+  console.log("user: ", user)
   useEffect(() => {
     if (indexSubMenu === "1")
       setSubMenuName(
@@ -85,8 +85,6 @@ const SubMenu = () => {
     fetchList();
   }, [indexSubMenu, specializedDepartmentId]);
 
-  console.log("subMenu1Data: ", subMenu1Data);
-
   useEffect(() => {
     if (indexSubMenu !== "5") {
       const fetchSpecializedDepartment = async () => {
@@ -124,7 +122,7 @@ const SubMenu = () => {
                     <Add style={{ color: "black", display: `${displayStyle}` }}
                       className='add-row-icon' onClick={handleAddSubMenu} />
                     :
-                    <Add style={{ color: "black", display: user?.role !== "Teacher" ? "none" : "initial" }} className='add-row-icon' onClick={() => navigate('/upload-sub-menu-4')} />
+                    <Add style={{ color: "black", display: user?.role !== "Leader" ? "none" : "initial" }} className='add-row-icon' onClick={() => navigate('/upload-sub-menu-4')} />
                 }
               </div>
             </div>

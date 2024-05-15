@@ -11,6 +11,6 @@ export interface User {
     placeOfBirth: string,
     age: number,
     levelOfTrainningId: number,
-    specializedDepartmentId: number,
+    departmentId: number,
     accountId: number,
 }

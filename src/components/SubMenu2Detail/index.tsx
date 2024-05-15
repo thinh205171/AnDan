@@ -255,7 +255,7 @@ const SubMenu2Detail = () => {
       if (!location.pathname.split("/")[3]) {
         if (userInfoLogin) {
           const res = await apiGetSpecializedDepartmentById(
-            userInfoLogin?.specializedDepartmentId
+            userInfoLogin?.departmentId
           );
           if (res && res.data) {
             const departmentData: any = res.data;
@@ -274,7 +274,7 @@ const SubMenu2Detail = () => {
             const userData: any = fecthUserResult.data;
             setUserInfoDocument(userData);
             const res = await apiGetSpecializedDepartmentById(
-              userData?.specializedDepartmentId
+              userData?.departmentId
             );
             if (res && res.data) {
               const departmentData: any = res.data;
@@ -516,11 +516,9 @@ const SubMenu2Detail = () => {
       accumulator.push(...currentValue);
       return accumulator;
     }, []);
-    console.log("flattenedRows: ", flattenedRows);
     const rowsWithDocumentId = flattenedRows.map((row) => {
       return { ...row, document2Id: documentId };
     });
-    console.log("rowsWithDocumentId: ", rowsWithDocumentId);
 
     if (rowsWithDocumentId) {
       try {
@@ -539,7 +537,7 @@ const SubMenu2Detail = () => {
   return (
     <div className="sub-menu-container">
       {location.pathname?.includes("edit") ||
-      location.pathname?.includes("create") ? (
+        location.pathname?.includes("create") ? (
         <div>
           <div className="sub-menu-content" id="main-content">
             <div className="sub-menu-content-header">

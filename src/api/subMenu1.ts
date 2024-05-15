@@ -68,7 +68,7 @@ export const apiDeleteSubMenu1 = async (data: any) => {
 
 
 export const apiPostSubMenu1TeachingEquipment = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document1TeachingEquipment/AddDoc1TeachingEquipment`, data);
+    const result = await axios.post(`${base_url}Document1TeachingEquipment/AddDoc1TeachingEquipment`, data);
     if (result)
         return result;
     else
@@ -76,7 +76,7 @@ export const apiPostSubMenu1TeachingEquipment = async (data: any, docId: any) =>
 }
 
 export const apiPostSubMenu1CuriculumDistribution = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document1CuriculumDistribution/AddDoc1Curiculum`, data);
+    const result = await axios.post(`${base_url}Document1CuriculumDistribution/AddDoc1Curiculum`, data);
     if (result)
         return result;
     else
@@ -84,7 +84,7 @@ export const apiPostSubMenu1CuriculumDistribution = async (data: any, docId: any
 }
 
 export const apiPostSubMenu1SelectedTopic = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document1SelectedTopic/AddDoc1SelectedTopic`, data);
+    const result = await axios.post(`${base_url}Document1SelectedTopic/AddDoc1SelectedTopic`, data);
     if (result)
         return result;
     else
@@ -92,7 +92,7 @@ export const apiPostSubMenu1SelectedTopic = async (data: any, docId: any) => {
 }
 
 export const apiPostSubMenu1SubjectRooms = async (data: any, docId: any) => {
-    const result = await axios.put(`${base_url}Document1SubjectRooms/AddDoc1SubjectRoom`, data);
+    const result = await axios.post(`${base_url}Document1SubjectRooms/AddDoc1SubjectRoom`, data);
     if (result)
         return result;
     else
@@ -100,7 +100,7 @@ export const apiPostSubMenu1SubjectRooms = async (data: any, docId: any) => {
 }
 
 export const apiPostSubMenu1PeriodicAssessment = async (data: any) => {
-    const result = await axios.put(`${base_url}Document1PeriodicAssessment/UpdateDoc1PeriodicAssessment`, data);
+    const result = await axios.post(`${base_url}Document1PeriodicAssessment/UpdateDoc1PeriodicAssessment`, data);
     if (result)
         return result;
     else
