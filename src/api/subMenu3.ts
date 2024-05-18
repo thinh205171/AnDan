@@ -27,7 +27,7 @@ export const apiGetSubMenu3ById = async (id: string) => {
 }
 
 export const apiPostSubMenu3 = async (data: any) => {
-    const result = await axios.post(`${base_url}Document3/AddDocument3`, data);
+    const result = await axios.post(`${base_url}Document3/AddDoc3`, data);
     if (result)
         return result;
     else

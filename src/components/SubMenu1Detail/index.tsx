@@ -72,6 +72,7 @@ import { TeacherInfo } from "../../models/teacherInfo";
 import { options } from "../UploadPhuLuc4";
 import axios from "axios";
 import { textAlign } from "html2canvas/dist/types/css/property-descriptors/text-align";
+import { apiGetListIdOfTeacherAndPricipleByDepartmentId, apiPostNotification } from "../../api/notification";
 
 interface Row1 {
   teachingEquipmentId: number | null;
@@ -134,7 +135,7 @@ const defaultRows: Row5[] = [
   },
   {
     testingCategoryName: "Cuối Học kỳ 2",
-    testingCategoryId: 14,
+    testingCategoryId: 4,
     time: null,
     date: "",
     description: "",
@@ -205,6 +206,24 @@ const SubMenu1Detail = () => {
   const [chuaDat, setChuaDat] = useState("");
   const [documentId, setDocumentId] = useState<number | null>(null);
   const [document1Info, setDocument1Info] = useState<Document1>();
+  const [principleAndTeacher, setPrincipleAndTeacher] = useState<any>();
+  const [hostByList, setHostByList] = useState<any>();
+
+  console.log("principleAndTeacher: ", principleAndTeacher)
+
+  useEffect(() => {
+    const fecthPrincipleAndTeacher = async () => {
+      if (specializedDepartment?.id) {
+        const res = await apiGetListIdOfTeacherAndPricipleByDepartmentId(
+          specializedDepartment?.id
+        );
+        if (res && res.data) {
+          const resData: any = res.data;
+          setPrincipleAndTeacher(resData);
+        }
+      }
+    };
+  })
 
   const getTargetElement = () => document.getElementById("main-content");
 
@@ -500,11 +519,27 @@ const SubMenu1Detail = () => {
         });
         if (post) {
           setDocumentId(post?.data?.id);
+          await apiPostNotification({
+            receiveBy: principleAndTeacher?.principle || [],
+            sentBy: user?.userId,
+            titleName: `${post?.data?.name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
+            message: `${post?.data?.name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
+            docType: 1,
+            docId: post?.data?.id,
+          });
         }
       } else alert("Nhập đầy đủ thông tin!");
     } else {
       if (khoiLop && user && hoadDong) {
         setOpen(true);
+        await apiPostNotification({
+          receiveBy: principleAndTeacher?.principle || [],
+          sentBy: user?.userId,
+          titleName: `${document1Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
+          message: `${document1Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
+          docType: 1,
+          docId: document1Info?.id,
+        });
       } else alert("Nhập đầy đủ thông tin!");
     }
   };
@@ -1857,6 +1892,22 @@ const SubMenu1Detail = () => {
                   userId: document1Info?.userId,
                   isApprove: 3,
                   approveBy: user?.userId,
+                });
+                await apiPostNotification({
+                  receiveBy: [document1Info?.userId] || [],
+                  sentBy: user?.userId,
+                  titleName: `${document1Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
+                  message: `${document1Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
+                  docType: 1,
+                  docId: document1Info?.id,
+                });
+                await apiPostNotification({
+                  receiveBy: hostByList || [],
+                  sentBy: user?.userId,
+                  titleName: `${document1Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN, HÃY TẠO KHUNG KẾ HOẠCH`,
+                  message: `${document1Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN, HÃY TẠO KHUNG KẾ HOẠCH`,
+                  docType: 1,
+                  docId: document1Info?.id,
                 });
               } catch (error) {
                 alert("Không thể xét duyệt");

@@ -2,8 +2,8 @@ import { config } from "process";
 import { base_url } from "../utils/baseUrl"
 import axios from "axios";
 
-export const apiPostNotification = async (data: any, query: any) => {
-    const result = await axios.post(`${base_url}Notification/AddNotification`, data, { params: query });
+export const apiPostNotification = async (data: any) => {
+    const result = await axios.post(`${base_url}Notification/AddNotification`, [data]);
     if (result)
         return result;
     else

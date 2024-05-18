@@ -73,5 +73,12 @@ export const apiDeleteDocument2GradeByDocument2Id = async (docId: any) => {
     else
         return null;
 }
-
+export const apiGetUserHostBy = async (data: number): Promise<any> => {
+    const result = await axios.get(`${base_url}Document2/GetUserByDepId?depIds=${data}`);
+    console.log("result: ", result)
+    if (result)
+        return result;
+    else
+        return null;
+}
 

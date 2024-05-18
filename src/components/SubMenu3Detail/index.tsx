@@ -447,8 +447,9 @@ const SubMenu3Detail = () => {
         });
         if (post) {
           setDocumentId(post?.data?.id);
-          await apiPostNotification([document1Info?.userId], {
-            userId: user?.userId,
+          await apiPostNotification({
+            receiveBy: [document1Info?.userId] || [],
+            sentBy: user?.userId,
             titleName: `${post?.data?.name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
             message: `${post?.data?.name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
             docType: 3,
@@ -459,8 +460,9 @@ const SubMenu3Detail = () => {
     } else {
       if (user) {
         setOpen(true);
-        await apiPostNotification([document1Info?.userId], {
-          userId: user?.userId,
+        await apiPostNotification({
+          receiveBy: [document1Info?.userId] || [],
+          sentBy: user?.userId,
           titleName: `${document3Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
           message: `${document3Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
           docType: 3,
@@ -1607,8 +1609,9 @@ const SubMenu3Detail = () => {
                     },
                     document3Info?.id
                   );
-                  await apiPostNotification([document3Info?.userId], {
-                    userId: user?.userId,
+                  await apiPostNotification({
+                    receiveBy: [document3Info?.userId] || [],
+                    sentBy: user?.userId,
                     titleName: `${document3Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
                     message: `${document3Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
                     docType: 3,
@@ -1666,8 +1669,9 @@ const SubMenu3Detail = () => {
                     },
                     document3Info?.id
                   );
-                  await apiPostNotification([document3Info?.userId], {
-                    userId: user?.userId,
+                  await apiPostNotification({
+                    receiveBy: [document3Info?.userId] || [],
+                    sentBy: user?.userId,
                     titleName: `${document3Info?.name} ĐÃ BỊ TỪ CHỐI, HÃY ĐĂNG TẢI LẠI`,
                     message: `${document3Info?.name} ĐÃ BỊ TỪ CHỐI, HÃY ĐĂNG TẢI LẠI`,
                     docType: 3,

@@ -26,6 +26,7 @@ import { apiGetSelectedTopic } from "../../api/selectedTopic";
 import { SelectedTopic } from "../../models/SelectedTopic";
 import { User } from "../../models/User";
 import { apiGetAllGetUser, apiGetUser } from "../../api/user";
+import { apiGetUserHostBy } from "../../api/subMenu2";
 import { Grade } from "../../models/grade";
 import { apiGetGrade } from "../../api/grade";
 import { useAppSelector } from "../../hook/useTypedSelector";
@@ -250,6 +251,7 @@ const SubMenu2Detail = () => {
     }
   };
 
+
   useEffect(() => {
     const fetchSpecializedDepartmentById = async () => {
       if (!location.pathname.split("/")[3]) {
@@ -289,10 +291,12 @@ const SubMenu2Detail = () => {
 
   useEffect(() => {
     const fetchAllUser = async () => {
-      const res = await apiGetAllGetUser();
-      if (res && res.data) {
-        const usersData: User[] = res.data;
-        setUsers(usersData);
+      if (userInfoLogin) {
+        const res = await apiGetUserHostBy(userInfoLogin?.departmentId);
+        if (res && res.data) {
+          const usersData: User[] = res.data;
+          setUsers(usersData);
+        }
       }
     };
 
@@ -306,7 +310,7 @@ const SubMenu2Detail = () => {
 
     fetchAllUser();
     fetchGrades();
-  }, []);
+  }, [userInfoLogin]);
 
   const handleClickOpen = async () => {
     setDisplayAddRow(!displayAddRow);
@@ -331,8 +335,9 @@ const SubMenu2Detail = () => {
           ]);
           if (post) {
             setDocumentId(post?.data[0]?.id);
-            await apiPostNotification(principleAndTeacher?.principle, {
-              userId: user?.userId,
+            await apiPostNotification({
+              receiveBy: principleAndTeacher?.principle || [],
+              sentBy: user?.userId,
               titleName: `${post?.data[0].name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
               message: `${post?.data[0].name} ĐÃ ĐƯỢC ĐĂNG TẢI, HÃY XÉT DUYỆT`,
               docType: 2,
@@ -346,8 +351,9 @@ const SubMenu2Detail = () => {
     } else {
       if (user) {
         setOpen(true);
-        await apiPostNotification(principleAndTeacher?.principle, {
-          userId: user?.userId,
+        await apiPostNotification({
+          receiveBy: principleAndTeacher?.principle || [],
+          sentBy: user?.userId,
           titleName: `${document2Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
           message: `${document2Info?.name} ĐÃ ĐƯỢC CHỈNH SỬA, HÃY XÉT DUYỆT`,
           docType: 2,
@@ -831,7 +837,7 @@ const SubMenu2Detail = () => {
                                       </option>
                                       {users?.map((item) => (
                                         <option value={item?.id}>
-                                          {item?.fullName}
+                                          {item?.name}
                                         </option>
                                       ))}
                                     </select>
@@ -1269,15 +1275,17 @@ const SubMenu2Detail = () => {
                   },
                   document2Info?.id
                 );
-                await apiPostNotification([document2Info?.userId], {
-                  userId: user?.userId,
+                await apiPostNotification({
+                  receiveBy: [document2Info?.userId] || [],
+                  sentBy: user?.userId,
                   titleName: `${document2Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
                   message: `${document2Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN`,
                   docType: 2,
                   docId: document2Info?.id,
                 });
-                await apiPostNotification(hostByList, {
-                  userId: user?.userId,
+                await apiPostNotification({
+                  receiveBy: hostByList || [],
+                  sentBy: user?.userId,
                   titleName: `${document2Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN, HÃY TẠO KHUNG KẾ HOẠCH`,
                   message: `${document2Info?.name} ĐÃ ĐƯỢC CHẤP NHẬN, HÃY TẠO KHUNG KẾ HOẠCH`,
                   docType: 2,
@@ -1334,8 +1342,9 @@ const SubMenu2Detail = () => {
                   },
                   document2Info?.id
                 );
-                await apiPostNotification([document2Info?.userId], {
-                  userId: user?.userId,
+                await apiPostNotification({
+                  receiveBy: [document2Info?.userId] || [],
+                  sentBy: user?.userId,
                   titleName: `${document2Info?.name} ĐÃ BỊ TỪ CHỐI HÃY ĐĂNG TẢI LẠI`,
                   message: `${document2Info?.name} ĐÃ BỊ TỪ CHỐI HÃY ĐĂNG TẢI LẠI`,
                   docType: 2,

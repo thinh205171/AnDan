@@ -100,7 +100,7 @@ export const apiPostSubMenu1SubjectRooms = async (data: any, docId: any) => {
 }
 
 export const apiPostSubMenu1PeriodicAssessment = async (data: any) => {
-    const result = await axios.post(`${base_url}Document1PeriodicAssessment/UpdateDoc1PeriodicAssessment`, data);
+    const result = await axios.put(`${base_url}Document1PeriodicAssessment/UpdateDoc1PeriodicAssessment`, data);
     if (result)
         return result;
     else
