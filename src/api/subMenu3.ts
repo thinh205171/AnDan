@@ -68,7 +68,7 @@ export const apiPostSubMenu3SelectedTopics = async (data: any) => {
 
 
 export const apiGetSubMenu3CuriculumDistribution = async (docId: any) => {
-    const result = await axios.post(`${base_url}Document3CuriculumDistribution/GetAllByDoc3ID/${docId}`);
+    const result = await axios.get(`${base_url}Document3CuriculumDistribution/GetAllByDoc3ID/${docId}`);
     if (result)
         return result;
     else
@@ -76,7 +76,7 @@ export const apiGetSubMenu3CuriculumDistribution = async (docId: any) => {
 }
 
 export const apiGetSubMenu3SelectedTopics = async (docId: any) => {
-    const result = await axios.post(`${base_url}Document3SelectedTopics/GetDoc3SelectedTopicsByDoc3ID/${docId}`);
+    const result = await axios.get(`${base_url}Document3SelectedTopics/GetDoc3SelectedTopicsByDoc3ID/${docId}`);
     if (result)
         return result;
     else

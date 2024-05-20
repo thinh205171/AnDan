@@ -184,7 +184,7 @@ const SubMenu1Detail = () => {
   const [totalClass, setTotalClass] = useState<TotalClass>();
   const [teacherInfo, setTeacherInfo] = useState<TeacherInfo>();
   const [userInfoLogin, setUserInfoLogin] = useState<User>();
-  const [userInfoDocument, setUserInfoDocument] = useState<User[]>([]);
+  const [userInfoDocument, setUserInfoDocument] = useState<User>();
 
   const [count, setCount] = useState(0);
   const [truong, setTruong] = useState("");
@@ -209,8 +209,6 @@ const SubMenu1Detail = () => {
   const [principleAndTeacher, setPrincipleAndTeacher] = useState<any>();
   const [hostByList, setHostByList] = useState<any>();
 
-  console.log("principleAndTeacher: ", principleAndTeacher)
-
   useEffect(() => {
     const fecthPrincipleAndTeacher = async () => {
       if (specializedDepartment?.id) {
@@ -223,7 +221,8 @@ const SubMenu1Detail = () => {
         }
       }
     };
-  })
+    fecthPrincipleAndTeacher()
+  }, [specializedDepartment?.id])
 
   const getTargetElement = () => document.getElementById("main-content");
 
@@ -736,7 +735,7 @@ const SubMenu1Detail = () => {
   };
 
   return (
-    <div className="sub-menu-container">
+    <div className="sub-menu-container justify-content-center align-items-center" style={{ minWidth: "30rem", justifyContent: "center", alignItems: "center", }}>
       {location.pathname?.includes("create") ||
         location.pathname?.includes("edit") ? (
         <div>
@@ -1609,28 +1608,33 @@ const SubMenu1Detail = () => {
             <div className="sub-menu-action">
               <div className="verify" style={{ justifyContent: "center" }}>
                 <div style={{ display: "flex", columnGap: "10px" }}>
-                  {/* {!location.pathname.includes("-create") && userInfoLogin?.id === document1Info?.userId && ( */}
-                  {!location.pathname.includes("-create") && (
-                    <div className="action-button" onClick={handleClickCreate}>
-                      Tạo khung kế hoạch
-                    </div>
-                  )}
-                  <div
-                    className="action-button"
-                    onClick={
-                      location.pathname.includes("add")
-                        ? handleClickAdd
-                        : handleClickSave
-                    }
-                  >
-                    {location.pathname.includes("create") ? "Tạo mới" : "Sửa"}
-                  </div>
-                  <div
-                    className="action-button"
-                    onClick={handleClickOpenRemove}
-                  >
-                    Xóa
-                  </div>
+                  {!location.pathname.includes("-create") && userInfoLogin?.departmentId === userInfoDocument?.departmentId
+                    && user?.role === "Teacher" && (
+                      // {!location.pathname.includes("-create") && (
+                      <div className="action-button" onClick={handleClickCreate}>
+                        Tạo khung kế hoạch
+                      </div>
+                    )}
+                  {
+                    userInfoLogin?.id === document1Info?.userId && <>
+                      <div
+                        className="action-button"
+                        onClick={
+                          location.pathname.includes("add")
+                            ? handleClickAdd
+                            : handleClickSave
+                        }
+                      >
+                        {location.pathname.includes("create") ? "Tạo mới" : "Sửa"}
+                      </div>
+                      <div
+                        className="action-button"
+                        onClick={handleClickOpenRemove}
+                      >
+                        Xóa
+                      </div>
+                    </>
+                  }
                 </div>
               </div>
             </div>

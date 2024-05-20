@@ -69,13 +69,9 @@ interface Row {
   curriculumId: number | null;
   selectedTopicsId: number | null;
   slot: number | null;
-  equipment: Equip[];
+  equipmentId: number[];
   time: string;
-  subjectRoomName: string;
-}
-
-interface Equip {
-  equipmentId: number | null;
+  subjectRoomId: string;
 }
 
 const SubMenu3Detail = () => {
@@ -83,34 +79,28 @@ const SubMenu3Detail = () => {
   const navigate = useNavigate();
   const document1Id = location.pathname.split("/")[3];
   const user = useAppSelector((state) => state.auth.user);
-  const [rows3, setRows3] = useState<Equip[]>([
-    {
-      equipmentId: null,
-    },
-  ]);
 
   const [rows1, setRows1] = useState<Row[]>([
     {
       curriculumId: null,
       selectedTopicsId: null,
-      equipment: [{ equipmentId: null }],
+      equipmentId: [0],
       slot: null,
       time: "",
-      subjectRoomName: "",
+      subjectRoomId: "",
     },
   ]);
   const [rows2, setRows2] = useState<Row[]>([
     {
       curriculumId: null,
       selectedTopicsId: null,
-      equipment: [{ equipmentId: null }],
+      equipmentId: [0],
       slot: null,
       time: "",
-      subjectRoomName: "",
+      subjectRoomId: "",
     },
   ]);
 
-  const [login, setLogin] = useState(false);
   const [open, setOpen] = useState(false);
   const [openAccept, setOpenAccept] = useState(false);
   const [openDeny, setOpenDeny] = useState(false);
@@ -141,10 +131,7 @@ const SubMenu3Detail = () => {
   const [truong, setTruong] = useState("");
   const [to, setTo] = useState("");
   const [giaoVien, setGiaoVien] = useState("");
-  const [hoadDong, setHoatDong] = useState<number | null>(null);
   const [khoiLop, setKhoiLop] = useState("");
-  const [startYear, setStartYear] = useState("");
-  const [endYear, setEndYear] = useState("");
   const [toTruong, setToTruong] = useState("");
   const [hieuTruong, setHieuTruong] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("");
@@ -271,7 +258,7 @@ const SubMenu3Detail = () => {
             const fecthUserResult = await apiGetUser(doc1Data?.userId);
             if (fecthUserResult && fecthUserResult.data) {
               const userData: any = fecthUserResult.data;
-              console.log("userData: ", userData)
+              console.log("userData: ", userData);
               setUserInfoDocument(userData);
               const res = await apiGetSpecializedDepartmentById(
                 userData?.departmentId
@@ -515,6 +502,7 @@ const SubMenu3Detail = () => {
         ...row,
         document3Id: documentId,
       }));
+      console.log("rows1WithDocumentId: ", rows1WithDocumentId)
       const res1 = await apiPostSubMenu3CuriculumDistribution(
         rows1WithDocumentId
       );
@@ -567,10 +555,10 @@ const SubMenu3Detail = () => {
       stt: null,
       selectedTopicsId: null,
       curriculumId: null,
-      equipment: [{ equipmentId: null }],
+      equipmentId: [0],
       slot: null,
       time: "",
-      subjectRoomName: "",
+      subjectRoomId: "",
     };
     setRows1([...rows1, newRow]);
   };
@@ -580,10 +568,10 @@ const SubMenu3Detail = () => {
       stt: null,
       curriculumId: null,
       selectedTopicsId: null,
-      equipment: [{ equipmentId: null }],
+      equipmentId: [0],
       slot: null,
       time: "",
-      subjectRoomName: "",
+      subjectRoomId: "",
     };
     setRows2([...rows2, newRow]);
   };
@@ -605,25 +593,25 @@ const SubMenu3Detail = () => {
   };
   const handleAddEquip = (rowIndex: number) => {
     const updatedRows = [...rows1];
-    updatedRows[rowIndex].equipment.push({ equipmentId: null });
+    updatedRows[rowIndex].equipmentId.push(0);
     setRows1(updatedRows);
   };
 
   const handleRemoveEquip = (rowIndex: number, equipIndex: number) => {
     const updatedRows = [...rows1];
-    updatedRows[rowIndex].equipment.splice(equipIndex, 1);
+    updatedRows[rowIndex].equipmentId.splice(equipIndex, 1);
     setRows1(updatedRows);
   };
 
   const handleAddEquip2 = (rowIndex: number) => {
     const updatedRows = [...rows2];
-    updatedRows[rowIndex].equipment.push({ equipmentId: null });
+    updatedRows[rowIndex].equipmentId.push(0);
     setRows2(updatedRows);
   };
 
   const handleRemoveEquip2 = (rowIndex: number, equipIndex: number) => {
     const updatedRows = [...rows2];
-    updatedRows[rowIndex].equipment.splice(equipIndex, 1);
+    updatedRows[rowIndex].equipmentId.splice(equipIndex, 1);
     setRows2(updatedRows);
   };
   const handleSubmitReport = async () => {
@@ -871,7 +859,7 @@ const SubMenu3Detail = () => {
                                   />
                                 </TableCell>
                                 <TableCell align="center">
-                                  {row.equipment?.map((equip, equipIndex) => (
+                                  {row.equipmentId?.map((equip, equipIndex) => (
                                     <div key={equipIndex}>
                                       <select
                                         id={"teachingEquipment"}
@@ -882,19 +870,19 @@ const SubMenu3Detail = () => {
                                           border: "none",
                                           outline: "none",
                                         }}
-                                        value={equip.equipmentId ?? ""}
+                                        value={equip ?? 0}
                                         onChange={(e) => {
                                           const newValue = parseInt(
                                             e.target.value
                                           );
                                           const updatedRows = [...rows1];
-                                          updatedRows[index].equipment[
+                                          updatedRows[index].equipmentId[
                                             equipIndex
-                                          ].equipmentId = newValue;
+                                          ] = newValue;
                                           setRows1(updatedRows);
                                         }}
                                       >
-                                        <option value="" disabled>
+                                        <option value={0} disabled>
                                           Chọn thiết bị dạy học
                                         </option>
                                         {teachingEquipment?.map((item) => (
@@ -907,7 +895,7 @@ const SubMenu3Detail = () => {
                                       </select>
                                       <div className="add-row-button">
                                         {equipIndex ===
-                                          row.equipment.length - 1 && (
+                                          row.equipmentId.length - 1 && (
                                             <Add
                                               style={{ color: "black" }}
                                               className="add-row-icon"
@@ -916,7 +904,7 @@ const SubMenu3Detail = () => {
                                               }
                                             />
                                           )}
-                                        {row.equipment.length > 1 && (
+                                        {row.equipmentId.length > 1 && (
                                           <Remove
                                             style={{ color: "black" }}
                                             className="add-row-icon"
@@ -942,11 +930,11 @@ const SubMenu3Detail = () => {
                                       border: "none",
                                       outline: "none",
                                     }}
-                                    value={row.subjectRoomName ?? ""}
+                                    value={row.subjectRoomId ?? ""}
                                     onChange={(e) => {
                                       const newValue = e.target.value;
                                       const updatedRows = [...rows1];
-                                      updatedRows[index].subjectRoomName =
+                                      updatedRows[index].subjectRoomId =
                                         newValue;
                                       setRows1(updatedRows);
                                     }}
@@ -955,7 +943,7 @@ const SubMenu3Detail = () => {
                                       Chọn địa điểm
                                     </option>
                                     {subjectRoom?.map((item) => (
-                                      <option value={item?.subjectRoomName}>
+                                      <option value={item?.subjectRoomId}>
                                         {item?.subjectRoomName}
                                       </option>
                                     ))}
@@ -1100,7 +1088,7 @@ const SubMenu3Detail = () => {
                                   />
                                 </TableCell>
                                 <TableCell align="center">
-                                  {row.equipment?.map((equip, equipIndex) => (
+                                  {row.equipmentId?.map((equip, equipIndex) => (
                                     <div key={equipIndex}>
                                       <select
                                         id="teachingEquipment"
@@ -1111,19 +1099,19 @@ const SubMenu3Detail = () => {
                                           border: "none",
                                           outline: "none",
                                         }}
-                                        value={equip.equipmentId ?? ""}
+                                        value={equip ?? 0}
                                         onChange={(e) => {
                                           const newValue = parseInt(
                                             e.target.value
                                           );
                                           const updatedRows = [...rows2];
-                                          updatedRows[index].equipment[
+                                          updatedRows[index].equipmentId[
                                             equipIndex
-                                          ].equipmentId = newValue;
+                                          ] = newValue;
                                           setRows2(updatedRows);
                                         }}
                                       >
-                                        <option value="" disabled>
+                                        <option value={0} disabled>
                                           Chọn thiết bị dạy học
                                         </option>
                                         {teachingEquipment?.map((item) => (
@@ -1136,7 +1124,7 @@ const SubMenu3Detail = () => {
                                       </select>
                                       <div className="add-row-button">
                                         {equipIndex ===
-                                          row.equipment.length - 1 && (
+                                          row.equipmentId.length - 1 && (
                                             <Add
                                               style={{ color: "black" }}
                                               className="add-row-icon"
@@ -1145,7 +1133,7 @@ const SubMenu3Detail = () => {
                                               }
                                             />
                                           )}
-                                        {row.equipment.length > 1 && (
+                                        {row.equipmentId.length > 1 && (
                                           <Remove
                                             style={{ color: "black" }}
                                             className="add-row-icon"
@@ -1171,11 +1159,11 @@ const SubMenu3Detail = () => {
                                       border: "none",
                                       outline: "none",
                                     }}
-                                    value={row.subjectRoomName ?? ""}
+                                    value={row.subjectRoomId ?? ""}
                                     onChange={(e) => {
                                       const newValue = e.target.value;
                                       const updatedRows = [...rows2];
-                                      updatedRows[index].subjectRoomName =
+                                      updatedRows[index].subjectRoomId =
                                         newValue;
                                       setRows2(updatedRows);
                                     }}
@@ -1184,7 +1172,7 @@ const SubMenu3Detail = () => {
                                       Chọn địa điểm
                                     </option>
                                     {subjectRoom?.map((item) => (
-                                      <option value={item?.subjectRoomName}>
+                                      <option value={item?.subjectRoomId}>
                                         {item?.subjectRoomName}
                                       </option>
                                     ))}

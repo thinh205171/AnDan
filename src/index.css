@@ -1,19 +1,19 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
 .MuiTableCell-root {
-  padding: 12px !important;
+  padding: 8px !important;
 }
 
 * {
@@ -24,7 +24,7 @@ code {
 }
 
 sub-menu-content {
-  font-family: 'Times New Roman', serif !important;
+  font-family: "Times New Roman", serif !important;
 }
 
 body {
@@ -37,11 +37,11 @@ body {
     @media (min-width: 769px) {
       width: 750px;
     }
-    
+
     @media (min-width: 992px) {
       width: 970px;
     }
-    
+
     @media (min-width: 1200px) {
       width: 1270px;
     }
@@ -53,11 +53,11 @@ body {
 }
 
 .button-mui {
-  background-color: #E2BFB3 !important;
+  background-color: #e2bfb3 !important;
   color: #000 !important;
   font-weight: 600 !important;
 
   &:hover {
-      background-color: #FFB38E !important;
+    background-color: #ffb38e !important;
   }
 }

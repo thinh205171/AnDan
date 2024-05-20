@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -63,7 +63,7 @@ interface Row {
   slot: number | null;
   time: string;
   place: string;
-  hostBy: number | null;
+  hostBy: number[];
   collaborateWith: string;
   condition: string;
 }
@@ -85,14 +85,13 @@ const SubMenu2Detail = () => {
         slot: null,
         time: "",
         place: "",
-        hostBy: null,
+        hostBy: [0],
         collaborateWith: "",
         condition: "",
       },
     ],
   ]);
   const [gradeIds, setGradeIds] = useState<GradeRow[]>([{ gradeId: null }]);
-  const [login, setLogin] = useState(false);
   const [open, setOpen] = useState(false);
   const [openAccept, setOpenAccept] = useState(false);
   const [openDeny, setOpenDeny] = useState(false);
@@ -101,7 +100,6 @@ const SubMenu2Detail = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [specializedDepartment, setSpecializedDepartment] =
     useState<Department>();
-  const [formCategory, setFormCategory] = useState<FormCategory[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
   const [documentId, setDocumentId] = useState(null);
   const [userInfoLogin, setUserInfoLogin] = useState<User>();
@@ -116,15 +114,6 @@ const SubMenu2Detail = () => {
   const [hostByList, setHostByList] = useState<any>();
 
   const [truong, setTruong] = useState("");
-  const [to, setTo] = useState("");
-  const [startYear, setStartYear] = useState("");
-  const [endYear, setEndYear] = useState("");
-  const [khoiLop1, setKhoiLop1] = useState("");
-  const [soHocSinh1, setSoHocSinh1] = useState("");
-  const [khoiLop2, setKhoiLop2] = useState("");
-  const [soHocSinh2, setSoHocSinh2] = useState("");
-  const [khoiLop3, setKhoiLop3] = useState("");
-  const [soHocSinh3, setSoHocSinh3] = useState("");
   const [toTruong, setToTruong] = useState("");
   const [hieuTruong, setHieuTruong] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("");
@@ -170,6 +159,11 @@ const SubMenu2Detail = () => {
         }
       }
     };
+    fetchUserInfoLogin();
+
+  }, [user]);
+
+  useEffect(() => {
     const fecthPrincipleAndTeacher = async () => {
       if (specializedDepartment?.id) {
         const res = await apiGetListIdOfTeacherAndPricipleByDepartmentId(
@@ -181,6 +175,10 @@ const SubMenu2Detail = () => {
         }
       }
     };
+    fecthPrincipleAndTeacher();
+
+  }, [specializedDepartment?.id])
+  useEffect(() => {
     const fecthHostByList = async () => {
       if (document2Info) {
         const res = await apiGetListHostbyByIdOfUserByDoc2Id(document2Info?.id);
@@ -190,10 +188,21 @@ const SubMenu2Detail = () => {
         }
       }
     };
-    fetchUserInfoLogin();
-    fecthPrincipleAndTeacher();
     fecthHostByList();
-  }, [specializedDepartment?.id, user]);
+
+  }, [document2Info])
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fecthTotalClass = useCallback(async (gradeId: any, index: any) => {
+    const res = await apiGetTotalClassByGradeId(gradeId);
+    if (res && res.data) {
+      const totalClassData: TotalClass = res.data;
+      setTotalClass(totalClassData);
+      const updatedMultiTotalClass = [...multiTotalClass];
+      updatedMultiTotalClass[index] = res.data;
+      setMultiTotalClass(updatedMultiTotalClass);
+    }
+  }, [multiTotalClass]);
 
   useEffect(() => {
     if (location.pathname.includes("edit")) {
@@ -228,7 +237,7 @@ const SubMenu2Detail = () => {
                 slot: null,
                 time: "",
                 place: "",
-                hostBy: null,
+                hostBy: [0],
                 collaborateWith: "",
                 condition: "",
               },
@@ -239,18 +248,6 @@ const SubMenu2Detail = () => {
       fetchDoc2GradeInfo();
     }
   }, [location.pathname]);
-
-  const fecthTotalClass = async (gradeId: any, index: any) => {
-    const res = await apiGetTotalClassByGradeId(gradeId);
-    if (res && res.data) {
-      const totalClassData: TotalClass = res.data;
-      setTotalClass(totalClassData);
-      const updatedMultiTotalClass = [...multiTotalClass];
-      updatedMultiTotalClass[index] = res.data;
-      setMultiTotalClass(updatedMultiTotalClass);
-    }
-  };
-
 
   useEffect(() => {
     const fetchSpecializedDepartmentById = async () => {
@@ -290,6 +287,18 @@ const SubMenu2Detail = () => {
   }, [location.pathname, userInfoLogin]);
 
   useEffect(() => {
+    const fetchGrades = async () => {
+      const res = await apiGetGrade();
+      if (res && res.data) {
+        const gradeData: Grade[] = res.data;
+        setGrades(gradeData);
+      }
+    };
+
+    fetchGrades();
+  }, []);
+
+  useEffect(() => {
     const fetchAllUser = async () => {
       if (userInfoLogin) {
         const res = await apiGetUserHostBy(userInfoLogin?.departmentId);
@@ -299,18 +308,9 @@ const SubMenu2Detail = () => {
         }
       }
     };
-
-    const fetchGrades = async () => {
-      const res = await apiGetGrade();
-      if (res && res.data) {
-        const gradeData: Grade[] = res.data;
-        setGrades(gradeData);
-      }
-    };
-
     fetchAllUser();
-    fetchGrades();
-  }, [userInfoLogin]);
+
+  }, [userInfoLogin])
 
   const handleClickOpen = async () => {
     setDisplayAddRow(!displayAddRow);
@@ -468,7 +468,7 @@ const SubMenu2Detail = () => {
       slot: null,
       time: "",
       place: "",
-      hostBy: null,
+      hostBy: [],
       collaborateWith: "",
       condition: "",
     };
@@ -497,7 +497,7 @@ const SubMenu2Detail = () => {
         slot: null,
         time: "",
         place: "",
-        hostBy: null,
+        hostBy: [0],
         collaborateWith: "",
         condition: "",
       },
@@ -540,8 +540,22 @@ const SubMenu2Detail = () => {
     setOpen(false);
   };
 
+  const handleAddHost = (rowIndex: number, rowIndex2: number) => {
+    const updatedRows = [...multiRows];
+    updatedRows[rowIndex][rowIndex2].hostBy.push(0);
+    setMultiRows(updatedRows);
+  };
+  const handleRemoveHost = (
+    rowIndex: number,
+    rowIndex2: number,
+    equipIndex: number
+  ) => {
+    const updatedRows = [...multiRows];
+    updatedRows[rowIndex][rowIndex2].hostBy.splice(equipIndex, 1);
+    setMultiRows(updatedRows);
+  };
   return (
-    <div className="sub-menu-container">
+    <div className="sub-menu-container" style={{ minWidth: "30rem" }}>
       {location.pathname?.includes("edit") ||
         location.pathname?.includes("create") ? (
         <div>
@@ -812,35 +826,64 @@ const SubMenu2Detail = () => {
                                     />
                                   </TableCell>
                                   <TableCell align="center">
-                                    <select
-                                      id="selectedTopic"
-                                      style={{
-                                        width: "150px",
-                                        height: "40px",
-                                        marginLeft: "4px",
-                                        border: "none",
-                                        outline: "none",
-                                      }}
-                                      value={row.hostBy ?? ""}
-                                      onChange={(e) => {
-                                        const newValue = parseInt(
-                                          e.target.value
-                                        );
-                                        const updatedRows = [...multiRows];
-                                        updatedRows[indexGrade][index].hostBy =
-                                          newValue;
-                                        setMultiRows(updatedRows);
-                                      }}
-                                    >
-                                      <option value="" disabled>
-                                        Chọn chủ trì
-                                      </option>
-                                      {users?.map((item) => (
-                                        <option value={item?.id}>
-                                          {item?.name}
-                                        </option>
-                                      ))}
-                                    </select>
+                                    {row.hostBy?.map((hos, hosIndex) => (
+                                      <div key={hosIndex}>
+                                        <select
+                                          id="selectedTopic"
+                                          style={{
+                                            width: "150px",
+                                            height: "40px",
+                                            marginLeft: "4px",
+                                            border: "none",
+                                            outline: "none",
+                                          }}
+                                          value={hos ?? 0}
+                                          onChange={(e) => {
+                                            const newValue = parseInt(
+                                              e.target.value
+                                            );
+                                            const updatedRows = [...multiRows];
+                                            updatedRows[indexGrade][index].hostBy[
+                                              hosIndex
+                                            ] = newValue;
+                                            setMultiRows(updatedRows);
+                                          }}
+                                        >
+                                          <option value={0} disabled>
+                                            Chọn chủ trì
+                                          </option>
+                                          {users?.map((item) => (
+                                            <option value={item?.id}>
+                                              {item?.name}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        <div className="add-row-button">
+                                          {hosIndex === row.hostBy.length - 1 && (
+                                            <Add
+                                              style={{ color: "black" }}
+                                              className="add-row-icon"
+                                              onClick={() =>
+                                                handleAddHost(indexGrade, index)
+                                              }
+                                            />
+                                          )}
+                                          {row.hostBy.length > 1 && (
+                                            <Remove
+                                              style={{ color: "black" }}
+                                              className="add-row-icon"
+                                              onClick={() =>
+                                                handleRemoveHost(
+                                                  indexGrade,
+                                                  index,
+                                                  hosIndex
+                                                )
+                                              }
+                                            />
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
                                   </TableCell>
                                   <TableCell align="center">
                                     <textarea
@@ -1015,7 +1058,7 @@ const SubMenu2Detail = () => {
                   <div
                     style={{
                       display:
-                        user?.userId === userInfoDocument?.id
+                        userInfoLogin?.id === userInfoDocument?.id
                           ? "initial"
                           : "none",
                     }}
@@ -1031,7 +1074,7 @@ const SubMenu2Detail = () => {
                   <div
                     style={{
                       display:
-                        user?.userId === userInfoDocument?.id
+                        userInfoLogin?.id === userInfoDocument?.id
                           ? "initial"
                           : "none",
                     }}
