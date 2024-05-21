@@ -72,7 +72,7 @@ const SubMenu4Detail = () => {
 
   const handleSubmitReport = async () => {
     const rp = {
-      userId: user?.userId,
+      userId: parseInt(user?.userId),
       doctype: 4,
       docId: document4Info?.id,
       message: reasonReport,

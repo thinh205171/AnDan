@@ -142,6 +142,8 @@ const SubMenu3Detail = () => {
 
   const getTargetElement = () => document.getElementById("main-content");
 
+  console.log("document3Info: ", document3Info)
+
   const downloadPdf = async () => {
     try {
       const pdf = await generatePDF(getTargetElement, options);
@@ -156,7 +158,7 @@ const SubMenu3Detail = () => {
         const res = await apiUpdateSubMenu3(
           {
             id: documentId,
-            document1Id: parseInt(document1Id),
+            document1Id: location.pathname.includes("create") ? parseInt(document1Id) : document3Info?.document1Id,
             linkFile: response?.data,
             userId: user?.userId,
           },
@@ -500,15 +502,14 @@ const SubMenu3Detail = () => {
     if (rows1 && rows2) {
       const rows1WithDocumentId = rows1.map((row) => ({
         ...row,
-        document3Id: documentId,
+        document3Id: documentId ?? location.pathname.split('/')[3],
       }));
-      console.log("rows1WithDocumentId: ", rows1WithDocumentId)
       const res1 = await apiPostSubMenu3CuriculumDistribution(
         rows1WithDocumentId
       );
       const rows2WithDocumentId = rows2.map((row) => ({
         ...row,
-        document3Id: documentId,
+        document3Id: documentId ?? location.pathname.split('/')[3],
       }));
       const res2 = await apiPostSubMenu3SelectedTopics(rows2WithDocumentId);
       if (res1 && res2) {
@@ -616,7 +617,7 @@ const SubMenu3Detail = () => {
   };
   const handleSubmitReport = async () => {
     const rp = {
-      userId: user?.userId,
+      userId: parseInt(user?.userId),
       doctype: 3,
       docId: document3Info?.id,
       message: reasonReport,
@@ -631,7 +632,10 @@ const SubMenu3Detail = () => {
       justifyContent="center"
       style={{ overflow: "visible" }}
     >
-      <div className="sub-menu-container" style={{ minWidth: "25rem" }}>
+      <div
+        className="sub-menu-container"
+        style={{ minWidth: "25rem", width: "100rem" }}
+      >
         {location.pathname?.includes("edit") ||
           location.pathname?.includes("create") ? (
           <div>
@@ -727,7 +731,7 @@ const SubMenu3Detail = () => {
                         fontWeight: "bold",
                       }}
                       onChange={(e) => setKhoiLop(e.target.value)}
-                      defaultValue={document3Info?.claasName}
+                      defaultValue={document3Info?.claasName ?? ""}
                     >
                       <option value="" disabled>
                         Chọn lớp
@@ -897,7 +901,12 @@ const SubMenu3Detail = () => {
                                         {equipIndex ===
                                           row.equipmentId.length - 1 && (
                                             <Add
-                                              style={{ color: "black" }}
+                                              style={{
+                                                color: "black",
+                                                display: displayAddRow
+                                                  ? "none"
+                                                  : "",
+                                              }}
                                               className="add-row-icon"
                                               onClick={() =>
                                                 handleAddEquip(index)
@@ -906,7 +915,12 @@ const SubMenu3Detail = () => {
                                           )}
                                         {row.equipmentId.length > 1 && (
                                           <Remove
-                                            style={{ color: "black" }}
+                                            style={{
+                                              color: "black",
+                                              display: displayAddRow
+                                                ? "none"
+                                                : "",
+                                            }}
                                             className="add-row-icon"
                                             onClick={() =>
                                               handleRemoveEquip(
@@ -957,12 +971,18 @@ const SubMenu3Detail = () => {
                     </TableContainer>
                     <div className="add-row-button">
                       <Add
-                        style={{ color: "black" }}
+                        style={{
+                          color: "black",
+                          display: displayAddRow ? "none" : "",
+                        }}
                         className="add-row-icon"
                         onClick={handleAddRow1}
                       />
                       <Remove
-                        style={{ color: "black" }}
+                        style={{
+                          color: "black",
+                          display: displayAddRow ? "none" : "",
+                        }}
                         className="add-row-icon"
                         onClick={handleRemoveRow1}
                       />
@@ -1122,7 +1142,12 @@ const SubMenu3Detail = () => {
                                           </option>
                                         ))}
                                       </select>
-                                      <div className="add-row-button">
+                                      <div
+                                        className="add-row-button"
+                                        style={{
+                                          display: displayAddRow ? "none" : "",
+                                        }}
+                                      >
                                         {equipIndex ===
                                           row.equipmentId.length - 1 && (
                                             <Add
@@ -1184,7 +1209,10 @@ const SubMenu3Detail = () => {
                         </TableBody>
                       </Table>
                     </TableContainer>
-                    <div className="add-row-button">
+                    <div
+                      className="add-row-button"
+                      style={{ display: displayAddRow ? "none" : "" }}
+                    >
                       <Add
                         style={{ color: "black" }}
                         className="add-row-icon"
@@ -1358,9 +1386,9 @@ const SubMenu3Detail = () => {
               <div className="sub-menu-row">
                 <div>
                   <i>
-                    {document3Info?.isApprove === 4
-                      ? "(Tài liệu chưa được thẩm định)"
-                      : "(Tài liệu đã được thẩm định)"}
+                    {document3Info?.isApprove === 3
+                      ? "(Tài liệu đã được thẩm định)"
+                      : "(Tài liệu chưa được thẩm định)"}
                   </i>
                 </div>
               </div>
@@ -1694,7 +1722,7 @@ const SubMenu3Detail = () => {
               id="alert-dialog-description"
               style={{ textAlign: "center", fontWeight: 600 }}
             >
-              Bạn có chắc muốn xóa thay đổi không?
+              Bạn có chắc muốn xóa tài liệu này không?
             </DialogContentText>
           </DialogContent>
           <DialogActions>

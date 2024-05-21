@@ -13,4 +13,5 @@ export interface User {
     levelOfTrainningId: number,
     departmentId: number,
     accountId: number,
+    signature: string
 }

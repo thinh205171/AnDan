@@ -145,8 +145,6 @@ const SubMenu = () => {
     fetchList();
   }, [indexSubMenu, specializedDepartmentId]);
 
-  console.log("subMenu1Data: ", subMenu1Data);
-
   useEffect(() => {
     setPages(Array(subMenu1Data.length).fill(1));
   }, [indexSubMenu, specializedDepartmentId, subMenu1Data.length]);
@@ -162,6 +160,7 @@ const SubMenu = () => {
             .map((id: any) => `listId=${id}`)
             .join("&");
           setSpecializedDepartmentID(queryString);
+          console.log("queryString: ", queryString)
         }
       };
       fetchSpecializedDepartment();
@@ -172,7 +171,6 @@ const SubMenu = () => {
 
   const displayStyle =
     indexSubMenu === "3" || user?.role !== "Leader" ? "none" : "initial";
-
   return (
     <div className="home-panel" style={{ minWidth: "20rem" }}>
       <div className="home-panel1-content">

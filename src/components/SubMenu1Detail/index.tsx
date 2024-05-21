@@ -12,6 +12,7 @@ import {
   MenuItem,
   Paper,
   Radio,
+  RadioGroup,
   Select,
   Table,
   TableBody,
@@ -73,6 +74,7 @@ import { options } from "../UploadPhuLuc4";
 import axios from "axios";
 import { textAlign } from "html2canvas/dist/types/css/property-descriptors/text-align";
 import { apiGetListIdOfTeacherAndPricipleByDepartmentId, apiPostNotification } from "../../api/notification";
+import { apiPostReport } from "../../api/report";
 
 interface Row1 {
   teachingEquipmentId: number | null;
@@ -185,6 +187,8 @@ const SubMenu1Detail = () => {
   const [teacherInfo, setTeacherInfo] = useState<TeacherInfo>();
   const [userInfoLogin, setUserInfoLogin] = useState<User>();
   const [userInfoDocument, setUserInfoDocument] = useState<User>();
+  const [reasonReport, setReasonReport] = useState("");
+  const [descriptionRp, setDescriptionRp] = useState("");
 
   const [count, setCount] = useState(0);
   const [truong, setTruong] = useState("");
@@ -267,9 +271,6 @@ const SubMenu1Detail = () => {
     };
     fetchUserInfoLogin();
   }, [user]);
-
-  console.log("userInfoLogin: ", userInfoLogin)
-  console.log("document1Info: ", document1Info)
 
   useEffect(() => {
     const fetchSpecializedDepartmentById = async () => {
@@ -599,6 +600,18 @@ const SubMenu1Detail = () => {
     setOpenReport(false);
   };
 
+  const handleSubmitReport = async () => {
+    const rp = {
+      userId: parseInt(user?.userId),
+      doctype: 1,
+      docId: document1Info?.id,
+      message: reasonReport,
+      description: descriptionRp,
+    };
+    await apiPostReport(rp);
+    setOpenReport(false);
+  };
+
   const handleClickOpenRemove = () => {
     setOpenRemove(true);
   };
@@ -807,7 +820,7 @@ const SubMenu1Detail = () => {
                         if (location.pathname.includes("create"))
                           setHoatDong(parseInt(e.target.value));
                       }}
-                      value={document1Info?.subjectId}
+                      value={document1Info?.subjectId ?? ""}
                     >
                       <option value="" disabled>
                         Chọn môn học
@@ -837,7 +850,7 @@ const SubMenu1Detail = () => {
                         if (location.pathname.includes("create"))
                           setKhoiLop(parseInt(e.target.value));
                       }}
-                      value={document1Info?.gradeId}
+                      value={document1Info?.gradeId ?? ""}
                     >
                       <option value="" disabled>
                         Chọn lớp
@@ -881,7 +894,7 @@ const SubMenu1Detail = () => {
                     </div>
                     <div style={{ marginLeft: "8px" }}>
                       <strong>Số giáo viên: </strong>
-                      {teacherInfo?.totalTeacher[0]?.userCount}
+                      {teacherInfo?.totalTeacher[0]?.userCount || 0}
                     </div>
                     <div style={{ display: "flex", marginLeft: "8px" }}>
                       <strong>Trình độ đào tạo:</strong>
@@ -889,21 +902,21 @@ const SubMenu1Detail = () => {
                         <strong>Cao đẳng: </strong>
                         {
                           teacherInfo?.totalTeacherLevelOfTrainning[0]
-                            ?.userCount
+                            ?.userCount || 0
                         }
                       </div>
                       <div style={{ marginLeft: "8px" }}>
                         <strong>; Đại học: </strong>
                         {
                           teacherInfo?.totalTeacherLevelOfTrainning[1]
-                            ?.userCount
+                            ?.userCount || 0
                         }
                       </div>
                       <div style={{ marginLeft: "8px" }}>
                         <strong>; Trên đại học: </strong>
                         {
                           teacherInfo?.totalTeacherLevelOfTrainning[2]
-                            ?.userCount
+                            ?.userCount || 0
                         }
                       </div>
                     </div>
@@ -920,21 +933,21 @@ const SubMenu1Detail = () => {
                         Tốt:{" "}
                         {
                           teacherInfo?.totalTeacherProfessionalStandard[0]
-                            ?.userCount
+                            ?.userCount || 0
                         }
                       </div>
                       <div style={{ marginLeft: "8px" }}>
                         ; Khá:{" "}
                         {
                           teacherInfo?.totalTeacherProfessionalStandard[1]
-                            ?.userCount
+                            ?.userCount || 0
                         }
                       </div>
                       <div style={{ marginLeft: "8px" }}>
                         ; Chưa đạt:{" "}
                         {
                           teacherInfo?.totalTeacherProfessionalStandard[2]
-                            ?.userCount
+                            ?.userCount || 0
                         }
                       </div>
                     </div>
@@ -1643,9 +1656,9 @@ const SubMenu1Detail = () => {
             <div className="sub-menu-row">
               <div>
                 <i>
-                  {document1Info?.isApprove === 4
-                    ? "(Tài liệu chưa được thẩm định)"
-                    : "(Tài liệu đã được thẩm định)"}
+                  {document1Info?.isApprove === 3
+                    ? "(Tài liệu đã được thẩm định)"
+                    : "(Tài liệu chưa được thẩm định)"}
                 </i>
               </div>
             </div>
@@ -1659,32 +1672,32 @@ const SubMenu1Detail = () => {
               <div>
                 <strong>Ngày gửi: </strong> {document1Info?.createdDate}
               </div>
-              <div className="right-action">
-                <div className="share-facebook">
-                  <img src="/facebook-circle-svgrepo-com.svg" alt="SVG" />
-                  <span>Chia sẻ</span>
-                  <span>0</span>
-                </div>
+              <div className="right-action" onClick={handleClickOpenReport}>
+                <strong>
+                  <u className="underline-blue">Báo cáo tài liệu có sai sót</u>
+                </strong>
               </div>
             </div>
           </div>
           <div>
-            <div className="sub-menu-action">
-              <div className="verify">
-                <span>Tình trạng thẩm định:</span>
-                <div style={{ display: "flex", columnGap: "10px" }}>
-                  <div
-                    className="action-button"
-                    onClick={handleClickOpenAccept}
-                  >
-                    Chấp thuận
-                  </div>
-                  <div className="action-button" onClick={handleClickOpenDeny}>
-                    Từ chối
+            {
+              user?.role === "principle" && <div className="sub-menu-action">
+                <div className="verify">
+                  <span>Tình trạng thẩm định:</span>
+                  <div style={{ display: "flex", columnGap: "10px" }}>
+                    <div
+                      className="action-button"
+                      onClick={handleClickOpenAccept}
+                    >
+                      Chấp thuận
+                    </div>
+                    <div className="action-button" onClick={handleClickOpenDeny}>
+                      Từ chối
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            }
             <div className="sub-menu-note">
               Ghi chú <br />
               <textarea name="" id="" rows={8}></textarea>
@@ -1734,11 +1747,7 @@ const SubMenu1Detail = () => {
       </Dialog>
       <Dialog
         open={openReport}
-        onClose={(event, reason) => {
-          if (reason !== "backdropClick" && reason !== "escapeKeyDown") {
-            handleCloseReport();
-          }
-        }}
+        onClose={handleCloseReport}
         maxWidth={"md"}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
@@ -1749,111 +1758,84 @@ const SubMenu1Detail = () => {
         >
           Báo cáo tài liệu
         </DialogTitle>
-
-        {login ? (
-          <>
-            <DialogContent>
-              <DialogContentText
-                id="alert-dialog-description"
-                style={{
-                  textAlign: "left",
-                  backgroundColor: "#D9D9D9",
-                  borderRadius: "20px",
-                  padding: "20px",
-                }}
+        <DialogContent>
+          <DialogContentText
+            id="alert-dialog-description"
+            style={{
+              textAlign: "left",
+              backgroundColor: "#D9D9D9",
+              borderRadius: "20px",
+              padding: "20px",
+            }}
+          >
+            <div className="report-row">
+              <div className="report-title">Tài liệu</div>
+              <div className="report-detail">Giáo án tài liệu A</div>
+            </div>
+            <div className="report-row">
+              <div className="report-title">Lý do báo cáo</div>
+              <div
+                className="report-detail"
+                style={{ display: "flex", flexDirection: "column" }}
               >
-                <div className="report-row">
-                  <div className="report-title">Tài liệu</div>
-                  <div className="report-detail">Giáo án tài liệu A</div>
-                </div>
-                <div className="report-row">
-                  <div className="report-title">Lý do báo cáo</div>
-                  <div
-                    className="report-detail"
-                    style={{ display: "flex", flexDirection: "column" }}
-                  >
-                    <FormControlLabel
-                      value=""
-                      control={<Radio />}
-                      label="Có lỗi kỹ thuật ..."
-                    />
-                    <FormControlLabel
-                      value=""
-                      control={<Radio />}
-                      label="Không dùng để dạy học"
-                    />
-                    <FormControlLabel
-                      value=""
-                      control={<Radio />}
-                      label="Vi phạm bản quyền"
-                    />
-                    <FormControlLabel
-                      value=""
-                      control={<Radio />}
-                      label="Lý do khác"
-                    />
-                  </div>
-                </div>
-                <div className="report-row">
-                  <div className="report-title">Chi tiết lỗi</div>
-                  <div className="report-detail">
-                    <span style={{ whiteSpace: "nowrap" }}>
-                      Đề nghị cung cấp lý do và chỉ ra các điểm không chính xác
-                    </span>
-                    <br />
-                    <textarea name="" id="" rows={10} />
-                  </div>
-                </div>
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                onClick={handleCloseReport}
-                style={{ color: "#000", fontWeight: 600 }}
-              >
-                {" "}
-                Quay lại trang
-              </Button>
-              <Button
-                onClick={handleCloseReport}
-                className="button-mui"
-                autoFocus
-              >
-                Gửi báo cáo
-              </Button>
-            </DialogActions>
-          </>
-        ) : (
-          <>
-            <DialogContent>
-              <DialogContentText
-                id="alert-dialog-description"
-                style={{
-                  textAlign: "left",
-                  fontWeight: 600,
-                  marginBottom: "12px",
-                }}
-              >
-                Bạn cần đăng nhập để thực hiện chức năng
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                onClick={handleCloseReport}
-                style={{ color: "#000", fontWeight: 600 }}
-              >
-                Hủy bỏ
-              </Button>
-              <Button
-                onClick={() => setLogin(true)}
-                className="button-mui"
-                autoFocus
-              >
-                Đăng nhập
-              </Button>
-            </DialogActions>
-          </>
-        )}
+                <RadioGroup
+                  aria-labelledby="demo-controlled-radio-buttons-group"
+                  name="controlled-radio-buttons-group"
+                  value={reasonReport ?? ""}
+                  onChange={(e) => setReasonReport(e.target.value)}
+                >
+                  <FormControlLabel
+                    value="Có lỗi kỹ thuật"
+                    control={<Radio />}
+                    label="Có lỗi kỹ thuật"
+                  />
+                  <FormControlLabel
+                    value="Không dùng để dạy học"
+                    control={<Radio />}
+                    label="Không dùng để dạy học"
+                  />
+                  <FormControlLabel
+                    value="Vi phạm bản quyền"
+                    control={<Radio />}
+                    label="Vi phạm bản quyền"
+                  />
+                  <FormControlLabel
+                    value="Lý do khác"
+                    control={<Radio />}
+                    label="Lý do khác"
+                  />
+                </RadioGroup>
+              </div>
+            </div>
+            <div className="report-row">
+              <div className="report-title">Chi tiết lỗi</div>
+              <div className="report-detail">
+                <span style={{ whiteSpace: "nowrap" }}>
+                  Đề nghị cung cấp lý do và chỉ ra các điểm không chính xác
+                </span>
+                <br />
+                <textarea
+                  name=""
+                  id=""
+                  rows={10}
+                  onChange={(e) => setDescriptionRp(e.target.value)}
+                />
+              </div>
+            </div>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCloseReport}
+            style={{ color: "#000", fontWeight: 600 }}
+          >
+            {" "}
+            Quay lại trang
+          </Button>
+          <Button onClick={handleSubmitReport} className="button-mui" autoFocus>
+            Gửi báo cáo
+          </Button>
+        </DialogActions>
       </Dialog>
       <Dialog
         open={openAccept}
@@ -2000,7 +1982,7 @@ const SubMenu1Detail = () => {
             id="alert-dialog-description"
             style={{ textAlign: "center", fontWeight: 600 }}
           >
-            Bạn có chắc muốn xóa thay đổi không?
+            Bạn có chắc muốn xóa tài liệu này không?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -2010,7 +1992,11 @@ const SubMenu1Detail = () => {
           >
             Hủy bỏ
           </Button>
-          <Button onClick={handleCloseRemove} className="button-mui" autoFocus>
+          <Button onClick={async () => {
+            await apiDeleteSubMenu1(document1Info?.id)
+            navigate('/sub-menu/1')
+          }}
+            className="button-mui" autoFocus>
             Xóa
           </Button>
         </DialogActions>

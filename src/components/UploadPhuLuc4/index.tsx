@@ -135,6 +135,11 @@ const UploadPhuLuc4 = () => {
 
     const handleAddDoc4 = async () => {
         if (!isEditPath) {
+            console.log("teachingPlannerId: ", teachingPlannerId)
+            console.log("user: ", user)
+            console.log("tieuDe: ", tieuDe)
+            console.log("fileUrl: ", fileUrl)
+            console.log("avatarUrl: ", avatarUrl)
             if (teachingPlannerId && user && tieuDe && fileUrl && avatarUrl) {
                 const post = await apiPostSubMenu4({ teachingPlannerId: teachingPlannerId, name: tieuDe, linkFile: fileUrl, linkImage: avatarUrl })
                 if (post) {
@@ -176,7 +181,7 @@ const UploadPhuLuc4 = () => {
                     <div className="upload-input">
                         <select id="subjects" style={{ width: "100%", height: "30px" }}
                             onChange={(e) => setSubjectId(parseInt(e.target.value))}
-                            defaultValue={teachingPlanner?.subjectId}
+                            defaultValue={teachingPlanner?.subjectId ?? ""}
                             disabled={isEditPath ? true : false}
                         >
                             <option value="" disabled>Chọn môn học</option>
@@ -195,7 +200,7 @@ const UploadPhuLuc4 = () => {
                     <div className="upload-input">
                         <select id="classes" style={{ width: "100%", height: "30px" }}
                             onChange={(e) => setClassId(parseInt(e.target.value))}
-                            defaultValue={teachingPlanner?.classId}
+                            defaultValue={teachingPlanner?.classId ?? ""}
                             disabled={isEditPath ? true : false}
                         >
                             <option value="" disabled>Chọn lớp</option>
