@@ -35,11 +35,14 @@ import {
   apiGetCurriculumDistributionByDoc1Id,
   apiGetPeriodicAssessmentByDoc1Id,
   apiGetSelectedTopicByDoc1Id,
+  apiGetSelectedtopicBySubjectId,
   apiGetSubMenu1ById,
+  apiGetSubjectBySpeId,
   apiGetSubjectsRoomByDoc1Id,
   apiGetTeacherInformation,
   apiGetTeachingEquipmentByDoc1Id,
   apiGetTotalClassByGradeId,
+  apiGetcurriculumbySubjectId,
   apiPostSubMenu1,
   apiPostSubMenu1CuriculumDistribution,
   apiPostSubMenu1PeriodicAssessment,
@@ -316,10 +319,12 @@ const SubMenu1Detail = () => {
     };
 
     const fetchSubject = async () => {
-      const res = await apiGetSubject();
-      if (res && res.data) {
-        const subjectData: Subject[] = res.data;
-        setSubjects(subjectData);
+      if (userInfoLogin && !location.pathname.includes("view")) {
+        const res = await apiGetSubjectBySpeId(userInfoDocument?.departmentId ?? userInfoLogin?.departmentId);
+        if (res && res.data) {
+          const subjectData: Subject[] = res.data;
+          setSubjects(subjectData);
+        }
       }
     };
 
@@ -340,19 +345,25 @@ const SubMenu1Detail = () => {
     };
 
     const fetchSelectedTopic = async () => {
-      const res = await apiGetSelectedTopic();
-      if (res && res.data) {
-        const selectedTopicData: SelectedTopic[] = res.data;
-        setSelectedTopic(selectedTopicData);
+      if (document1Info) {
+        const res = await apiGetSelectedtopicBySubjectId(document1Info.subjectId);
+        if (res && res.data) {
+          const selectedTopicData: SelectedTopic[] = res.data;
+          setSelectedTopic(selectedTopicData);
+        }
       }
+
     };
 
     const fetchCurriculumDistribution = async () => {
-      const res = await apiGetCurriculumDistribution();
-      if (res && res.data) {
-        const curriculumDistributionData: CurriculumDistribution[] = res.data;
-        setCurriculumDistribution(curriculumDistributionData);
+      if (document1Info) {
+        const res = await apiGetcurriculumbySubjectId(document1Info.subjectId);
+        if (res && res.data) {
+          const curriculumDistributionData: CurriculumDistribution[] = res.data;
+          setCurriculumDistribution(curriculumDistributionData);
+        }
       }
+
     };
 
     const fetchTestingCategory = async () => {
@@ -515,7 +526,7 @@ const SubMenu1Detail = () => {
           note: "",
           status: true,
           approveByName: "",
-          isApprove: 1,
+          isApprove: 2,
         });
         if (post) {
           setDocumentId(post?.data?.id);
@@ -532,6 +543,17 @@ const SubMenu1Detail = () => {
     } else {
       if (khoiLop && user && hoadDong) {
         setOpen(true);
+        try {
+          await apiUpdateSubMenu1({
+            id: document1Info?.id,
+            subjectId: document1Info?.subjectId,
+            gradeId: document1Info?.gradeId,
+            userId: document1Info?.userId,
+            isApprove: 2,
+          });
+        } catch (error) {
+          alert("Không thể sửa");
+        }
         await apiPostNotification({
           receiveBy: principleAndTeacher?.principle || [],
           sentBy: user?.userId,
@@ -556,7 +578,7 @@ const SubMenu1Detail = () => {
         note: "",
         status: true,
         approveByName: "",
-        isAprrove: 2,
+        isAprrove: 1,
       });
       if (post) {
         setDocumentId(post?.data?.id);
@@ -817,10 +839,44 @@ const SubMenu1Detail = () => {
                         fontWeight: "bold",
                       }}
                       onChange={(e) => {
-                        if (location.pathname.includes("create"))
+                        if (location.pathname.includes("create")) {
                           setHoatDong(parseInt(e.target.value));
+                          const value = parseInt(e.target.value);
+                          setHoatDong(value);
+
+                          // Function to fetch curriculum by subject ID
+                          const fetchCurriculumBySubjectId = async () => {
+                            try {
+                              const res = await apiGetcurriculumbySubjectId(value);
+                              if (res && res.data) {
+                                const curriculumData: CurriculumDistribution[] = res.data;
+                                setCurriculumDistribution(curriculumData);
+                              }
+                            } catch (error) {
+                              console.error("Error fetching curriculum data:", error);
+                            }
+                          };
+
+                          // Function to fetch selected topic by subject ID
+                          const fetchSelectedTopicBySubjectId = async () => {
+                            try {
+                              const res = await apiGetSelectedtopicBySubjectId(value);
+                              if (res && res.data) {
+                                const selectedTopicData: SelectedTopic[] = res.data;
+                                setSelectedTopic(selectedTopicData);
+                              }
+                            } catch (error) {
+                              console.error("Error fetching selected topic data:", error);
+                            }
+                          };
+
+                          // Call the appropriate fetch function
+                          fetchCurriculumBySubjectId();
+                          fetchSelectedTopicBySubjectId();
+                        }
+
                       }}
-                      value={document1Info?.subjectId ?? ""}
+                      value={document1Info?.subjectId ? document1Info?.subjectId : hoadDong ?? ""}
                     >
                       <option value="" disabled>
                         Chọn môn học
@@ -850,7 +906,7 @@ const SubMenu1Detail = () => {
                         if (location.pathname.includes("create"))
                           setKhoiLop(parseInt(e.target.value));
                       }}
-                      value={document1Info?.gradeId ?? ""}
+                      value={document1Info?.gradeId ? document1Info?.gradeId : khoiLop ?? ""}
                     >
                       <option value="" disabled>
                         Chọn lớp
@@ -1667,6 +1723,11 @@ const SubMenu1Detail = () => {
                 <strong>Người gửi: </strong>{" "}
                 <u className="underline-blue">{document1Info?.userFullName}</u>
               </div>
+              <div className="right-action" onClick={() => navigate(`/sub-menu-3/list-view/${document1Info?.id}`)}>
+                <strong>
+                  <u className="underline-blue">Xem các khung kế hoạch</u>
+                </strong>
+              </div>
             </div>
             <div className="sub-menu-row">
               <div>
@@ -1679,28 +1740,30 @@ const SubMenu1Detail = () => {
               </div>
             </div>
           </div>
-          <div>
-            {
-              user?.role === "principle" && <div className="sub-menu-action">
-                <div className="verify">
-                  <span>Tình trạng thẩm định:</span>
-                  <div style={{ display: "flex", columnGap: "10px" }}>
-                    <div
-                      className="action-button"
-                      onClick={handleClickOpenAccept}
-                    >
-                      Chấp thuận
-                    </div>
-                    <div className="action-button" onClick={handleClickOpenDeny}>
-                      Từ chối
-                    </div>
+          <div className="sub-menu-action">
+            <div
+              className="verify"
+              style={{
+                display:
+                  user?.role === "Principal" && document1Info?.isApprove === 2
+                    ? "flex"
+                    : "none",
+              }}
+            >
+              <span>Tình trạng thẩm định:</span>
+              {
+                <div style={{ display: "flex", columnGap: "10px" }}>
+                  <div
+                    className="action-button"
+                    onClick={handleClickOpenAccept}
+                  >
+                    Chấp thuận
+                  </div>
+                  <div className="action-button" onClick={handleClickOpenDeny}>
+                    Từ chối
                   </div>
                 </div>
-              </div>
-            }
-            <div className="sub-menu-note">
-              Ghi chú <br />
-              <textarea name="" id="" rows={8}></textarea>
+              }
             </div>
           </div>
         </>
@@ -1895,6 +1958,10 @@ const SubMenu1Detail = () => {
                   docType: 1,
                   docId: document1Info?.id,
                 });
+                alert("Thành công! Hãy chờ đợi trong giây lát để chuyển trang");
+                navigate(`/sub-menu/1`);
+
+
               } catch (error) {
                 alert("Không thể xét duyệt");
               }
@@ -1949,6 +2016,8 @@ const SubMenu1Detail = () => {
                   isApprove: 4,
                   approveBy: user?.userId,
                 });
+                alert("Thành công! Hãy chờ đợi trong giây lát để chuyển trang");
+                navigate(`/sub-menu/1`);
               } catch (error) {
                 alert("Không thể từ chối");
               }

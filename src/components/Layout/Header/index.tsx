@@ -329,8 +329,6 @@ const Header = () => {
     verifyToken();
   }, [dispatch, isLogin]);
 
-  console.log(location.pathname.split("/"));
-
   useEffect(() => {
     if (authStatus === 1) {
       setOpenlogin(false);

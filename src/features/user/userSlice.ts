@@ -80,7 +80,7 @@ interface UserState {
   authStatus: number | null;
 }
 
-const initialState = {
+const initialState: UserState = {
   user: null,
   token: '',
   isError: false,

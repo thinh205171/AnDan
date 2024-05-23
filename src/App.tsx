@@ -13,6 +13,8 @@ import ScromTypePage from './pages/ScromTypePage';
 import UploadScromPage from './pages/UploadScromPage';
 import UploadPhuLuc4Page from './pages/UploadPhuLuc4Page';
 import ApproveListPage from './pages/ApproveListPage';
+import SubMenu3List from './components/SubMenu3List';
+import SubMenu4List from './components/SubMenu4List';
 
 const App = () => {
   return (
@@ -28,9 +30,11 @@ const App = () => {
           <Route path="/sub-menu-2/detail-create" element={<SubMenu2DetailPage />} />
           <Route path="/sub-menu-2/detail-view/:index" element={<SubMenu2DetailPage />} />
           <Route path="/sub-menu-2/detail-edit/:index" element={<SubMenu2DetailPage />} />
+          <Route path="/sub-menu-3/list-view/:index" element={<SubMenu3List />} />
           <Route path="/sub-menu-3/detail-view/:index" element={<SubMenu3DetailPage />} />
           <Route path="/sub-menu-3/detail-create/:index" element={<SubMenu3DetailPage />} />
           <Route path="/sub-menu-3/detail-edit/:index" element={<SubMenu3DetailPage />} />
+          <Route path="/sub-menu-4/list-view/:index" element={<SubMenu4List />} />
           <Route path="/sub-menu-4/detail-add" element={<SubMenu4DetailPage />} />
           <Route path="/sub-menu-4/detail-view/:index" element={<SubMenu4DetailPage />} />
           <Route path="/sub-menu-4/detail-edit/:index" element={<UploadPhuLuc4Page />} />
@@ -41,6 +45,7 @@ const App = () => {
           <Route path="/bai-giang-scrom/:type" element={<ScromTypePage />} />
           <Route path="/upload-bai-giang" element={<UploadScromPage />} />
           <Route path="/upload-sub-menu-4" element={<UploadPhuLuc4Page />} />
+          <Route path="/upload-sub-menu-4/:doc1Id" element={<UploadPhuLuc4Page />} />
           <Route path="/yeu-cau-phe-duyet" element={<ApproveListPage />} />
         </Routes>
       </div>

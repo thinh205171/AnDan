@@ -247,32 +247,32 @@ const SubMenu3Detail = () => {
 
   useEffect(() => {
     const fetchSpecializedDepartmentById = async () => {
-      if (!location.pathname.includes("view")) {
-        let document1IdInit = 0;
-        if (location.pathname.includes("create"))
-          document1IdInit = parseInt(location.pathname.split("/")[3]);
-        else if (document3Info) document1IdInit = document3Info?.document1Id;
-        if (document1IdInit !== 0) {
-          const fecthDoc1 = await apiGetSubMenu1ById(document1IdInit);
-          if (fecthDoc1 && fecthDoc1.data) {
-            const doc1Data: any = fecthDoc1.data;
-            setDocument1Info(doc1Data);
-            const fecthUserResult = await apiGetUser(doc1Data?.userId);
-            if (fecthUserResult && fecthUserResult.data) {
-              const userData: any = fecthUserResult.data;
-              console.log("userData: ", userData);
-              setUserInfoDocument(userData);
-              const res = await apiGetSpecializedDepartmentById(
-                userData?.departmentId
-              );
-              if (res && res.data) {
-                const departmentData: any = res.data;
-                setSpecializedDepartment(departmentData);
-              }
+
+      let document1IdInit = 0;
+      if (location.pathname.includes("create"))
+        document1IdInit = parseInt(location.pathname.split("/")[3]);
+      else if (document3Info) document1IdInit = document3Info?.document1Id;
+      if (document1IdInit !== 0) {
+        const fecthDoc1 = await apiGetSubMenu1ById(document1IdInit);
+        if (fecthDoc1 && fecthDoc1.data) {
+          const doc1Data: any = fecthDoc1.data;
+          setDocument1Info(doc1Data);
+          const fecthUserResult = await apiGetUser(doc1Data?.userId);
+          if (fecthUserResult && fecthUserResult.data) {
+            const userData: any = fecthUserResult.data;
+            console.log("userData: ", userData);
+            setUserInfoDocument(userData);
+            const res = await apiGetSpecializedDepartmentById(
+              userData?.departmentId
+            );
+            if (res && res.data) {
+              const departmentData: any = res.data;
+              setSpecializedDepartment(departmentData);
             }
           }
         }
       }
+
     };
 
     const fetchTeachingEquipment = async () => {
@@ -432,7 +432,7 @@ const SubMenu3Detail = () => {
           note: "",
           status: true,
           approveByName: "",
-          isApprove: 1,
+          isApprove: 2,
         });
         if (post) {
           setDocumentId(post?.data?.id);
@@ -473,7 +473,7 @@ const SubMenu3Detail = () => {
         note: "",
         status: true,
         approveByName: "",
-        isApprove: 2,
+        isApprove: 1,
       });
       if (post) {
         setDocumentId(post?.data?.id);
@@ -1399,6 +1399,13 @@ const SubMenu3Detail = () => {
                     {document3Info?.userFullName}
                   </u>
                 </div>
+                <div className="right-action" onClick={() => navigate(`/sub-menu-4/list-view/${document3Info?.id}`)}>
+                  <strong>
+                    <u className="underline-blue">
+                      Xem các kế hoạch bài dạy
+                    </u>
+                  </strong>
+                </div>
               </div>
               <div className="sub-menu-row">
                 <div>
@@ -1416,6 +1423,13 @@ const SubMenu3Detail = () => {
                 <div>
                   <strong>Ngày gửi: </strong> {document3Info?.createdDate}
                 </div>
+                <div className="right-action" onClick={() => navigate(`/upload-sub-menu-4/${document3Info?.id}`)}>
+                  <strong>
+                    <u className="underline-blue">
+                      Tạo kế hoạch bài dạy
+                    </u>
+                  </strong>
+                </div>
               </div>
             </div>
             <div>
@@ -1425,7 +1439,7 @@ const SubMenu3Detail = () => {
                   <div
                     style={{
                       display:
-                        parseInt(user?.userId) === document1Info?.userId
+                        userInfoLogin?.id === document1Info?.userId && document3Info?.isApprove === 2
                           ? "flex"
                           : "none",
                       columnGap: "10px",

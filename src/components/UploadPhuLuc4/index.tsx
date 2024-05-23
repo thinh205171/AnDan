@@ -7,11 +7,12 @@ import { apiGetAllClass } from '../../api/class';
 import { apiGetSubject } from '../../api/subject';
 import { blob } from 'stream/consumers';
 import axios from 'axios';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Radio, RadioGroup, Select } from '@mui/material';
 import { useAppSelector } from '../../hook/useTypedSelector';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { apiDeleteTeachingPlanner, apiGetTeachingPlannerById, apiPostTeachingPlanner } from '../../api/teachingPlanner';
 import { apiGetSubMenu4ById, apiPostSubMenu4, apiUpdateSubMenu4 } from '../../api/subMenu4';
+import { apiGetDoc3InformationByDoc3Id } from '../../api/subMenu3';
 
 export const options: Options = {
     filename: "using-function.pdf",
@@ -22,6 +23,7 @@ export const options: Options = {
 const UploadPhuLuc4 = () => {
     const location = useLocation()
     const navigate = useNavigate()
+    const params = useParams()
     const user = useAppSelector(state => state.auth.user)
     const [subjectId, setSubjectId] = useState<number | null>(null)
     const [classId, setClassId] = useState<number | null>(null)
@@ -35,7 +37,20 @@ const UploadPhuLuc4 = () => {
     const [teachingPlannerId, setTeachingPlannerId] = useState(null);
     const [teachingPlanner, setTeachingPlanner] = useState<any>();
     const [document4Info, setDocument4Info] = useState<any>()
+    const [topicOrLesson, setTopicOrLesson] = useState("lesson")
     const isEditPath = location.pathname.includes('edit');
+
+    useEffect(() => {
+        if (params?.doc1Id) {
+            const fetchGetDoc3InformationByDoc3Id = async () => {
+                const res = await apiGetDoc3InformationByDoc3Id(params.doc1Id)
+                if (res && res.data) {
+                    setTeachingPlanner(res.data)
+                }
+            }
+            fetchGetDoc3InformationByDoc3Id()
+        }
+    }, [params.doc1Id])
 
     useEffect(() => {
         if (isEditPath) {
@@ -52,7 +67,7 @@ const UploadPhuLuc4 = () => {
     useEffect(() => {
         if (document4Info) {
             const fecthTeachingPlanner = async () => {
-                const res = await apiGetTeachingPlannerById(location.pathname.split('/')[3])
+                const res = await apiGetTeachingPlannerById(document4Info?.teachingPlannerId)
                 if (res && res.data) {
                     setTeachingPlanner(res.data)
                 }
@@ -116,8 +131,8 @@ const UploadPhuLuc4 = () => {
 
     const handleUpload = async () => {
         setOpen(true)
-        if (subjectId && classId && user) {
-            const post = await apiPostTeachingPlanner(null, { userId: user?.userId, subjectId: subjectId, classId: classId })
+        if (teachingPlanner && user) {
+            const post = await apiPostTeachingPlanner(null, { userId: user?.userId, subjectId: teachingPlanner?.document3Info?.subjectId, classId: teachingPlanner?.document3Info?.classId })
             if (post) {
                 setTeachingPlannerId(post?.data.id)
             }
@@ -135,12 +150,7 @@ const UploadPhuLuc4 = () => {
 
     const handleAddDoc4 = async () => {
         if (!isEditPath) {
-            console.log("teachingPlannerId: ", teachingPlannerId)
-            console.log("user: ", user)
-            console.log("tieuDe: ", tieuDe)
-            console.log("fileUrl: ", fileUrl)
-            console.log("avatarUrl: ", avatarUrl)
-            if (teachingPlannerId && user && tieuDe && fileUrl && avatarUrl) {
+            if (teachingPlannerId && user && teachingPlanner && fileUrl && avatarUrl) {
                 const post = await apiPostSubMenu4({ teachingPlannerId: teachingPlannerId, name: tieuDe, linkFile: fileUrl, linkImage: avatarUrl })
                 if (post) {
                     setOpen(false)
@@ -165,6 +175,8 @@ const UploadPhuLuc4 = () => {
         }
     }
 
+    console.log("teachingPlanner: ", teachingPlanner)
+
     return (
         <div className='scrom-upload-panel'>
             <div className='scrom-upload-panel-content' id='main-content'>
@@ -181,8 +193,8 @@ const UploadPhuLuc4 = () => {
                     <div className="upload-input">
                         <select id="subjects" style={{ width: "100%", height: "30px" }}
                             onChange={(e) => setSubjectId(parseInt(e.target.value))}
-                            defaultValue={teachingPlanner?.subjectId ?? ""}
-                            disabled={isEditPath ? true : false}
+                            value={teachingPlanner?.subjectId ? teachingPlanner?.subjectId : teachingPlanner?.document3Info?.subjectId ?? ""}
+                            disabled={true}
                         >
                             <option value="" disabled>Chọn môn học</option>
                             {
@@ -200,8 +212,8 @@ const UploadPhuLuc4 = () => {
                     <div className="upload-input">
                         <select id="classes" style={{ width: "100%", height: "30px" }}
                             onChange={(e) => setClassId(parseInt(e.target.value))}
-                            defaultValue={teachingPlanner?.classId ?? ""}
-                            disabled={isEditPath ? true : false}
+                            value={teachingPlanner?.classId ? teachingPlanner?.subjectId : teachingPlanner?.document3Info?.classId ?? ""}
+                            disabled={true}
                         >
                             <option value="" disabled>Chọn lớp</option>
                             {
@@ -212,14 +224,55 @@ const UploadPhuLuc4 = () => {
                         </select>
                     </div>
                 </div>
-                <div className='upload-row'>
+                {
+                    params?.doc1Id && <div className='upload-row'>
+                        <div className='upload-title'>
+                            <select
+                                onChange={(e) => {
+                                    setTopicOrLesson(e.target.value)
+                                }}
+                                value={topicOrLesson}
+                            >
+                                <option value="lesson" label="Bài giảng" />
+                                <option value="topic" label="Chuyên đề" />
+                            </select>
+                        </div>
+                        <div className="upload-input">
+                            <div>
+                                {
+                                    topicOrLesson === "lesson" ? (
+                                        <select onChange={handleTieuDeChange}>
+                                            <option value="" disabled>Chọn bài giảng</option>
+                                            {
+                                                teachingPlanner?.curriculumNames?.map((topic: any, index: number) => (
+                                                    <option value={topic} key={index}>{topic}</option>
+                                                ))
+                                            }
+                                        </select>
+                                    ) : (
+                                        <select onChange={handleTieuDeChange}>
+                                            <option value="" disabled>Chọn chuyên đề</option>
+                                            {
+                                                teachingPlanner?.selectedTopicsNames?.map((name: any, index: number) => (
+                                                    <option value={name} key={index}>{name}</option>
+                                                ))
+                                            }
+                                        </select>
+                                    )
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                {/* <div className='upload-row'>
                     <div className='upload-title'>
-                        Tiêu đề
+                        Chuyên đề
                     </div>
                     <div className="upload-input">
-                        <input type="text" value={document4Info?.name} disabled={isEditPath ? true : false} onChange={handleTieuDeChange} />
+                        <input type="text" value={document4Info?.name} disabled={!isTopic} onChange={handleTieuDeChange} />
                     </div>
-                </div>
+                </div> */}
                 <div className='upload-row'>
                     <div className='upload-title'>
                         File dữ liệu

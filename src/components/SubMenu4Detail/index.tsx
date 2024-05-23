@@ -95,10 +95,10 @@ const SubMenu4Detail = () => {
           <div className="verify" style={{ justifyContent: "center" }}>
             <div
               style={{
-                display:
-                  parseInt(user?.userId) === document4Info?.userId
-                    ? "flex"
-                    : "none",
+                // display:
+                //   parseInt(user?.userId) === document4Info?.userId
+                //     ? "flex"
+                //     : "none",
                 columnGap: "10px",
               }}
             >
